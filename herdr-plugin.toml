@@ -1,0 +1,113 @@
+# herdr-plugin.toml — manifest for the herdr words plugin.
+#
+# What it does: a small, keyboard-only vocabulary drill you can open in a
+# popup during the gaps between coding sessions. It keeps a spaced-repetition
+# schedule (a compact SM-2), three bundled wordbooks, and gets out of the way
+# in ~90 seconds.
+#
+# Design notes for whoever reads this next:
+#  - Pure Python 3 (stdlib only), so there is no [[build]] step at all. herdr
+#    resolves the relative `main.py` path against the plugin root (0.9.0+).
+#  - Actions receive no PTY, so every interactive path opens a pane through
+#    `open-pane`, which shells out to `herdr plugin pane open`.
+#  - `pane.agent_status_changed` is the only event used. `agent.idle` is not a
+#    valid event name in herdr 0.9.x (herdr warns about unknown events).
+#  - The event handler is deliberately cheap: it reads the payload, applies a
+#    throttle + quiet-hour check, and at most sparks a notification.
+
+id = "herdr.words"
+name = "herdr words"
+version = "1.0.0"
+min_herdr_version = "0.9.0"
+description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a popup, with typing recall, phonetics, and 1100+ bundled words."
+platforms = ["linux", "macos"]
+
+# Prepare state/config directories once per server start, and print a one-line
+# status into the plugin log so `herdr plugin list` failures are easy to spot.
+[[startup]]
+command = ["python3", "main.py", "startup"]
+
+# When an agent finishes and the pane goes idle, offer a short drill. The
+# handler decides whether to speak (throttle, quiet hours, daily goal) and
+# never blocks the event loop: it only runs a notification.
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "main.py", "event"]
+
+# The drill itself. `popup` is right for a break: it floats over the work,
+# does not disturb the layout, and hands focus back on Esc.
+[[panes]]
+id = "break"
+title = "herdr words"
+placement = "popup"
+width = "72%"
+height = "70%"
+command = ["python3", "main.py", "drill"]
+
+# A read-only progress view, kept open until you press Enter.
+[[panes]]
+id = "stats"
+title = "herdr words · 进度"
+placement = "popup"
+width = "80%"
+height = "85%"
+command = ["python3", "main.py", "stats", "--wait"]
+
+# --- actions -------------------------------------------------------------
+# Bind these in ~/.config/herdr/config.toml:
+#
+#   [[keys.command]]
+#   key = "prefix+w"
+#   type = "plugin_action"
+#   command = "herdr.words.drill"
+#   description = "背单词"
+#
+# Each mode gets its own action id so a single key can jump straight into
+# dictation or self-test without a menu.
+[[actions]]
+id = "drill"
+title = "Words: 开始背单词"
+description = "按记忆曲线来一组（约 90 秒）"
+command = ["python3", "main.py", "open-pane", "break", "-m", "smart"]
+
+[[actions]]
+id = "follow"
+title = "Words: 跟打"
+description = "看着单词打一遍，建立拼写手感"
+command = ["python3", "main.py", "open-pane", "break", "-m", "follow"]
+
+[[actions]]
+id = "dictation"
+title = "Words: 默写"
+description = "只看中文和挖空例句，把单词写出来"
+command = ["python3", "main.py", "open-pane", "break", "-m", "dictation"]
+
+[[actions]]
+id = "spelling"
+title = "Words: 看中文拼写"
+description = "只给中文释义，凭记忆拼出英文"
+command = ["python3", "main.py", "open-pane", "break", "-m", "spelling"]
+
+[[actions]]
+id = "selfcheck"
+title = "Words: 自测"
+description = "看见单词自评认识程度，按 1-4 打分"
+command = ["python3", "main.py", "open-pane", "break", "-m", "selfcheck"]
+
+[[actions]]
+id = "review"
+title = "Words: 错词本"
+description = "只练之前拼错过的词"
+command = ["python3", "main.py", "open-pane", "break", "-m", "review"]
+
+[[actions]]
+id = "stats"
+title = "Words: 学习进度"
+description = "今日进度、待复习数量、记忆状态分布"
+command = ["python3", "main.py", "open-pane", "stats"]
+
+[[actions]]
+id = "nudge-now"
+title = "Words: 现在提醒我"
+description = "手动触发一次提醒（忽略节流与静默时段）"
+command = ["python3", "main.py", "event", "--force"]

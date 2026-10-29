@@ -102,7 +102,8 @@ def _resolve_book(settings: Settings, state_dir: Path, override: str | None) -> 
 
 
 def _resolve_mode(settings: Settings, override: str | None) -> str:
-    mode = (override or settings.get("mode") or "smart").lower()
+    mode = (override or os.environ.get("HERDR_WORDS_MODE")
+            or settings.get("mode") or "smart").lower()
     return mode if mode in MODES else "smart"
 
 
@@ -208,7 +209,7 @@ def _meter(value: int, goal: int, width: int = 22) -> str:
 # --------------------------------------------------------------------------
 def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
               state_dir: Path) -> int:
-    book = _resolve_book(settings, state_dir, args.book)
+    book = _resolve_book(settings, state_dir, args.book or os.environ.get("HERDR_WORDS_BOOK"))
     mode = _resolve_mode(settings, args.mode)
     size = args.size or int(settings.get("session_size", 10) or 10)
     now = time.time()
@@ -372,6 +373,11 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
     print(term.style(" 开始训练: herdr words drill   ·   帮助: herdr words drill --help",
                      term.HEX["surface2"]))
     print()
+    if getattr(args, "wait", False) and sys.stdin.isatty():
+        try:
+            input(term.style(" 按回车关闭这个窗格…", term.HEX["surface2"]))
+        except EOFError:
+            pass
     return 0
 
 
@@ -539,8 +545,12 @@ def cmd_event(args: argparse.Namespace, settings: Settings, progress: Progress,
             herdr.stderr("event payload is not JSON")
             return 1
     if not payload:
-        herdr.stderr("no event payload (set HERDR_PLUGIN_EVENT_JSON or --payload)")
-        return 1
+        if not args.force:
+            herdr.stderr("no event payload (set HERDR_PLUGIN_EVENT_JSON or --payload)")
+            return 1
+        # `--force` is also used by the "nudge me now" action, which herdr
+        # dispatches without an event payload.
+        payload = {}
 
     event = os.environ.get("HERDR_PLUGIN_EVENT") or args.event or "unknown"
     status = herdr.find_status(payload)
@@ -601,6 +611,25 @@ def cmd_event(args: argparse.Namespace, settings: Settings, progress: Progress,
 
     record.update({"last": now, "status": status, "event": event})
     herdr.save_json(record_path, record)
+    return 0
+
+
+def cmd_open_pane(args: argparse.Namespace, settings: Settings, progress: Progress,
+                  state_dir: Path) -> int:
+    """Open a drill/stats pane. herdr actions get no PTY, so they call this."""
+    entrypoint = args.entrypoint or "break"
+    env: dict[str, str] = {}
+    if args.mode:
+        env["HERDR_WORDS_MODE"] = args.mode
+    if args.book:
+        env["HERDR_WORDS_BOOK"] = args.book
+    result = herdr.open_pane(entrypoint, placement=args.placement,
+                             env=env or None, focus=not args.no_focus)
+    if result is None:
+        herdr.stderr("无法打开窗格：herdr 命令失败")
+        return 1
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False))
     return 0
 
 
@@ -672,6 +701,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     stats = sub.add_parser("stats", help="查看学习进度")
     stats.add_argument("--json", action="store_true")
+    stats.add_argument("--wait", action="store_true",
+                       help="打印后等待回车（用于窗格）")
     stats.set_defaults(func=cmd_stats)
 
     books = sub.add_parser("books", help="列出词书")
@@ -704,6 +735,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     startup = sub.add_parser("startup", help="启动时准备目录（内部使用）")
     startup.set_defaults(func=cmd_startup)
+
+    open_pane = sub.add_parser("open-pane", help="在 herdr 里打开训练窗格（内部使用）")
+    open_pane.add_argument("entrypoint", nargs="?", default="break")
+    open_pane.add_argument("-m", "--mode", choices=MODES)
+    open_pane.add_argument("-b", "--book")
+    open_pane.add_argument("--placement", default="popup")
+    open_pane.add_argument("--no-focus", action="store_true")
+    open_pane.add_argument("--json", action="store_true")
+    open_pane.set_defaults(func=cmd_open_pane)
 
     doctor = sub.add_parser("doctor", help="自检环境")
     doctor.add_argument("--json", action="store_true")

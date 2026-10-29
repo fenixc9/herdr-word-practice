@@ -133,6 +133,25 @@ def _format_clock(seconds: float) -> str:
     return f"{minutes:02d}:{secs:02d}"
 
 
+def _fit(painter: Painter, limit: int) -> None:
+    """Make room for the footer by dropping padding, never content.
+
+    Small popups (or a tall verdict block) can overflow the frame. Blank rows
+    are the cheapest thing to lose, so they go first; if the card itself is too
+    tall we simply let it clip rather than lose the status line.
+    """
+    limit = max(0, limit)
+    while len(painter.rows) > limit:
+        for index in range(len(painter.rows) - 1, -1, -1):
+            if not term.strip_ansi(painter.rows[index]).strip():
+                del painter.rows[index]
+                break
+        else:
+            return
+    while len(painter.rows) < limit:
+        painter.blank(1)
+
+
 def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
                  *, streak: int = 0, today_count: int = 0, daily_goal: int = 0,
                  sound_on: bool = True, help_open: bool = False,
@@ -176,8 +195,7 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
     elif message:
         centered(painter, message, "teal")
 
-    while len(painter.rows) < height - 3:
-        painter.blank(1)
+    _fit(painter, height - 3)
     bottom_rule(painter)
     _render_status(painter, session, today_count, daily_goal, sound_on)
     _render_keys(painter, session, variant)
@@ -406,8 +424,7 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
     painter.blank(1)
     centered(painter, "下次复习  " + next_due_label(session.states), "overlay1")
 
-    while len(painter.rows) < painter.height - 2:
-        painter.blank(1)
+    _fit(painter, painter.height - 2)
     bottom_rule(painter)
     frame_footer(painter, [("⏎", "再来一组"), ("⇥", "进度"), ("esc", "退出")])
     return painter.render()
@@ -431,7 +448,6 @@ def _render_help(painter: Painter, session: DrillSession) -> list[str]:
     frame_footer(painter, [("?", "关闭"), ("esc", "退出")])
     return painter.render()
 
-
 def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     theme = painter.theme
     hint = {
@@ -450,8 +466,7 @@ def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     painter.blank(1)
     centered(painter, "换模式：  herdr words drill -m smart", "overlay1")
     centered(painter, "换词书：  herdr words books", "overlay1")
-    while len(painter.rows) < painter.height - 3:
-        painter.blank(1)
+    _fit(painter, painter.height - 3)
     bottom_rule(painter)
     _render_status(painter, session, 0, 0, True)
     frame_footer(painter, [("esc", "退出")])

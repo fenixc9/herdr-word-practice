@@ -1,0 +1,20 @@
+#!/bin/sh
+# Thin launcher so herdr can run the plugin from any cwd.
+#
+# herdr resolves a relative command against the plugin root (0.9.0+), but the
+# python module path still needs the root on sys.path — main.py handles that.
+set -e
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+root=$(dirname -- "$here")
+
+if [ -n "$HERDR_WORDS_PYTHON" ]; then
+    exec "$HERDR_WORDS_PYTHON" "$root/main.py" "$@"
+fi
+if command -v python3 >/dev/null 2>&1; then
+    exec python3 "$root/main.py" "$@"
+fi
+if command -v python >/dev/null 2>&1; then
+    exec python "$root/main.py" "$@"
+fi
+echo "herdr words: python3 not found" >&2
+exit 127
