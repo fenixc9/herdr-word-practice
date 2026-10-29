@@ -1,0 +1,281 @@
+# id=coding
+# name=程序员英语
+# name_en=Coding English
+# description=vibe coding 里天天见的技术词：看得懂日志、写得清 commit、读得顺文档。
+implement	/ˈɪmplɪment/	v.	实现	Implement the smallest change that passes the test.	实现能通过测试的最小改动。	build,carry out	
+deploy	/dɪˈplɔɪ/	v.	部署	We deploy twice a day behind a flag.	我们每天在开关后面部署两次。	release,roll out	de-（去掉）+ ploy（折叠）→ 展开部署
+refactor	/riːˈfæktər/	v.	重构	Refactor after the tests are green.	测试通过之后再重构。	restructure,rewrite	re-（再）+ factor（构成）→ 重新组织
+commit	/kəˈmɪt/	v./n.	提交；承诺	Commit one logical change at a time.	一次只提交一个逻辑改动。	submit,pledge	
+merge	/mɜːrdʒ/	v./n.	合并	Merge after the checks pass.	检查通过之后再合并。	combine,join	
+rebase	/riːˈbeɪs/	v.	变基	Rebase onto main before opening the PR.	开 PR 之前先变基到 main。	replay,reapply	
+branch	/bræntʃ/	n./v.	分支	Create a branch for the experiment.	为这个实验建一个分支。	fork,path	
+clone	/kloʊn/	v./n.	克隆	Clone the repo and run the setup script.	克隆仓库并运行安装脚本。	copy,duplicate	
+fetch	/fetʃ/	v.	拉取；获取	Fetch the latest tags first.	先拉取最新的标签。	get,retrieve	
+push	/pʊʃ/	v.	推送	Push the branch and open a pull request.	推送分支并开一个 PR。	shove,send	
+pull	/pʊl/	v./n.	拉取；拉动	Pull the latest changes before you start.	开始之前先拉取最新改动。	draw,drag	
+remote	/rɪˈmoʊt/	adj./n.	远程的；远端	Add the upstream as a second remote.	把上游添加为第二个远端。	distant,far	
+upstream	/ˌʌpˈstriːm/	n./adj.	上游	The fix landed upstream last week.	这个修复上周进了上游。	source,origin	
+fork	/fɔːrk/	n./v.	派生仓库；分叉	The fork has three extra patches.	这个派生仓库多了三个补丁。	split,branch	
+patch	/pætʃ/	n./v.	补丁；打补丁	Apply the patch to the release branch.	把补丁打到发布分支上。	fix,update	
+diff	/dɪf/	n./v.	差异；对比	Keep the diff small and readable.	让 diff 小巧易读。	difference,change	
+conflict	/ˈkɑːnflɪkt/	n./v.	冲突	The conflict is in one config file.	冲突只在一个配置文件里。	clash,dispute	
+resolve	/rɪˈzɑːlv/	v.	解决	Resolve the conflict by hand.	手动解决这个冲突。	solve,settle	
+rollback	/ˈroʊlbæk/	n./v.	回滚	Keep a rollback ready before you deploy.	部署前先准备好回滚。	revert,undo	
+revert	/rɪˈvɜːrt/	v.	还原；回复	Revert the commit if the metric drops.	指标下跌就还原这次提交。	undo,restore	
+staging	/ˈsteɪdʒɪŋ/	n.	预发环境	Staging mirrors production closely.	预发环境和生产环境很接近。	preprod,testing	
+environment	/ɪnˈvaɪrənmənt/	n.	环境	The environment variables are injected at runtime.	环境变量在运行时注入。	setting,context	
+configuration	/kənˌfɪɡjəˈreɪʃn/	n.	配置	Keep the configuration in one place.	把配置放在一个地方。	setup,settings	
+dependency	/dɪˈpendənsi/	n.	依赖	Every dependency is a supply chain risk.	每个依赖都是供应链风险。	requirement,reliance	
+package	/ˈpækɪdʒ/	n./v.	包；打包	The package has no sub-dependencies.	这个包没有子依赖。	bundle,module	
+install	/ɪnˈstɔːl/	v.	安装	Install the plugin in one command.	一条命令安装插件。	set up,add	
+compile	/kəmˈpaɪl/	v.	编译	Compile the assets once per deploy.	每次部署编译一次资源。	build,assemble	
+build	/bɪld/	v./n.	构建	The build fails on a missing type.	构建因为缺一个类型而失败。	construct,compile	
+artifact	/ˈɑːrtɪfækt/	n.	构建产物	Upload the artifact for later reuse.	上传构建产物以便复用。	output,product	
+bundle	/ˈbʌndl/	n./v.	打包文件；捆绑	The bundle is smaller than last week.	打包文件比上周小了。	package,pack	
+minify	/ˈmɪnɪfaɪ/	v.	压缩（代码）	Minify the output for production.	生产环境压缩输出。	compress,shrink	
+lint	/lɪnt/	v./n.	静态检查	The linter catches unused imports.	静态检查能抓出未使用的导入。	check,inspect	
+format	/ˈfɔːrmæt/	n./v.	格式；格式化	Format the file before committing.	提交之前先格式化文件。	layout,style	
+default	/dɪˈfɔːlt/	n./adj.	默认	The default timeout is five seconds.	默认超时是五秒。	standard,preset	
+override	/ˌoʊvərˈraɪd/	v./n.	覆盖；重写	Override the value per environment.	按环境覆盖这个值。	replace,supersede	
+inherit	/ɪnˈherɪt/	v.	继承	The child class inherits the config.	子类继承了这份配置。	derive,take over	
+interface	/ˈɪntərfeɪs/	n./v.	接口；界面	Keep the interface narrow.	让接口保持精简。	boundary,API	
+callback	/ˈkɔːlbæk/	n.	回调	The callback runs after the write.	回调在写入之后执行。	handler,hook	
+async	/eɪˈsɪŋk/	adj.	异步的	Make the call async and await it.	把调用改成异步并 await 它。	non-blocking,concurrent	
+await	/əˈweɪt/	v.	等待	Await the promise before reading the field.	读取字段之前先 await 这个 promise。	wait,suspend	
+concurrency	/kənˈkɜːrənsi/	n.	并发	Concurrency makes this bug hard to see.	并发让这个 bug 很难看出来。	parallelism,overlap	
+parallel	/ˈpærəlel/	adj.	并行的	Run the checks in parallel.	并行运行这些检查。	simultaneous,concurrent	
+sequential	/sɪˈkwenʃl/	adj.	顺序的	The steps must stay sequential.	这些步骤必须保持顺序。	ordered,serial	
+thread	/θred/	n.	线程	One thread handles the queue.	一个线程处理这个队列。	worker,line	
+mutex	/ˈmjuːteks/	n.	互斥锁	The mutex protects the counter.	这个互斥锁保护计数器。	lock,guard	mutual + exclusion
+deadlock	/ˈdedlɑːk/	n.	死锁	The deadlock came from lock ordering.	这个死锁源于加锁顺序。	standstill,stalemate	
+atomic	/əˈtɑːmɪk/	adj.	原子的	The write must be atomic.	这次写入必须是原子的。	indivisible,all-or-nothing	
+transaction	/trænˈzækʃn/	n.	事务；交易	Wrap both updates in one transaction.	把两次更新包在一个事务里。	operation,deal	
+persist	/pərˈsɪst/	v.	持久化；坚持	Persist the state to disk.	把状态持久化到磁盘。	save,continue	
+query	/ˈkwɪri/	n./v.	查询	The query scans the whole table.	这个查询会扫全表。	ask,request	
+index	/ˈɪndeks/	n./v.	索引	Add an index on the lookup column.	在查询列上加一个索引。	list,catalog	
+schema	/ˈskiːmə/	n.	表结构；模式	The schema change needs a migration.	表结构变更需要迁移。	structure,model	
+migration	/maɪˈɡreɪʃn/	n.	迁移	Run the migration before the deploy.	部署之前先跑迁移。	upgrade,transfer	
+constraint	/kənˈstreɪnt/	n.	约束	The constraint prevents duplicates.	这个约束能防止重复。	restriction,limit	
+join	/dʒɔɪn/	v./n.	连接；关联	The join on two columns is slow.	两列关联的 join 很慢。	combine,link	
+cache	/kæʃ/	n./v.	缓存	The cache hides the real latency.	缓存掩盖了真实延迟。	store,buffer	
+invalidate	/ɪnˈvælɪdeɪt/	v.	使失效	Invalidate the cache on every write.	每次写入都让缓存失效。	void,revoke	
+expire	/ɪkˈspaɪər/	v.	过期	The tokens expire after an hour.	令牌一小时后过期。	lapse,end	
+evict	/ɪˈvɪkt/	v.	驱逐；淘汰	Evict the least recently used entry.	淘汰最久未使用的条目。	eject,remove	
+stale	/steɪl/	adj.	陈旧的；过期的	The stale cache caused the weird numbers.	过期的缓存导致了奇怪的数字。	old,outdated	
+throttle	/ˈθrɑːtl/	v./n.	限流；节流	Throttle the client to one call a second.	把客户端限流到每秒一次。	limit,restrain	
+debounce	/diːˈbaʊns/	v.	防抖	Debounce the input by 200 ms.	对输入做 200 毫秒防抖。	delay,filter	
+retry	/riːˈtraɪ/	v./n.	重试	Retry with jitter and a cap.	带抖动和上限地重试。	repeat,attempt	
+backoff	/ˈbækɔːf/	n.	退避	Exponential backoff softens spikes.	指数退避能缓和尖峰。	delay,pause	
+timeout	/ˈtaɪmaʊt/	n.	超时	Set a timeout on every network call.	每个网络调用都设超时。	limit,deadline	
+idle	/ˈaɪdl/	adj./v.	空闲的	Use the idle time between tasks to drill.	用任务之间的空闲时间背单词。	inactive,free	
+queue	/kjuː/	n./v.	队列；排队	The queue drains in seconds.	队列几秒内就排空了。	line,wait	
+buffer	/ˈbʌfər/	n./v.	缓冲区	The buffer grows on slow consumers.	消费者慢的时候缓冲区会增长。	cushion,store	
+stream	/striːm/	n./v.	流；流式传输	Stream the response instead of buffering it.	流式返回，而不是缓冲整个响应。	flow,channel	
+batch	/bætʃ/	n./v.	批次；批处理	Send the events in one batch.	把这些事件批量发送。	group,set	
+chunk	/tʃʌŋk/	n.	块；分片	Split the upload into 5 MB chunks.	把上传拆成 5 MB 的块。	piece,block	
+payload	/ˈpeɪloʊd/	n.	负载；有效数据	The payload exceeds the size limit.	负载超过了大小限制。	data,body	
+header	/ˈhedər/	n.	请求头；标题	The auth header is missing.	缺少认证头。	heading,metadata	
+status	/ˈsteɪtəs/	n.	状态	The status code says it all.	状态码说明了一切。	state,condition	
+response	/rɪˈspɑːns/	n.	响应	The response is cached for a minute.	这个响应缓存一分钟。	reply,answer	
+request	/rɪˈkwest/	n./v.	请求	Every request carries a trace id.	每个请求都带一个追踪 id。	ask,query	
+endpoint	/ˈendpɔɪnt/	n.	接口端点	The endpoint rejects unsigned calls.	这个接口拒绝未签名的调用。	API,route	
+route	/ruːt/	n./v.	路由	The route matches on method and path.	路由按方法和路径匹配。	path,direct	
+handler	/ˈhændlər/	n.	处理函数	The handler returns a plain object.	这个处理函数返回一个普通对象。	callback,processor	
+middleware	/ˈmɪdlwer/	n.	中间件	Auth lives in one middleware.	认证放在一个中间件里。	layer,filter	
+proxy	/ˈprɑːksi/	n.	代理	The proxy adds the tracing header.	代理会添加追踪头。	agent,go-between	
+gateway	/ˈɡeɪtweɪ/	n.	网关	The gateway terminates TLS.	网关负责终结 TLS。	portal,bridge	
+socket	/ˈsɑːkɪt/	n.	套接字	The socket stays open for push events.	套接字为推送事件保持打开。	port,connection	
+handshake	/ˈhændʃeɪk/	n.	握手	The TLS handshake costs one round trip.	TLS 握手要花一次往返。	greeting,agreement	
+latency	/ˈleɪtənsi/	n.	延迟	The extra hop adds 20 ms of latency.	多这一跳增加了 20 毫秒延迟。	delay,lag	
+throughput	/ˈθruːpʊt/	n.	吞吐量	Throughput doubled after the fix.	修复之后吞吐量翻倍。	capacity,rate	
+bandwidth	/ˈbændwɪdθ/	n.	带宽	Compression saves bandwidth.	压缩能节省带宽。	capacity,width	
+benchmark	/ˈbentʃmɑːrk/	n./v.	基准测试	The benchmark runs on every commit.	基准测试在每次提交时运行。	baseline,standard	
+profile	/ˈproʊfaɪl/	n./v.	性能剖析	Profile before you optimize.	优化之前先做性能剖析。	analyze,outline	
+optimize	/ˈɑːptɪmaɪz/	v.	优化	Optimize the query, not the hardware.	优化查询，而不是硬件。	improve,tune	
+bottleneck	/ˈbɑːtlnek/	n.	瓶颈	The single writer is the bottleneck.	唯一的写入者是瓶颈。	obstacle,limit	
+overhead	/ˈoʊvərhed/	n.	额外开销	The wrapper adds negligible overhead.	这个包装层带来的额外开销可以忽略。	cost,burden	
+footprint	/ˈfʊtprɪnt/	n.	占用空间	The tool has a tiny memory footprint.	这个工具内存占用很小。	size,trace	
+scalable	/ˈskeɪləbl/	adj.	可扩展的	The design is scalable but complex.	这个设计可扩展，但很复杂。	expandable,flexible	
+resilient	/rɪˈzɪliənt/	adj.	有韧性的	The system is resilient to node loss.	这个系统能扛住节点丢失。	tough,adaptive	
+redundant	/rɪˈdʌndənt/	adj.	冗余的	Drop the redundant validation.	去掉多余的校验。	extra,duplicate	
+failover	/ˈfeɪloʊvər/	n.	故障转移	Failover took four seconds.	故障转移花了四秒钟。	switchover,backup	
+uptime	/ˈʌptaɪm/	n.	正常运行时间	We promise 99.9 percent uptime.	我们承诺 99.9% 的可用性。	availability,runtime	
+outage	/ˈaʊtɪdʒ/	n.	服务中断	The outage lasted seven minutes.	这次中断持续了七分钟。	downtime,blackout	
+degraded	/dɪˈɡreɪdɪd/	adj.	降级的	The service is up but degraded.	服务还在，但处于降级状态。	impaired,reduced	
+incident	/ˈɪnsɪdənt/	n.	事故；事件	The incident review is tomorrow.	事故复盘在明天。	event,accident	
+severity	/sɪˈverɪti/	n.	严重程度	Label the severity before paging anyone.	呼叫值班之前先标好严重程度。	seriousness,gravity	
+alert	/əˈlɜːrt/	n./v.	告警；提醒	The alert fired three times last night.	昨晚这个告警触发了三次。	alarm,warning
+assert	/əˈsɜːrt/	v.	断言	The test asserts the exact string.	这个测试断言了确切的字符串。	claim,affirm	
+fixture	/ˈfɪkstʃər/	n.	测试夹具	The fixture builds a fake user.	这个夹具构造了一个假用户。	setup,sample	
+mock	/mɑːk/	v./n.	模拟；模拟对象	Mock the network in the unit test.	在单元测试里模拟网络。	fake,imitate	
+stub	/stʌb/	n./v.	桩；占位实现	Replace the stub with a real client.	用真实客户端替换这个桩。	placeholder,fake	
+coverage	/ˈkʌvərɪdʒ/	n.	覆盖率	Coverage is a weak signal on its own.	覆盖率自身是个弱信号。	extent,scope	
+regression	/rɪˈɡreʃn/	n.	回归问题	The release introduced a regression.	这个版本引入了一个回归问题。	setback,decline	
+reproduce	/ˌriːprəˈduːs/	v.	复现	Reproduce the bug before you fix it.	修之前先复现这个 bug。	replicate,recreate	
+trace	/treɪs/	n./v.	追踪记录；追踪	The trace shows a hidden retry.	追踪记录显示了一次隐藏的重试。	track,follow	
+verbose	/vɜːrˈboʊs/	adj.	冗长的；详细的	Run the tool with verbose logging.	用详细日志模式运行这个工具。	wordy,detailed	
+debug	/diːˈbʌɡ/	v.	调试	Debug the failure path first.	先调试失败路径。	troubleshoot,fix	
+breakpoint	/ˈbreɪkpɔɪnt/	n.	断点	Set a breakpoint in the handler.	在处理函数里设一个断点。	pause,stop	
+stack	/stæk/	n./v.	栈；堆叠	The stack trace points at line 42.	栈追踪指向第 42 行。	pile,heap	
+heap	/hiːp/	n.	堆	A heap allocation shows up in the profile.	堆分配会在剖析里显现。	mound,pile	
+leak	/liːk/	n./v.	泄漏	A slow leak killed the pod overnight.	缓慢的泄漏一夜之间拖死了容器。	drip,escape	
+garbage	/ˈɡɑːrbɪdʒ/	n.	垃圾	The garbage collector pauses briefly.	垃圾回收会短暂停顿。	waste,trash	
+parse	/pɑːrs/	v.	解析	Parse the input with a strict grammar.	用严格的文法解析输入。	analyze,interpret	
+token	/ˈtoʊkən/	n.	令牌；词法单元	The token expires in an hour.	令牌一小时后过期。	credential,symbol	
+syntax	/ˈsɪntæks/	n.	语法	The syntax error is a missing brace.	语法错误是少了一个大括号。	grammar,structure	
+semantic	/sɪˈmæntɪk/	adj.	语义的	A semantic change breaks compatibility.	语义变更会破坏兼容性。	meaningful,logical	
+variable	/ˈveriəbl/	n./adj.	变量	Rename the variable to match its meaning.	把变量重命名成符合语义的名字。	placeholder,factor	
+constant	/ˈkɑːnstənt/	n./adj.	常量	Extract the magic number into a constant.	把魔法数字提取成常量。	fixed,steady	
+literal	/ˈlɪtərəl/	n./adj.	字面量	Prefer constants over bare literals.	优先用常量而不是裸字面量。	exact,verbatim	
+mutable	/ˈmjuːtəbl/	adj.	可变的	Shared mutable state causes bugs.	共享的可变状态会引发 bug。	changeable,variable	
+immutable	/ɪˈmjuːtəbl/	adj.	不可变的	Immutable data is easier to reason about.	不可变数据更容易推理。	fixed,unchangeable	
+pointer	/ˈpɔɪntər/	n.	指针	The pointer is null at that point.	那时指针是空的。	reference,indicator	
+reference	/ˈrefrəns/	n./v.	引用；参考	Pass the object by reference.	按引用传递这个对象。	citation,mention	
+allocate	/ˈæləkeɪt/	v.	分配	Allocate the buffer once and reuse it.	只分配一次缓冲区并复用。	assign,distribute	
+initialize	/ɪˈnɪʃəlaɪz/	v.	初始化	Initialize the client lazily.	懒初始化这个客户端。	set up,start	
+instantiate	/ɪnˈstænʃieɪt/	v.	实例化	Instantiate one client per process.	每个进程实例化一个客户端。	create,build	
+invoke	/ɪnˈvoʊk/	v.	调用	Invoke the handler only once.	只调用一次处理函数。	call,trigger	
+exception	/ɪkˈsepʃn/	n.	异常	The exception is swallowed silently.	这个异常被悄悄吞掉了。	error,anomaly	
+catch	/kætʃ/	v.	捕获	Catch specific errors, not everything.	捕获具体的错误，而不是全部。	grab,seize	
+throw	/θroʊ/	v.	抛出	Throw a typed error with a code.	抛出一个带错误码的类型化错误。	fling,raise	
+validate	/ˈvælɪdeɪt/	v.	校验	Validate at the boundary only.	只在边界处校验。	verify,check	
+sanitize	/ˈsænətaɪz/	v.	清洗；净化	Sanitize the input before rendering.	渲染之前先清洗输入。	clean,purify	
+escape	/ɪˈskeɪp/	v.	转义；逃逸	Escape the HTML entities.	转义这些 HTML 实体。	avoid,flee	
+encode	/ɪnˈkoʊd/	v.	编码	Encode the key with base64url.	用 base64url 编码这个键。	convert,cipher	
+decode	/diːˈkoʊd/	v.	解码	Decode the payload before logging it.	记录日志前先解码负载。	decipher,translate	
+serialize	/ˈsɪriəlaɪz/	v.	序列化	Serialize the state as JSON.	把状态序列化成 JSON。	convert,encode	
+deserialize	/ˌdiːˈsɪriəlaɪz/	v.	反序列化	Deserialize only trusted input.	只反序列化可信输入。	parse,decode	
+hash	/hæʃ/	n./v.	哈希	Hash the password with a salt.	用盐对密码做哈希。	digest,scramble	
+encrypt	/ɪnˈkrɪpt/	v.	加密	Encrypt the token at rest.	静态存储时加密这个令牌。	encode,scramble	
+decrypt	/diːˈkrɪpt/	v.	解密	Decrypt the payload in memory only.	只在内存里解密负载。	decode,unlock	
+signature	/ˈsɪɡnətʃər/	n.	签名	Verify the signature before parsing.	解析之前先验证签名。	sign,mark	
+authenticate	/ɔːˈθentɪkeɪt/	v.	认证	Authenticate with a signed header.	用签名头认证。	verify,validate	
+authorize	/ˈɔːθəraɪz/	v.	授权	Authorize the action, not just the user.	授权的是这个动作，而不仅是用户。	permit,allow	
+credential	/krəˈdenʃl/	n.	凭证	Rotate the credentials every ninety days.	每九十天轮换一次凭证。	secret,pass	
+permission	/pərˈmɪʃn/	n.	权限	The permission is scoped to one repo.	这个权限只限一个仓库。	authorization,right	
+scope	/skoʊp/	n./v.	范围；作用域	Keep the scope of the change small.	把改动的范围控制得小一些。	range,extent	
+role	/roʊl/	n.	角色	The role can read but not write.	这个角色可以读但不能写。	part,function	
+policy	/ˈpɑːləsi/	n.	策略；政策	The policy blocks force pushes.	这项策略禁止强制推送。	rule,guideline	
+audit	/ˈɔːdɪt/	n./v.	审计	The audit log keeps every change.	审计日志保留每一次改动。	inspect,review	
+compliance	/kəmˈplaɪəns/	n.	合规	Compliance review takes a week.	合规评审要一周。	conformity,obedience	
+vulnerable	/ˈvʌlnərəbl/	adj.	有漏洞的	The old parser is vulnerable to crafted input.	旧解析器对构造的输入有漏洞。	exposed,weak	
+exploit	/ɪkˈsplɔɪt/	v./n.	利用（漏洞）	The bug is hard to exploit but real.	这个漏洞很难利用，但确实存在。	abuse,use	
+mitigate	/ˈmɪtɪɡeɪt/	v.	缓解	Mitigate the risk with a rate limit.	用限流缓解这个风险。	reduce,ease	
+feature	/ˈfiːtʃər/	n.	功能	The feature hides behind a flag.	这个功能藏在开关后面。	function,capability	
+requirement	/rɪˈkwaɪərmənt/	n.	需求	Write the requirement as a test.	把需求写成测试。	need,specification	
+specification	/ˌspesɪfɪˈkeɪʃn/	n.	规范	The specification leaves one case open.	这份规范留下了一个未定的情况。	spec,standard	
+milestone	/ˈmaɪlstoʊn/	n.	里程碑	The milestone slipped by a week.	这个里程碑晚了一周。	marker,stage	
+deadline	/ˈdedlaɪn/	n.	截止时间	The deadline is Friday noon.	截止时间是周五中午。	due date,limit	
+sprint	/sprɪnt/	n.	迭代；冲刺	The sprint ends on Wednesday.	这个迭代周三结束。	cycle,phase	
+backlog	/ˈbæklɔːɡ/	n.	待办事项	The backlog is full of small fixes.	待办列表里全是小修复。	queue,pile	
+ticket	/ˈtɪkɪt/	n.	工单	Open a ticket with the reproduction steps.	带着复现步骤开一个工单。	issue,case	
+assign	/əˈsaɪn/	v.	分配	Assign one owner per task.	每个任务只分配一个负责人。	allocate,give	
+priority	/praɪˈɔːrəti/	n.	优先级	The priority is fixing the leak.	优先级是修好这个泄漏。	precedence,rank	
+estimate	/ˈestɪmət/	n./v.	估算	The estimate was off by a factor of two.	这个估算差了一倍。	guess,assessment	
+blocker	/ˈblɑːkər/	n.	阻塞项	The review is the only blocker.	评审是唯一的阻塞项。	obstacle,barrier	
+tradeoff	/ˈtreɪdɔːf/	n.	取舍	Every design is a tradeoff.	每个设计都是一种取舍。	compromise,balance	
+proposal	/prəˈpoʊzl/	n.	提案	The proposal needs two approvals.	这个提案需要两个批准。	suggestion,plan	
+approval	/əˈpruːvl/	n.	批准	The change is waiting for approval.	这个变更在等批准。	consent,agreement	
+feedback	/ˈfiːdbæk/	n.	反馈	Short feedback loops are precious.	短的反馈循环非常宝贵。	response,comment	
+suggestion	/səˈdʒestʃən/	n.	建议	The suggestion made the diff smaller.	这条建议让 diff 变小了。	idea,proposal	
+simplify	/ˈsɪmplɪfaɪ/	v.	简化	Simplify before you generalize.	先简化，再抽象。	streamline,ease	
+clarify	/ˈklærəfaɪ/	v.	澄清	Clarify the error message.	把这个报错信息说清楚。	explain,illuminate	
+document	/ˈdɑːkjument/	v./n.	记录；文档	Document the why, not the what.	记录为什么，而不是做什么。	record,describe	
+changelog	/ˈtʃeɪndʒlɔːɡ/	n.	更新日志	The changelog lists the breaking change.	更新日志列出了破坏性变更。	release notes,log	
+release	/rɪˈliːs/	n./v.	发布；版本	The release ships on Friday.	这个版本周五发布。	launch,version	
+version	/ˈvɜːrʒn/	n.	版本	Pin the version for reproducible builds.	锁定版本以保证可复现构建。	edition,revision	
+deprecate	/ˈdeprəkeɪt/	v.	弃用	Deprecate the field before removing it.	移除字段之前先标记弃用。	retire,phase out	
+compatibility	/kəmˌpætəˈbɪləti/	n.	兼容性	Compatibility with v1 matters here.	这里与 v1 的兼容性很重要。	consistency,interoperability	
+upgrade	/ˈʌpɡreɪd/	n./v.	升级	Upgrade one dependency at a time.	一次升级一个依赖。	improve,update	
+downgrade	/ˈdaʊnɡreɪd/	n./v.	降级	Downgrade if the metric regresses.	指标回归了就降级。	reduce,revert	
+announce	/əˈnaʊns/	v.	宣布	Announce the change before the deploy.	部署之前先宣布这个变更。	declare,notify	
+notify	/ˈnoʊtɪfaɪ/	v.	通知	Notify the on-call engineer.	通知值班工程师。	inform,alert	
+mention	/ˈmenʃn/	v./n.	提到	Mention the workaround in the README.	在 README 里提一下这个绕行方案。	refer,note	
+summarize	/ˈsʌməraɪz/	v.	总结	Summarize the incident in five lines.	用五行话总结这次事故。	condense,outline	
+outline	/ˈaʊtlaɪn/	n./v.	概要；概述	Outline the plan before coding.	写代码之前先概述计划。	sketch,summary	
+scenario	/səˈnærioʊ/	n.	场景	Test the worst-case scenario.	测试最坏情况。	case,situation	
+usage	/ˈjuːsɪdʒ/	n.	用法	The usage example is clear.	用法示例很清楚。	use,application	
+guideline	/ˈɡaɪdlaɪn/	n.	指南	The guideline says one owner per file.	指南规定每个文件只有一个负责人。	rule,advice	
+convention	/kənˈvenʃn/	n.	约定；惯例	Follow the naming convention.	遵循命名约定。	custom,standard	
+consistency	/kənˈsɪstənsi/	n.	一致性	Consistency beats cleverness.	一致性胜过聪明。	uniformity,stability	
+clarity	/ˈklærəti/	n.	清晰	Clarity is the real feature.	清晰才是真正的功能。	clearness,transparency	
+readability	/ˌriːdəˈbɪləti/	n.	可读性	Readability pays off every review.	可读性在每次评审中都有回报。	legibility,clarity	
+maintainability	/meɪnˌteɪnəˈbɪləti/	n.	可维护性	Small modules improve maintainability.	小模块能提升可维护性。	serviceability,simplicity	
+simplicity	/sɪmˈplɪsəti/	n.	简单	Simplicity is hard to achieve.	简单很难做到。	ease,plainness	
+complexity	/kəmˈpleksəti/	n.	复杂度	Complexity hides in the config.	复杂度藏在配置里。	difficulty,intricacy	
+coupling	/ˈkʌplɪŋ/	n.	耦合	Loose coupling keeps deploys independent.	松耦合让部署彼此独立。	connection,linkage	
+cohesion	/koʊˈhiːʒn/	n.	内聚	High cohesion makes files readable.	高内聚让文件更好读。	unity,consistency	
+modular	/ˈmɑːdʒələr/	adj.	模块化的	The codebase is modular and testable.	这个代码库模块化且可测试。	separable,structured	
+reusable	/ˌriːˈjuːzəbl/	adj.	可复用的	A reusable hook saves duplication.	一个可复用的 hook 能减少重复。	recyclable,shared	
+boilerplate	/ˈbɔɪlərpleɪt/	n.	样板代码	The generator removes the boilerplate.	生成器去掉了样板代码。	template,standard	
+template	/ˈtemplət/	n.	模板	Use the template for new issues.	新建 issue 时用这个模板。	pattern,model	
+snippet	/ˈsnɪpət/	n.	代码片段	Save the snippet for later reuse.	把这个片段保存下来复用。	fragment,piece	
+shortcut	/ˈʃɔːrtkʌt/	n.	快捷键；捷径	Learn one shortcut a day.	每天学一个快捷键。	hotkey,path	
+keybinding	/ˈkiːbaɪndɪŋ/	n.	键位绑定	Set a keybinding for the drill.	给训练设置一个键位绑定。	shortcut,binding	
+pane	/peɪn/	n.	窗格	Open the drill in a popup pane.	在弹出窗格里打开训练。	frame,panel	
+overlay	/ˈoʊvərleɪ/	n.	浮层	The overlay does not steal focus.	这个浮层不会抢焦点。	cover,layer	
+popup	/ˈpɑːpʌp/	n.	弹窗	The popup is 60 columns wide.	这个弹窗宽 60 列。	window,dialog	
+notification	/ˌnoʊtɪfɪˈkeɪʃn/	n.	通知	The notification appears after a long task.	长任务结束后会出现通知。	alert,message	
+interval	/ˈɪntərvl/	n.	间隔	The review interval grows with each success.	每次答对，复习间隔都会变长。	gap,period	
+repetition	/ˌrepəˈtɪʃn/	n.	重复	Spaced repetition beats rereading.	间隔重复胜过反复阅读。	recurrence,repeat	
+retention	/rɪˈtenʃn/	n.	记忆保持；保留	Retention improves with active recall.	主动回忆能提升记忆保持率。	preservation,memory	
+recall	/rɪˈkɔːl/	v./n.	回忆	Active recall is the core drill.	主动回忆是核心训练方式。	remember,retrieve	
+fluency	/ˈfluːənsi/	n.	流利	Fluency grows from daily practice.	流利来自每日练习。	smoothness,ease	
+pronunciation	/prəˌnʌnsiˈeɪʃn/	n.	发音	The pronunciation uses US phonetics.	发音使用美式音标。	articulation,accent	
+phonetic	/fəˈnetɪk/	adj.	语音的	The phonetic hint is shown after a miss.	答错之后才会显示音标提示。	sound,spoken	
+mnemonic	/nɪˈmɑːnɪk/	n./adj.	助记符；助记的	A mnemonic links the root to the meaning.	助记法把词根和含义联系起来。	memory aid,device	
+etymology	/ˌetɪˈmɑːlədʒi/	n.	词源	Etymology makes words stick.	词源能让单词记得更牢。	origin,derivation	
+synonym	/ˈsɪnənɪm/	n.	同义词	The synonym list widens your vocabulary.	同义词列表能扩大词汇量。	equivalent,alternative	
+definition	/ˌdefɪˈnɪʃn/	n.	定义	The definition fits on one line.	这个定义一行就够。	meaning,explanation	
+example	/ɪɡˈzæmpl/	n.	例子	An example is worth ten rules.	一个例子胜过十条规则。	sample,instance	
+context	/ˈkɑːntekst/	n.	上下文；语境	Words stick better in context.	单词在语境里记得更牢。	setting,background	
+progress	/ˈprɑːɡres/	n.	进度	The progress bar fills as you answer.	随着作答，进度条会填满。	advance,improvement	
+streak	/striːk/	n.	连续记录	A ten-day streak builds a habit.	连续十天能养成习惯。	run,series	
+favorite	/ˈfeɪvərɪt/	n./adj.	收藏；最爱的	Mark hard words as favorites.	把难词标记为收藏。	preferred,chosen	
+master	/ˈmæstər/	v./n.	掌握；主分支	Master the word before you move on.	掌握这个词再往下走。	learn,control	
+review	/rɪˈvjuː/	n./v.	复习	Review the missed words tomorrow.	明天复习这些错词。	revise,revisit	
+quiz	/kwɪz/	n./v.	小测验	A short quiz fits between tasks.	一个小测验适合放在任务间隙。	test,exam	
+drill	/drɪl/	n./v.	训练；操练	The drill takes ninety seconds.	这次训练只要九十秒。	practice,exercise	
+hint	/hɪnt/	n.	提示	Ask for a hint before you give up.	放弃之前先要一个提示。	clue,suggestion	
+answer	/ˈænsər/	n./v.	回答	Type the answer, then press Enter.	输入答案，然后按回车。	reply,response	
+score	/skɔːr/	n./v.	得分	The score resets every day.	得分每天重置。	point,result	
+accuracy	/ˈækjərəsi/	n.	准确率	Accuracy matters more than speed.	准确率比速度更重要。	precision,correctness	
+typo	/ˈtaɪpoʊ/	n.	拼写错误	A single typo fails the build.	一个拼写错误就能让构建失败。	mistake,error	
+autocorrect	/ˌɔːtoʊkəˈrekt/	n./v.	自动纠正	Turn off autocorrect while you type the word.	输入单词时关掉自动纠正。	fix,correct	
+muscle	/ˈmʌsl/	n.	肌肉	Typing builds muscle memory.	打字能建立肌肉记忆。	tissue,strength	
+memory	/ˈmeməri/	n.	记忆；内存	Memory fades without review.	不复习记忆就会消退。	recall,storage	
+habit	/ˈhæbɪt/	n.	习惯	A small habit beats a big plan.	一个小习惯胜过一个大计划。	routine,custom	
+motivation	/ˌmoʊtɪˈveɪʃn/	n.	动力	Progress bars feed motivation.	进度条能给动力。	drive,incentive	
+focus	/ˈfoʊkəs/	n./v.	专注	Focus on one card at a time.	一次专注一张卡。	concentrate,center	
+break	/breɪk/	n./v.	休息	Take a two-minute break between tasks.	任务之间休息两分钟。	pause,rest	
+recover	/rɪˈkʌvər/	v.	恢复	The session recovers after a crash.	会话在崩溃后会恢复。	restore,heal	
+state	/steɪt/	n./v.	状态	The state is saved on exit.	退出时会保存状态。	condition,status	
+storage	/ˈstɔːrɪdʒ/	n.	存储	The progress lives in local storage.	进度保存在本地存储里。	space,store	
+settings	/ˈsetɪŋz/	n.	设置	Open settings to change the daily goal.	打开设置修改每日目标。	preferences,config	
+option	/ˈɑːpʃn/	n.	选项	One option is enough here.	这里一个选项就够了。	choice,alternative	
+toggle	/ˈtɑːɡl/	v./n.	切换	Toggle the mode with Tab.	用 Tab 切换模式。	switch,flip	
+plugin	/ˈplʌɡɪn/	n.	插件	The plugin registers two actions.	这个插件注册了两个动作。	addon,extension	
+extension	/ɪkˈstenʃn/	n.	扩展	The extension adds a pane entrypoint.	这个扩展增加了一个窗格入口。	addon,expansion	
+entrypoint	/ˈentri pɔɪnt/	n.	入口点	Each entrypoint maps to one command.	每个入口点对应一条命令。	entry,start	
+register	/ˈredʒɪstər/	v.	注册	Register the handler at startup.	启动时注册这个处理函数。	sign up,record	
+event	/ɪˈvent/	n.	事件	The event fires when the agent goes idle.	当 agent 空闲时会触发这个事件。	occurrence,incident	
+trigger	/ˈtrɪɡər/	v./n.	触发	The event triggers a gentle nudge.	这个事件会触发一次温和的提醒。	cause,prompt	
+nudge	/nʌdʒ/	n./v.	轻推；提醒	A gentle nudge keeps the habit alive.	温和的提醒能让习惯保持下去。	push,prompt	
+reminder	/rɪˈmaɪndər/	n.	提醒	The reminder fires after 45 minutes.	提醒会在 45 分钟后触发。	prompt,notice	
+silence	/ˈsaɪləns/	n./v.	静音；沉默	Silence the reminder for tonight.	今晚把这个提醒静音。	quiet,mute	
+pronounce	/prəˈnaʊns/	v.	发音	Press Ctrl+R to hear the word pronounced.	按 Ctrl+R 听这个词的发音。	say,articulate	
+speaker	/ˈspiːkər/	n.	扬声器	The speaker reads the word aloud.	扬声器会朗读这个词。	audio,voice	
+volume	/ˈvɑːljuːm/	n.	音量；体积	Turn the volume down at night.	夜间把音量调低。	loudness,amount	
+audio	/ˈɔːdioʊ/	n./adj.	音频	Audio is optional in this drill.	这个训练里音频是可选的。	sound,voice	
+terminal	/ˈtɜːrmɪnl/	n./adj.	终端	The drill runs inside the terminal.	这个训练在终端里运行。	console,shell	
+prompt	/ˈprɑːmpt/	n./v.	提示符；促使	The prompt shows the Chinese meaning.	提示符显示中文含义。	cue,stimulus	
+cursor	/ˈkɜːrsər/	n.	光标	The cursor blinks in the input box.	光标在输入框里闪烁。	pointer,marker	
+input	/ˈɪnpʊt/	n./v.	输入	The input accepts the whole word.	输入框接受整个单词。	entry,data	
+output	/ˈaʊtpʊt/	n./v.	输出	The output is one line per word.	输出是每个单词一行。	result,product	
+panel	/ˈpænl/	n.	面板	The panel shows the daily stats.	这个面板显示当日统计。	board,pane	
+statusline	/ˈsteɪtəs laɪn/	n.	状态栏	The status line shows the streak.	状态栏显示连续天数。	bar,indicator	
+border	/ˈbɔːrdər/	n.	边框	The card has a soft border.	这张卡有一个柔和的边框。	edge,frame	
+theme	/θiːm/	n.	主题	The dark theme fits the terminal.	深色主题更适合终端。	style,design	
+contrast	/ˈkɑːntræst/	n.	对比度	The contrast is high enough to read.	对比度足够高，看得清。	difference,comparison	
+highlight	/ˈhaɪlaɪt/	v./n.	高亮	Highlight the matching letters in green.	用绿色高亮匹配的字母。	emphasize,accent	
+palette	/ˈpælət/	n.	调色板	The palette has six muted colors.	这个调色板有六种柔和的颜色。	colors,scheme

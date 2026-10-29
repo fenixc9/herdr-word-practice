@@ -1,0 +1,324 @@
+# id=cet6
+# name=CET-6 进阶
+# name_en=CET-6 Advanced
+# description=六级进阶词：写作和阅读里的加分项，也是技术文档里的常客。
+abolish	/əˈbɑːlɪʃ/	v.	废除；取消	The team abolished the weekly status meeting.	团队取消了每周状态会。	end,revoke	ab-（离开）+ olish → 使消失
+abrupt	/əˈbrʌpt/	adj.	突然的；生硬的	The service had an abrupt restart.	服务突然重启了。	sudden,sharp	
+absurd	/əbˈsɜːrd/	adj.	荒谬的；荒唐的	The workaround felt absurd but worked.	这个绕行方案很荒唐，但确实有效。	ridiculous,silly	
+accelerate	/əkˈseləreɪt/	v.	加速；促进	Caching accelerated the release cycle.	缓存加速了发布周期。	speed up,hasten	
+accumulate	/əˈkjuːmjəleɪt/	v.	积累；堆积	Debt accumulates silently.	技术债会悄悄积累。	build up,collect	
+acute	/əˈkjuːt/	adj.	尖锐的；急性的	The team felt acute pressure before launch.	发布前团队感到巨大的压力。	sharp,severe	
+adhere	/ədˈhɪr/	v.	坚持；遵守	Adhere to the style guide.	遵守这份风格指南。	follow,stick	
+adjacent	/əˈdʒeɪsnt/	adj.	相邻的；邻近的	The two panes are adjacent.	这两个窗格是相邻的。	next to,neighboring	
+advocate	/ˈædvəkeɪt/	v./n.	提倡；拥护者	She advocates smaller pull requests.	她提倡更小的 PR。	support,champion	
+aesthetic	/esˈθetɪk/	n./adj.	美感；审美的	The panel has a clean aesthetic.	这个面板有一种简洁的美感。	style,taste	
+ambiguous	/æmˈbɪɡjuəs/	adj.	模棱两可的；含糊的	The error message is ambiguous.	这个报错信息很含糊。	unclear,vague	
+amend	/əˈmend/	v.	修改；修订	Amend the RFC before the vote.	投票之前修订这份 RFC。	revise,change	
+analogy	/əˈnælədʒi/	n.	类比；比喻	Use an analogy to explain the cache.	用类比解释缓存。	comparison,parallel	
+anticipate	/ænˈtɪsɪpeɪt/	v.	预料；预期	Anticipate the failure modes.	预料可能出现的失败模式。	expect,foresee	
+arbitrary	/ˈɑːrbɪtreri/	adj.	任意的；武断的	Avoid arbitrary limits.	避免随意设定的限制。	random,capricious	
+articulate	/ɑːrˈtɪkjuleɪt/	v./adj.	清晰表达；口齿清楚的	She articulated the trade-off clearly.	她清楚地表达了取舍。	express,clear	
+aspiration	/ˌæspəˈreɪʃn/	n.	抱负；渴望	His aspiration is to write simple code.	他的抱负是写简单的代码。	ambition,goal	
+assert	/əˈsɜːrt/	v.	断言；坚持	The test asserts the exact output.	这个测试断言了确切的输出。	claim,insist	
+attribute	/əˈtrɪbjuːt/	v./n.	归因于；属性	Attribute the slowdown to the new query.	把变慢归因于新查询。	ascribe,property	
+authentic	/ɔːˈθentɪk/	adj.	真实的；可信的	The demo used authentic data.	这个演示用了真实数据。	genuine,real	
+autonomy	/ɔːˈtɑːnəmi/	n.	自主权；自治	Give each team autonomy over its stack.	让每个团队自主决定技术栈。	independence,freedom	
+auxiliary	/ɔːɡˈzɪliəri/	adj.	辅助的；备用的	The auxiliary node takes over on failure.	备用节点会在故障时接管。	backup,secondary	
+benchmark	/ˈbentʃmɑːrk/	n./v.	基准；基准测试	The benchmark is reproducible.	这个基准测试是可复现的。	standard,baseline	
+breach	/briːtʃ/	n./v.	违反；泄露	The breach exposed session tokens.	这次泄露暴露了会话令牌。	violation,leak	
+brittle	/ˈbrɪtl/	adj.	脆弱的；易碎的	The test is brittle because it depends on time.	这个测试依赖时间，很脆弱。	fragile,unstable	
+capability	/ˌkeɪpəˈbɪləti/	n.	能力；功能	The plugin has offline capability.	这个插件具备离线能力。	ability,feature	
+chronic	/ˈkrɑːnɪk/	adj.	长期的；慢性的	The chronic flakiness slowed the team.	长期的不稳定拖慢了团队。	persistent,long-term	
+coherent	/koʊˈhɪrənt/	adj.	连贯的；一致的	The design is coherent across screens.	这个设计在各屏幕上都很一致。	consistent,logical	
+coincide	/ˌkoʊɪnˈsaɪd/	v.	同时发生；一致	The spike coincided with the deploy.	这个尖峰和部署同时发生。	overlap,match	
+collaborate	/kəˈlæbəreɪt/	v.	合作；协作	We collaborate through pull requests.	我们通过 PR 协作。	cooperate,team up	
+commence	/kəˈmens/	v.	开始；着手	The migration commences at midnight.	迁移在午夜开始。	begin,start	
+commodity	/kəˈmɑːdəti/	n.	商品；日用品	Compute is becoming a commodity.	算力正在变成一种商品。	goods,product	
+compel	/kəmˈpel/	v.	强迫；迫使	The outage compelled a redesign.	这次宕机迫使重新设计。	force,oblige	
+compensate	/ˈkɑːmpenseɪt/	v.	补偿；弥补	Compensate for the clock skew.	补偿时钟偏移。	offset,make up	
+competent	/ˈkɑːmpɪtənt/	adj.	有能力的；称职的	She is a competent reviewer.	她是一位称职的评审者。	capable,skilled	
+compile	/kəmˈpaɪl/	v.	编译；汇编	Compile the assets once per deploy.	每次部署编译一次资源。	build,assemble	
+complement	/ˈkɑːmplɪment/	v./n.	补充；互补	The two tools complement each other.	这两个工具互相补充。	complete,enhance	
+comply	/kəmˈplaɪ/	v.	遵守；服从	The service complies with the standard.	这个服务符合标准。	follow,obey	
+conceive	/kənˈsiːv/	v.	构想；设想	She conceived the plugin in a weekend.	她用一个周末构思了这个插件。	imagine,devise	
+concise	/kənˈsaɪs/	adj.	简洁的；简明的	Keep the README concise.	让 README 保持简洁。	brief,succinct	
+condense	/kənˈdens/	v.	压缩；浓缩	Condense the log into a summary.	把日志浓缩成一份总结。	compress,shorten	
+confine	/kənˈfaɪn/	v.	限制；局限	Confine the change to one module.	把改动限制在一个模块内。	restrict,limit	
+conform	/kənˈfɔːrm/	v.	符合；遵守	Conform to the naming convention.	遵循命名约定。	comply,match	
+consecutive	/kənˈsekjətɪv/	adj.	连续的；接连的	Three consecutive failures triggered the alert.	连续三次失败触发了告警。	successive,running	
+consensus	/kənˈsensəs/	n.	共识	The team reached a consensus quickly.	团队很快达成了共识。	agreement,accord	
+conserve	/kənˈsɜːrv/	v.	节省；保护	Conserve battery in background mode.	在后台模式下节省电量。	save,preserve	
+consolidate	/kənˈsɑːlɪdeɪt/	v.	合并；巩固	Consolidate the duplicated helpers.	把重复的辅助函数合并。	merge,strengthen	
+constitute	/ˈkɑːnstɪtuːt/	v.	构成；组成	Three failures constitute a pattern.	三次失败就构成一个模式。	form,make up	
+contradict	/ˌkɑːntrəˈdɪkt/	v.	反驳；矛盾	The logs contradict the report.	日志与报告相互矛盾。	deny,conflict	
+controversial	/ˌkɑːntrəˈvɜːrʃl/	adj.	有争议的	The naming choice was controversial.	这个命名选择存在争议。	debatable,disputed	
+converge	/kənˈvɜːrdʒ/	v.	汇聚；趋于一致	The two designs converged after review.	评审之后两个设计趋于一致。	meet,unite	
+convey	/kənˈveɪ/	v.	传达；表达	The UI conveys progress clearly.	这个界面清楚地传达了进度。	communicate,express	
+conviction	/kənˈvɪkʃn/	n.	信念；定罪	She spoke with conviction about testing.	她谈到测试时充满信念。	belief,certainty	
+correlate	/ˈkɔːrəleɪt/	v.	相关；关联	Latency correlates with payload size.	延迟与负载大小相关。	relate,connect	
+corrupt	/kəˈrʌpt/	v./adj.	损坏；腐败的	The crash corrupted the index file.	崩溃损坏了索引文件。	damage,debase	
+counterpart	/ˈkaʊntərpɑːrt/	n.	对应物；同行	The Python counterpart is slower.	Python 版本的对应实现更慢。	equivalent,match	
+credible	/ˈkredəbl/	adj.	可信的；可靠的	The benchmark is credible and repeatable.	这个基准测试可信且可重复。	believable,reliable	
+criterion	/kraɪˈtɪriən/	n.	标准；准则	Define the acceptance criterion first.	先定义验收标准。	standard,benchmark	
+crucial	/ˈkruːʃl/	adj.	关键的；至关重要的	The retry is crucial for mobile users.	重试对移动端用户至关重要。	critical,vital	
+cumulative	/ˈkjuːmjələtɪv/	adj.	累积的	The cumulative delay reached a second.	累积延迟达到了一秒。	accumulated,total	
+deteriorate	/dɪˈtɪriəreɪt/	v.	恶化；退化	Performance deteriorated after the release.	发布之后性能恶化了。	worsen,decline	
+deviate	/ˈdiːvieɪt/	v.	偏离；背离	Do not deviate from the protocol.	不要偏离协议。	diverge,stray	
+diminish	/dɪˈmɪnɪʃ/	v.	减少；降低	Returns diminish after the third cache.	到第三层缓存后收益就减少了。	decrease,reduce	
+discard	/dɪsˈkɑːrd/	v.	丢弃；抛弃	Discard the stale cache entries.	丢弃过期的缓存条目。	throw away,drop	
+discrete	/dɪˈskriːt/	adj.	离散的；分开的	The state moves in discrete steps.	状态按离散步骤变化。	separate,distinct	
+disperse	/dɪˈspɜːrs/	v.	分散；消散	Disperse the load across nodes.	把负载分散到各节点。	scatter,spread	
+disrupt	/dɪsˈrʌpt/	v.	打断；扰乱	The deploy disrupted live sessions.	这次部署打断了进行中的会话。	interrupt,disturb	
+diverse	/daɪˈvɜːrs/	adj.	多样的；不同的	The team has diverse backgrounds.	团队背景多样。	varied,different	
+drastic	/ˈdræstɪk/	adj.	剧烈的；激进的	A drastic cut fixed the latency.	一次大幅削减解决了延迟。	extreme,severe	
+elevate	/ˈelɪveɪt/	v.	提升；提高	Elevate the design to a first-class concern.	把设计提升为一等公民。	raise,lift	
+embed	/ɪmˈbed/	v.	嵌入；内置	Embed the docs in the binary.	把文档嵌入二进制文件。	insert,integrate	
+empirical	/ɪmˈpɪrɪkl/	adj.	经验的；实证的	We need empirical evidence, not opinions.	我们需要实证证据，而不是意见。	observed,practical	
+endeavor	/ɪnˈdevər/	n./v.	努力；尝试	The rewrite was a long endeavor.	这次重写是一项长期努力。	effort,attempt	
+endorse	/ɪnˈdɔːrs/	v.	支持；背书	The maintainers endorsed the plan.	维护者们支持这个方案。	support,approve	
+enforce	/ɪnˈfɔːrs/	v.	强制执行	Enforce the rule in CI.	在 CI 里强制执行这条规则。	impose,apply	
+enrich	/ɪnˈrɪtʃ/	v.	丰富；充实	Enrich the logs with request ids.	给日志补充请求 id。	enhance,improve	
+entail	/ɪnˈteɪl/	v.	需要；牵涉	The change entails a full resync.	这个变更需要完整重新同步。	involve,require	
+equivalent	/ɪˈkwɪvələnt/	adj./n.	等价的；等价物	The two forms are equivalent.	这两种形式是等价的。	equal,comparable	
+erode	/ɪˈroʊd/	v.	侵蚀；削弱	Constant exceptions erode trust.	频繁的例外会侵蚀信任。	wear away,weaken	
+escalate	/ˈeskəleɪt/	v.	升级；加剧	Escalate the alert after five minutes.	五分钟后再升级这个告警。	intensify,raise	
+evoke	/ɪˈvoʊk/	v.	唤起；引起	The icon evokes a sense of speed.	这个图标让人想到速度。	arouse,summon	
+exceed	/ɪkˈsiːd/	v.	超过；超越	The payload exceeds the limit.	负载超过了限制。	surpass,beat	
+exempt	/ɪɡˈzempt/	adj./v.	豁免的；免除	Generated files are exempt from review.	生成的文件免于评审。	excused,free	
+exert	/ɪɡˈzɜːrt/	v.	施加；运用	The load exerts pressure on the pool.	负载给连接池施加压力。	apply,exercise	
+exhaust	/ɪɡˈzɔːst/	v./n.	耗尽；排气	The retries exhaust the connection pool.	重试会耗尽连接池。	use up,drain	
+explicit	/ɪkˈsplɪsɪt/	adj.	明确的；显式的	Make the contract explicit.	把契约写明确。	clear,definite	
+facilitate	/fəˈsɪlɪteɪt/	v.	促进；使便利	Good tooling facilitates review.	好的工具能促进评审。	ease,enable	
+feasible	/ˈfiːzəbl/	adj.	可行的；可能的	The plan is feasible by Friday.	这个计划周五前可行。	possible,viable	
+fluctuate	/ˈflʌktʃueɪt/	v.	波动；起伏	Latency fluctuates during peak hours.	高峰时段延迟会波动。	vary,swing	
+formulate	/ˈfɔːrmjuleɪt/	v.	制定；构想	Formulate the rule as a predicate.	把规则构造成一个谓词。	devise,express	
+foster	/ˈfɔːstər/	v.	培养；促进	Short reviews foster trust.	短评审能培养信任。	encourage,nurture	
+fragment	/ˈfræɡmənt/	n./v.	碎片；分裂	The log is split into fragments.	日志被拆成多个片段。	piece,break	
+framework	/ˈfreɪmwɜːrk/	n.	框架；结构	The framework hides the complexity.	这个框架隐藏了复杂度。	structure,system	
+gauge	/ɡeɪdʒ/	v./n.	衡量；仪表	Gauge the impact with a quick test.	用一个小测试衡量影响。	measure,meter	
+grasp	/ɡræsp/	v./n.	理解；抓住	Grasp the flow before changing it.	改之前先理解流程。	understand,grip	
+hierarchy	/ˈhaɪərɑːrki/	n.	层级；等级	The component hierarchy is shallow.	组件层级很浅。	order,ranking	
+identical	/aɪˈdentɪkl/	adj.	完全相同的	The two responses are identical.	这两个响应完全相同。	same,equal	
+incentive	/ɪnˈsentɪv/	n.	激励；动机	There is no incentive to over-optimize.	没有理由过度优化。	motivation,reward	
+incline	/ɪnˈklaɪn/	v./n.	倾向于；斜坡	I incline toward the simpler option.	我倾向于更简单的方案。	tend,lean	
+incorporate	/ɪnˈkɔːrpəreɪt/	v.	纳入；合并	Incorporate the feedback into the design.	把反馈纳入设计。	include,integrate	
+indispensable	/ˌɪndɪˈspensəbl/	adj.	不可或缺的	Tests are indispensable for refactoring.	测试对重构不可或缺。	essential,vital	
+induce	/ɪnˈduːs/	v.	引起；诱导	The retry can induce a storm.	重试可能引发风暴。	cause,trigger	
+infer	/ɪnˈfɜːr/	v.	推断；推论	We can infer the cause from the gap.	我们可以从这段间隔推断原因。	deduce,conclude	
+inherent	/ɪnˈhɪrənt/	adj.	固有的；内在的	Race conditions are inherent to shared state.	竞态条件是共享状态固有的问题。	intrinsic,built-in	
+inhibit	/ɪnˈhɪbɪt/	v.	抑制；阻碍	Strict limits inhibit experimentation.	严格限制会阻碍实验。	restrain,block	
+initiate	/ɪˈnɪʃieɪt/	v.	发起；开始	Initiate the rollback now.	现在发起回滚。	start,begin	
+innovative	/ˈɪnəveɪtɪv/	adj.	创新的	The approach is simple, not innovative.	这个方法很简单，并不创新。	creative,novel	
+integral	/ˈɪntɪɡrəl/	adj.	不可或缺的；积分的	Review is integral to the process.	评审是流程中不可分割的一部分。	essential,built-in	
+integrate	/ˈɪntɪɡreɪt/	v.	集成；整合	Integrate the service with the queue.	把这个服务与队列集成。	combine,merge	
+integrity	/ɪnˈteɡrəti/	n.	完整性；正直	Verify the data integrity after the migration.	迁移后校验数据完整性。	wholeness,honesty	
+intricate	/ˈɪntrɪkət/	adj.	复杂的；错综的	The retry logic is more intricate than it looks.	重试逻辑比看起来更复杂。	complex,elaborate	
+intrinsic	/ɪnˈtrɪnzɪk/	adj.	内在的；本质的	The delay is intrinsic to the design.	这个延迟是设计本身固有的。	inherent,essential	
+invoke	/ɪnˈvoʊk/	v.	调用；援引	Invoke the handler only once.	只调用一次处理函数。	call,trigger	
+legacy	/ˈleɡəsi/	n./adj.	遗留系统；旧版	The legacy endpoint still gets traffic.	旧接口仍在接收流量。	old,inherited	
+leverage	/ˈlevərɪdʒ/	v./n.	利用；杠杆	Leverage the existing cache.	利用现有的缓存。	use,exploit	
+magnitude	/ˈmæɡnɪtuːd/	n.	幅度；量级	The fix reduced the error by an order of magnitude.	这个修复把错误降低了一个数量级。	scale,size	
+mandatory	/ˈmændətɔːri/	adj.	强制的；必修的	Two approvals are mandatory.	必须有两个批准。	required,compulsory	
+manifest	/ˈmænɪfest/	v./adj./n.	显现；明显的；清单	The bug manifests only at midnight.	这个 bug 只在午夜显现。	appear,obvious	
+manipulate	/məˈnɪpjuleɪt/	v.	操作；操纵	Manipulate the DOM directly.	直接操作 DOM。	handle,control	
+mediate	/ˈmiːdieɪt/	v.	调解；斡旋	A queue mediates between the services.	队列在两个服务之间做中介。	arbitrate,intervene	
+minimal	/ˈmɪnɪml/	adj.	最小的；极简的	A minimal fix is easier to review.	最小修复更容易评审。	least,small	
+negligible	/ˈneɡlɪdʒəbl/	adj.	微不足道的	The overhead is negligible.	这个开销微不足道。	tiny,minor	
+neutral	/ˈnuːtrəl/	adj.	中立的；中性的	Keep the error message neutral.	让报错信息保持中立。	impartial,plain	
+notion	/ˈnoʊʃn/	n.	概念；想法	The notion of ownership matters.	归属权的概念很重要。	idea,concept	
+notorious	/noʊˈtɔːriəs/	adj.	臭名昭著的	This is a notorious flaky test.	这是一个出了名不稳定的测试。	infamous,famous	
+novel	/ˈnɑːvl/	adj./n.	新颖的；小说	The approach is novel but risky.	这个方法新颖但有风险。	new,original	
+nuance	/ˈnuːɑːns/	n.	细微差别	The nuance matters in error messages.	报错信息里的细微差别很重要。	subtlety,shade	
+obsolete	/ˌɑːbsəˈliːt/	adj.	过时的；废弃的	The flag is obsolete now.	这个开关现在已经废弃了。	outdated,unused	
+offset	/ˈɔːfset/	v./n.	抵消；补偿	Caching offsets the extra hop.	缓存抵消了多出的那一跳。	compensate,balance	
+ongoing	/ˈɑːnɡoʊɪŋ/	adj.	持续进行的	The migration is ongoing.	迁移仍在进行中。	continuing,current	
+orientation	/ˌɔːriənˈteɪʃn/	n.	方向；定位	The sidebar orientation is vertical.	侧边栏方向是垂直的。	direction,position	
+overlap	/ˌoʊvərˈlæp/	v./n.	重叠；交叉	The two cache layers overlap.	两层缓存有重叠。	intersect,cover	
+overwhelm	/ˌoʊvərˈwelm/	v.	压垮；使不知所措	Too many options overwhelm new users.	选项太多会让新用户不知所措。	swamp,overpower	
+parallel	/ˈpærəlel/	adj./n.	平行的；并行	Run the checks in parallel.	并行运行这些检查。	simultaneous,alongside	
+peculiar	/pɪˈkjuːliər/	adj.	奇怪的；特有的	The bug has a peculiar trigger.	这个 bug 有一个奇怪的触发条件。	odd,distinctive	
+perceive	/pərˈsiːv/	v.	察觉；认为	Users perceive the delay as a freeze.	用户把这个延迟感知成卡死。	notice,view	
+peripheral	/pəˈrɪfərəl/	adj./n.	外围的；次要的	Keep the peripheral logic separate.	把外围逻辑分开。	outer,secondary	
+persist	/pərˈsɪst/	v.	坚持；持久化	The setting persists across restarts.	这个设置会跨重启保留。	continue,remain	
+perspective	/pərˈspektɪv/	n.	视角；观点	From the user's perspective, it is broken.	从用户视角看，它就是坏了。	viewpoint,angle	
+phase	/feɪz/	n./v.	阶段；分阶段实施	The rollout happens in three phases.	这次发布分三个阶段。	stage,step	
+phenomenon	/fəˈnɑːmɪnən/	n.	现象	The spike is a known phenomenon.	这个尖峰是已知现象。	event,occurrence	
+portion	/ˈpɔːrʃn/	n.	部分；份额	A small portion of requests fail.	有一小部分请求失败。	part,share	
+predictable	/prɪˈdɪktəbl/	adj.	可预测的	Predictable systems are easier to debug.	可预测的系统更容易调试。	reliable,expected	
+preliminary	/prɪˈlɪmɪneri/	adj.	初步的	The preliminary numbers look good.	初步数据看起来不错。	initial,early	
+presume	/prɪˈzuːm/	v.	假定；推测	Do not presume the cache is warm.	不要假定缓存已经热了。	assume,suppose	
+prevail	/prɪˈveɪl/	v.	盛行；获胜	The simpler design prevailed.	更简单的设计胜出了。	win,dominate	
+prominent	/ˈprɑːmɪnənt/	adj.	显著的；突出的	Put the warning in a prominent place.	把警告放在显眼的位置。	noticeable,leading	
+prompt	/prɑːmpt/	adj./v./n.	及时的；促使；提示	The prompt appears before the first word.	第一张卡之前会出现提示。	quick,cue	
+prone	/proʊn/	adj.	易于……的；倾向于	This code is prone to race conditions.	这段代码容易出现竞态条件。	likely,inclined	
+prospect	/ˈprɑːspekt/	n.	前景；可能性	The prospect of a rewrite is daunting.	重写的前景令人望而生畏。	possibility,outlook	
+protocol	/ˈproʊtəkɔːl/	n.	协议；规程	The protocol uses binary frames.	这个协议使用二进制帧。	procedure,standard	
+provision	/prəˈvɪʒn/	n./v.	供给；条款	The provision covers three regions.	这项条款覆盖三个区域。	supply,clause	
+proximity	/prɑːkˈsɪməti/	n.	接近；邻近	Place the metrics near the chart.	把指标放在图表附近。	closeness,nearby	
+prune	/pruːn/	v.	修剪；删减	Prune unused dependencies monthly.	每月清理未使用的依赖。	trim,cut	
+radical	/ˈrædɪkl/	adj.	激进的；根本的	A radical rewrite is not needed.	不需要彻底重写。	extreme,fundamental	
+rationale	/ˌræʃəˈnæl/	n.	理由；原理	Document the rationale behind the flag.	记录这个开关背后的理由。	reason,basis	
+reciprocal	/rɪˈsɪprəkl/	adj.	互惠的；相互的	The integration is reciprocal.	这个集成是双向的。	mutual,shared	
+reconcile	/ˈrekənsaɪl/	v.	调和；核对	Reconcile the local state with the server.	把本地状态与服务器对齐。	settle,harmonize	
+refine	/rɪˈfaɪn/	v.	改进；提炼	Refine the wording of the error.	改进这个报错的措辞。	improve,polish	
+reinforce	/ˌriːɪnˈfɔːrs/	v.	加强；强化	Reinforce the habit with a daily goal.	用每日目标强化这个习惯。	strengthen,support	
+relevant	/ˈreləvənt/	adj.	相关的	Show only relevant logs.	只显示相关的日志。	related,applicable	
+reluctant	/rɪˈlʌktənt/	adj.	不情愿的	The team is reluctant to rewrite.	团队不愿重写。	unwilling,hesitant	
+render	/ˈrendər/	v.	渲染；呈现	Render the list in one pass.	一次遍历渲染这个列表。	draw,display	
+resemble	/rɪˈzembl/	v.	类似；像	The two APIs resemble each other.	这两个 API 很相似。	look like,mirror	
+restrain	/rɪˈstreɪn/	v.	抑制；约束	Restrain the retry rate.	限制重试速率。	limit,hold back	
+revenue	/ˈrevənuː/	n.	收入；收益	The feature pays for itself in revenue.	这个功能带来的收入足以覆盖成本。	income,earnings	
+rigid	/ˈrɪdʒɪd/	adj.	僵硬的；严格的	The rigid schema blocks small changes.	僵化的表结构阻碍了小改动。	stiff,strict	
+rigorous	/ˈrɪɡərəs/	adj.	严格的；严谨的	Rigorous testing pays off.	严谨的测试会有回报。	thorough,strict	
+scenario	/səˈnærioʊ/	n.	情景；场景	Test the failure scenario first.	先测试失败场景。	case,situation	
+scrutiny	/ˈskruːtəni/	n.	仔细审查	The change survived close scrutiny.	这个变更经受住了仔细审查。	examination,inspection	
+sequence	/ˈsiːkwəns/	n./v.	顺序；序列	Run the steps in sequence.	按顺序执行这些步骤。	order,series	
+simulate	/ˈsɪmjuleɪt/	v.	模拟	Simulate the network failure locally.	在本地模拟网络故障。	imitate,replicate	
+simultaneous	/ˌsaɪmlˈteɪniəs/	adj.	同时的	The two events were simultaneous.	这两个事件同时发生。	concurrent,parallel	
+sophisticated	/səˈfɪstɪkeɪtɪd/	adj.	复杂的；精密的	The algorithm is sophisticated but slow.	这个算法很精密，但很慢。	advanced,complex	
+sparse	/spɑːrs/	adj.	稀疏的	The matrix is sparse.	这个矩阵是稀疏的。	thin,scattered	
+stimulate	/ˈstɪmjuleɪt/	v.	刺激；促进	Small wins stimulate progress.	小胜利能促进进展。	encourage,inspire	
+subsequent	/ˈsʌbsɪkwənt/	adj.	随后的；后续的	Subsequent calls hit the cache.	后续调用会命中缓存。	following,later	
+subtle	/ˈsʌtl/	adj.	微妙的；细微的	The bug is subtle and rare.	这个 bug 很微妙且罕见。	slight,fine	
+suspend	/səˈspend/	v.	暂停；挂起	Suspend the job during the migration.	迁移期间暂停这个任务。	pause,halt	
+tangible	/ˈtændʒəbl/	adj.	切实的；有形的	The change brought tangible benefits.	这个变更带来了切实的好处。	real,concrete	
+tedious	/ˈtiːdiəs/	adj.	乏味的；冗长的	Manual testing is tedious.	手动测试很乏味。	boring,dull	
+tentative	/ˈtentətɪv/	adj.	试探性的；暂定的	The schedule is tentative.	日程是暂定的。	provisional,unconfirmed	
+thorough	/ˈθɜːroʊ/	adj.	彻底的；详尽的	A thorough review caught the bug.	彻底的评审抓住了这个 bug。	complete,detailed	
+threshold	/ˈθreʃhoʊld/	n.	阈值；门槛	Alert when the error rate crosses the threshold.	错误率越过阈值时告警。	limit,bar	
+tolerate	/ˈtɑːləreɪt/	v.	容忍；耐受	The parser tolerates trailing commas.	这个解析器容忍尾随逗号。	allow,bear	
+tremendous	/trəˈmendəs/	adj.	巨大的；极好的	The rewrite was a tremendous effort.	这次重写付出了巨大的努力。	huge,great	
+trigger	/ˈtrɪɡər/	v./n.	触发；起因	The cron triggers the cleanup.	定时任务触发清理。	cause,prompt	
+ultimate	/ˈʌltɪmət/	adj.	最终的；根本的	The ultimate goal is trust.	最终目标是信任。	final,supreme	
+undergo	/ˌʌndərˈɡoʊ/	v.	经历；接受	The service underwent a major upgrade.	这个服务经历了一次大升级。	experience,endure	
+underlying	/ˌʌndərˈlaɪɪŋ/	adj.	潜在的；底层的	Fix the underlying cause.	修复底层原因。	basic,root	
+undertake	/ˌʌndərˈteɪk/	v.	承担；着手	We undertook the migration in phases.	我们分阶段承担了这次迁移。	take on,begin	
+uniform	/ˈjuːnɪfɔːrm/	adj./n.	统一的；制服	Keep the error format uniform.	让错误格式保持统一。	consistent,even	
+utilize	/ˈjuːtəlaɪz/	v.	利用；使用	Utilize the idle capacity at night.	夜间利用空闲容量。	use,employ	
+vanish	/ˈvænɪʃ/	v.	消失；不见	The warning vanished after restart.	重启后警告消失了。	disappear,fade	
+variable	/ˈveriəbl/	adj./n.	可变的；变量	Network latency is highly variable.	网络延迟变化很大。	changeable,factor	
+viable	/ˈvaɪəbl/	adj.	可行的	The simpler plan is viable.	更简单的方案是可行的。	feasible,workable	
+vigorous	/ˈvɪɡərəs/	adj.	有力的；强健的	Vigorous testing found the edge case.	高强度的测试发现了边界情况。	strong,energetic	
+virtual	/ˈvɜːrtʃuəl/	adj.	虚拟的	The virtual list renders only visible rows.	虚拟列表只渲染可见行。	simulated,digital	
+vital	/ˈvaɪtl/	adj.	至关重要的	Clear errors are vital for adoption.	清晰的报错对推广至关重要。	essential,critical	
+vivid	/ˈvɪvɪd/	adj.	生动的；鲜明的	A vivid error message helps.	生动的报错信息有帮助。	bright,clear	
+whereas	/werˈæz/	conj.	然而；反之	Reads are cheap, whereas writes are costly.	读很便宜，而写很昂贵。	while,but	
+widespread	/ˈwaɪdspred/	adj.	广泛的；普遍的	The pattern is widespread in legacy code.	这个模式在遗留代码中很普遍。	common,extensive	
+acknowledgement	/əkˈnɑːlɪdʒmənt/	n.	承认；致谢	The acknowledgement arrived after the fix.	修复之后才收到确认。	admission,recognition	
+adaptation	/ˌædæpˈteɪʃn/	n.	适应；改编	The adaptation took two sprints.	适配花了两个迭代。	adjustment,modification	
+aggregate	/ˈæɡrɪɡeɪt/	v./n./adj.	聚合；总计	Aggregate the counts per minute.	按分钟聚合计数。	combine,total	
+alignment	/əˈlaɪnmənt/	n.	对齐；一致性	The alignment of the columns is off.	这些列的对齐有问题。	positioning,agreement	
+analytical	/ˌænəˈlɪtɪkl/	adj.	分析的；解析的	She has an analytical mind.	她有一个善于分析的头脑。	logical,systematic	
+anonymous	/əˈnɑːnɪməs/	adj.	匿名的	The telemetry is anonymous.	遥测数据是匿名的。	unnamed,unknown	
+apparatus	/ˌæpəˈrætəs/	n.	仪器；装置	The lab apparatus needs calibration.	实验室设备需要校准。	equipment,device	
+arbitrate	/ˈɑːrbɪtreɪt/	v.	仲裁；公断	A queue can arbitrate between writers.	队列可以在写入者之间做仲裁。	mediate,judge	
+assemble	/əˈsembl/	v.	组装；集合	Assemble the release notes from commits.	从提交记录汇总发布说明。	gather,construct	
+attain	/əˈteɪn/	v.	达到；获得	The service attained four nines of uptime.	这个服务达到了四个九的可用性。	achieve,reach	
+authenticate	/ɔːˈθentɪkeɪt/	v.	认证；验证身份	Authenticate the request with a signed header.	用签名头认证这个请求。	verify,validate	
+batch	/bætʃ/	n./v.	批次；批量处理	Send the events in one batch.	把这些事件批量发送。	group,set	
+bundle	/ˈbʌndl/	n./v.	包；捆绑	The bundle includes two entry points.	这个包包含两个入口。	package,pack	
+calendar	/ˈkælɪndər/	n.	日历；日程表	The review calendar is public.	评审日历是公开的。	schedule,agenda	
+candidate	/ˈkændɪdət/	n.	候选人；候选方案	This candidate release looks stable.	这个候选发布版本看起来很稳定。	applicant,option	
+cater	/ˈkeɪtər/	v.	迎合；提供饮食	The design caters to keyboard users.	这个设计迎合键盘用户。	serve,provide	
+cluster	/ˈklʌstər/	n./v.	集群；聚集	The cluster has three nodes.	这个集群有三个节点。	group,bundle	
+coincidence	/koʊˈɪnsɪdəns/	n.	巧合；一致	The timing was a coincidence.	时间上的吻合只是巧合。	chance,accident	
+collision	/kəˈlɪʒn/	n.	碰撞；冲突	The hash collision caused a slow lookup.	哈希冲突导致了查找变慢。	crash,clash	
+commute	/kəˈmjuːt/	v./n.	通勤；交换	He reads English on his commute.	他通勤时读英语。	travel,exchange	
+compatible	/kəmˈpætəbl/	adj.	兼容的；相容的	The library is compatible with v1.	这个库与 v1 兼容。	consistent,interoperable	
+competence	/ˈkɑːmpɪtəns/	n.	能力；胜任	Competence grows with deliberate practice.	能力随刻意练习增长。	ability,skill	
+comprise	/kəmˈpraɪz/	v.	包含；组成	The suite comprises three checks.	这个套件包含三项检查。	include,consist	
+compromise	/ˈkɑːmprəmaɪz/	n./v.	妥协；折中	The design is a compromise between speed and clarity.	这个设计是速度与清晰度之间的折中。	trade-off,settle	
+concurrent	/kənˈkɜːrənt/	adj.	并发的；同时的	Two concurrent writes caused the conflict.	两次并发写入导致了冲突。	parallel,simultaneous	
+confront	/kənˈfrʌnt/	v.	面对；对抗	We must confront the flaky test.	我们必须面对这个不稳定的测试。	face,challenge	
+consistent	/kənˈsɪstənt/	adj.	一致的；连贯的	The naming is consistent across modules.	各模块的命名是一致的。	steady,coherent	
+conspicuous	/kənˈspɪkjuəs/	adj.	显眼的；明显的	The warning is conspicuous on purpose.	这个警告故意做得很显眼。	noticeable,prominent	
+contempt	/kənˈtempt/	n.	轻视；蔑视	Show no contempt for simple questions.	不要轻视简单的问题。	scorn,disdain	
+contrive	/kənˈtraɪv/	v.	设法做到；谋划	They contrived a clever workaround.	他们设法想出了一个巧妙的绕行方案。	devise,manage	
+converse	/kənˈvɜːrs/	v./adj.	交谈；相反的	The converse is also true.	反过来也成立。	talk,opposite	
+cooperate	/koʊˈɑːpəreɪt/	v.	合作；配合	The services cooperate through events.	这些服务通过事件协作。	collaborate,unite	
+cordial	/ˈkɔːrdʒəl/	adj.	热诚的；友好的	The review was cordial and direct.	这次评审既友好又直接。	friendly,warm	
+corporate	/ˈkɔːrpərət/	adj.	公司的；法人的	The corporate network blocks the port.	公司网络封锁了这个端口。	company,business	
+correspondence	/ˌkɔːrəˈspɑːndəns/	n.	通信；对应	The correspondence between the two lists is exact.	两份清单完全对应。	communication,match	
+credential	/krəˈdenʃl/	n.	凭证；证书	Rotate the credentials every ninety days.	每九十天轮换一次凭证。	secret,certificate	
+deduce	/dɪˈduːs/	v.	推断；演绎	We deduced the cause from the timestamps.	我们从时间戳推断了原因。	infer,conclude	
+deficiency	/dɪˈfɪʃnsi/	n.	缺乏；缺陷	The deficiency is in the test coverage.	缺陷在于测试覆盖不足。	lack,shortcoming	
+deliberate	/dɪˈlɪbərət/	adj./v.	故意的；仔细考虑	The delay is deliberate.	这个延迟是故意的。	intentional,consider	
+demonstrate	/ˈdemənstreɪt/	v.	证明；演示	The benchmark demonstrates the gain.	基准测试证明了收益。	show,prove	
+denote	/dɪˈnoʊt/	v.	表示；意味着	The prefix denotes the environment.	这个前缀表示环境。	indicate,mean	
+depict	/dɪˈpɪkt/	v.	描述；描绘	The diagram depicts the data flow.	这张图描绘了数据流。	portray,describe	
+deprive	/dɪˈpraɪv/	v.	剥夺；使丧失	The outage deprived users of access.	这次中断剥夺了用户的访问权。	strip,deny	
+detach	/dɪˈtætʃ/	v.	分离；拆卸	Detach the handler before cleanup.	清理之前先解绑处理函数。	separate,remove	
+devise	/dɪˈvaɪz/	v.	设计；想出	Devise a test that fails first.	设计一个先失败的测试。	design,invent	
+dilemma	/dɪˈlemə/	n.	困境；两难	The team faced a classic dilemma.	团队面临一个经典的两难。	predicament,problem	
+discern	/dɪˈsɜːrn/	v.	辨别；察觉	It is hard to discern the root cause.	很难辨别根本原因。	detect,distinguish	
+disclose	/dɪsˈkloʊz/	v.	披露；揭示	The report discloses two incidents.	这份报告披露了两起事故。	reveal,expose	
+dispose	/dɪˈspoʊz/	v.	处理；处置	Dispose of the temporary files.	处理掉这些临时文件。	discard,arrange	
+distinct	/dɪˈstɪŋkt/	adj.	明显的；截然不同的	Keep two distinct modes.	保持两个截然不同的模式。	clear,separate	
+distort	/dɪˈstɔːrt/	v.	扭曲；歪曲	Sampling can distort the latency numbers.	采样可能扭曲延迟数据。	twist,misrepresent	
+domestic	/dəˈmestɪk/	adj.	国内的；家庭的	Domestic traffic is much cheaper.	国内流量便宜得多。	internal,home	
+duration	/duˈreɪʃn/	n.	持续时间	A short duration keeps attention high.	时间短能保持注意力。	length,period	
+dynamic	/daɪˈnæmɪk/	adj.	动态的；有活力的	The dynamic config updates hourly.	动态配置每小时更新。	changing,active	
+elaborate	/ɪˈlæbərət/	adj./v.	精心制作的；详述	The plan is too elaborate for a hotfix.	这个计划对热修复来说太复杂了。	detailed,explain	
+eligible	/ˈelɪdʒəbl/	adj.	有资格的；合格的	Only admins are eligible to merge.	只有管理员有资格合并。	qualified,suitable	
+embrace	/ɪmˈbreɪs/	v.	拥抱；接受	The team embraced the new workflow.	团队接受了新工作流。	accept,hug	
+emphasize	/ˈemfəsaɪz/	v.	强调	The docs emphasize the rollback path.	文档强调了回滚路径。	stress,highlight	
+enhance	/ɪnˈhæns/	v.	增强；提高	Enhance the signal and cut the noise.	增强信号，减少噪音。	improve,boost	
+enroll	/ɪnˈroʊl/	v.	注册；登记	Enroll the device before the demo.	演示之前先注册设备。	register,join	
+essential	/ɪˈsenʃl/	adj.	必要的；本质的	Focus is essential when reading code.	读代码时专注是必要的。	vital,necessary	
+evident	/ˈevɪdənt/	adj.	明显的；显然的	The cause is evident from the log.	从日志里可以明显看出原因。	obvious,clear	
+exaggerate	/ɪɡˈzædʒəreɪt/	v.	夸大；夸张	Do not exaggerate the risk.	不要夸大风险。	overstate,inflate	
+exclusive	/ɪkˈskluːsɪv/	adj.	独有的；排他的	The lock gives exclusive access.	这把锁提供独占访问。	sole,restricted	
+extract	/ɪkˈstrækt/	v./n.	提取；摘录	Extract the error code from the body.	从响应体里提取错误码。	remove,derive	
+fabricate	/ˈfæbrɪkeɪt/	v.	编造；制造	Never fabricate benchmark numbers.	不要编造基准测试数据。	invent,manufacture	
+fatigue	/fəˈtiːɡ/	n.	疲劳	Mental fatigue causes typos.	精神疲劳会导致拼写错误。	tiredness,exhaustion	
+fluent	/ˈfluːənt/	adj.	流利的；流畅的	She is fluent in three languages.	她精通三门语言。	smooth,articulate	
+formal	/ˈfɔːrml/	adj.	正式的	The RFC is a formal proposal.	RFC 是一份正式提案。	official,proper	
+fraction	/ˈfrækʃn/	n.	小部分；分数	Only a fraction of users hit the bug.	只有一小部分用户遇到这个 bug。	portion,part	
+frustrate	/ˈfrʌstreɪt/	v.	挫败；使沮丧	Slow feedback frustrates new users.	慢反馈让新用户沮丧。	discourage,annoy	
+furnish	/ˈfɜːrnɪʃ/	v.	提供；供应	Furnish the API with clear examples.	给 API 提供清晰的示例。	supply,provide	
+generate	/ˈdʒenəreɪt/	v.	生成；产生	Generate one fixture per test.	每个测试生成一份夹具。	produce,create	
+genuine	/ˈdʒenjuɪn/	adj.	真正的；真诚的	The praise was genuine.	这份赞扬是真诚的。	real,sincere	
+gradual	/ˈɡrædʒuəl/	adj.	渐进的	Recovery was gradual but steady.	恢复是渐进但稳定的。	slow,progressive	
+gratitude	/ˈɡrætɪtuːd/	n.	感激；感恩	Show gratitude in code review.	在代码评审中表达感谢。	thankfulness,appreciation	
+guarantee	/ˌɡærənˈtiː/	v./n.	保证；担保	No cache can guarantee freshness.	没有缓存能保证新鲜度。	promise,ensure	
+hypothesis	/haɪˈpɑːθəsɪs/	n.	假设	The hypothesis failed the test.	这个假设没有通过测试。	theory,premise	
+illustrate	/ˈɪləstreɪt/	v.	说明；举例	The trace illustrates the retry storm.	这份追踪说明了重试风暴。	show,demonstrate	
+imminent	/ˈɪmɪnənt/	adj.	即将发生的；迫近的	The deadline is imminent.	截止时间迫在眉睫。	upcoming,near	
+implement	/ˈɪmplɪment/	v.	实现；执行	Implement the smallest change that works.	实现能用的最小改动。	build,execute	
+implicit	/ɪmˈplɪsɪt/	adj.	隐含的；隐式的	Avoid implicit conversions.	避免隐式转换。	implied,hidden	
+incidental	/ˌɪnsɪˈdentl/	adj.	附带的；偶然的	The fix had incidental benefits.	这个修复带来了附带的好处。	secondary,accidental	
+indicate	/ˈɪndɪkeɪt/	v.	表明；指示	The chart indicates a plateau.	这张图表明进入了平台期。	show,signal	
+inevitable	/ɪnˈevɪtəbl/	adj.	不可避免的	Some churn is inevitable.	有些变动是不可避免的。	unavoidable,certain	
+influence	/ˈɪnfluəns/	n./v.	影响	The cache influences the measurement.	缓存影响了测量结果。	affect,impact	
+initiative	/ɪˈnɪʃətɪv/	n.	主动性；倡议	She took the initiative on the migration.	她主动牵头这次迁移。	drive,plan	
+insightful	/ˈɪnsaɪtfl/	adj.	有洞察力的	The review was unusually insightful.	这次评审格外有洞察力。	perceptive,wise	
+intervene	/ˌɪntərˈviːn/	v.	干预；介入	Intervene only when the alert fires.	只在告警触发时介入。	interfere,step in	
+justify	/ˈdʒʌstɪfaɪ/	v.	证明正当	Justify the change with data.	用数据证明这个变更是合理的。	defend,explain	
+mature	/məˈtʃʊr/	adj.	成熟的	The ecosystem is mature now.	生态现在已经成熟了。	grown,developed	
+minimize	/ˈmɪnɪmaɪz/	v.	最小化；使降到最低	Minimize the number of moving parts.	尽量减少活动部件。	reduce,lessen	
+modify	/ˈmɑːdɪfaɪ/	v.	修改；调整	Modify the config per environment.	按环境修改配置。	change,adjust	
+negotiate	/nɪˈɡoʊʃieɪt/	v.	谈判；协商	The teams negotiated the API shape.	团队协商了 API 形态。	bargain,discuss	
+neutralize	/ˈnuːtrəlaɪz/	v.	抵消；中和	The retry neutralizes transient failures.	重试抵消了瞬时故障。	offset,cancel	
+objective	/əbˈdʒektɪv/	n./adj.	目标；客观的	The objective is a smaller diff.	目标是更小的 diff。	goal,impartial	
+optimal	/ˈɑːptɪml/	adj.	最优的；最佳的	The optimal choice depends on context.	最优选择取决于上下文。	best,ideal	
+paradox	/ˈpærədɑːks/	n.	悖论；矛盾	The paradox is that slower is faster.	悖论是：慢就是快。	contradiction,puzzle	
+persistent	/pərˈsɪstənt/	adj.	持久的；坚持不懈的	Persistent storage keeps the state.	持久存储会保留状态。	lasting,tenacious	
+plausible	/ˈplɔːzəbl/	adj.	看似合理的	The explanation is plausible but unproven.	这个解释看似合理，但未证实。	believable,likely	
+precaution	/prɪˈkɔːʃn/	n.	预防措施	Take the precaution of backing up.	采取备份这个预防措施。	safeguard,care	
+precise	/prɪˈsaɪs/	adj.	精确的	Precise wording avoids confusion.	精确的措辞避免混淆。	exact,accurate	
+predict	/prɪˈdɪkt/	v.	预测	The model predicts a slow week.	模型预测这周会比较慢。	forecast,expect	
+preserve	/prɪˈzɜːrv/	v.	保存；保护	Preserve the original behavior.	保留原有行为。	keep,protect	
+prevalent	/ˈprevələnt/	adj.	普遍的；流行的	The pattern is prevalent in old code.	这个模式在旧代码里很普遍。	widespread,common	
+prohibit	/prəˈhɪbɪt/	v.	禁止；阻止	The policy prohibits force pushes.	这项策略禁止强制推送。	forbid,ban	
+redundant	/rɪˈdʌndənt/	adj.	冗余的；多余的	Remove the redundant check.	去掉这个多余的检查。	extra,duplicate	
+reliable	/rɪˈlaɪəbl/	adj.	可靠的	The retry path is reliable.	重试路径是可靠的。	dependable,stable	
+remarkable	/rɪˈmɑːrkəbl/	adj.	显著的；非凡的	The improvement is remarkable.	这个提升很显著。	notable,extraordinary	
+resilient	/rɪˈzɪliənt/	adj.	有弹性的；能恢复的	The system is resilient to failure.	这个系统对故障有恢复力。	tough,adaptive	
+resolve	/rɪˈzɑːlv/	v.	解决；决心	Resolve the deadlock with ordering.	用顺序解决这个死锁。	solve,settle	
+retain	/rɪˈteɪn/	v.	保留；保持	Retain the logs for thirty days.	日志保留三十天。	keep,hold	
+reveal	/rɪˈviːl/	v.	揭示；显示	The profile reveals a hot loop.	性能分析显示出一个热循环。	show,disclose	
+sufficient	/səˈfɪʃnt/	adj.	足够的	The coverage is sufficient.	覆盖已经足够。	enough,adequate	
+suppress	/səˈpres/	v.	抑制；压制	Suppress duplicate alerts.	抑制重复告警。	restrain,block	
+sustain	/səˈsteɪn/	v.	维持；支撑	The team cannot sustain this pace.	团队无法维持这个节奏。	maintain,support	
+withdraw	/wɪðˈdrɔː/	v.	撤回；提取	Withdraw the release from the channel.	把这个发布从渠道撤回。	retract,remove	
+yield	/jiːld/	v./n.	产生；让出	The optimization yields a small gain.	这个优化带来了一点收益。	produce,give in
