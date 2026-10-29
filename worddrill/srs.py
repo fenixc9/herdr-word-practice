@@ -27,10 +27,12 @@ STATUS_LEARNING = "learning"
 STATUS_REVIEW = "review"
 STATUS_MASTERED = "mastered"
 
-MODES = ("smart", "follow", "dictation", "spelling", "selfcheck", "review", "favorites")
+MODES = ("smart", "free", "follow", "dictation", "spelling", "selfcheck",
+         "review", "favorites")
 
 MODE_LABELS = {
     "smart": "智能复习",
+    "free": "自由练习",
     "follow": "跟打",
     "dictation": "默写",
     "spelling": "看中文拼写",
@@ -41,6 +43,7 @@ MODE_LABELS = {
 
 MODE_HINTS = {
     "smart": "按记忆曲线挑词：该复习的先来，再补一点新词。",
+    "free": "不按记忆曲线排，随便挑词练——想练哪本、练多少都行。",
     "follow": "看着单词打一遍，先建立手感和拼写记忆。",
     "dictation": "只看中文和挖空例句，把单词默写出来。",
     "spelling": "只给中文释义，凭记忆拼出英文。",
@@ -198,6 +201,12 @@ def plan_session(request: PlanRequest) -> list[Word]:
         return states.get(word.key) or WordState()
 
     candidates = list(request.words)
+
+    if mode == "free":
+        # No schedule, no budgets: a random handful of this book, nothing more.
+        pool = list(candidates)
+        rng.shuffle(pool)
+        return pool[:size]
 
     if mode == "favorites":
         pool = [w for w in candidates if state_of(w).fav]

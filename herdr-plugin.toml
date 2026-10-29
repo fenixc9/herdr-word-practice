@@ -71,6 +71,12 @@ description = "按记忆曲线来一组（约 90 秒）"
 command = ["python3", "main.py", "open-pane", "break", "-m", "smart"]
 
 [[actions]]
+id = "free"
+title = "Words: 自由练习"
+description = "不按记忆曲线排，随便挑词练"
+command = ["python3", "main.py", "open-pane", "break", "-m", "free"]
+
+[[actions]]
 id = "follow"
 title = "Words: 跟打"
 description = "看着单词打一遍，建立拼写手感"

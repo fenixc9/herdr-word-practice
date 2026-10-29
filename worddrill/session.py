@@ -230,7 +230,7 @@ class DrillSession:
         word = word or self.current
         if self.mode == "selfcheck":
             return "selfcheck"
-        if self.mode == "follow":
+        if self.mode in {"follow", "free"}:
             return "follow"
         if self.mode == "dictation":
             return "dictation"

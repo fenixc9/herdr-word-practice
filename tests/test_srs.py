@@ -116,6 +116,27 @@ def test_plan_review_mode_only_weak_words():
     assert plan[0].key == words[0].key
 
 
+def test_free_mode_ignores_schedule_and_budget():
+    words = [word(f"w{i}") for i in range(20)]
+    states = {words[0].key: srs.mark_mastered(srs.WordState(), now=0)}
+    # a due review and a mastered word both stay eligible: free means free.
+    states[words[1].key] = srs.WordState(status=srs.STATUS_REVIEW, due=0, reps=2)
+    plan = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="free", size=10, now=0,
+        daily_new_limit=0, new_today=99, seed=4))
+    assert len(plan) == 10
+    assert plan != srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=10, now=0,
+        daily_new_limit=0, new_today=99, seed=4))
+
+
+def test_free_mode_shows_the_word_like_follow():
+    from worddrill.session import DrillSession
+
+    session = DrillSession(words=[word("cache")], mode="free")
+    assert session.prompt_variant() == "follow"
+
+
 def test_plan_favorites_mode_only_favorites():
     words = [word(f"w{i}") for i in range(6)]
     states = {words[2].key: srs.WordState(fav=True)}
