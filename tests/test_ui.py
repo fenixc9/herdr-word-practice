@@ -340,3 +340,46 @@ def test_cjk_and_ascii_columns_align():
         plain = term.strip_ansi(row)
         starts.add(term.text_width(plain[: plain.index("共")]))
     assert len(starts) == 1, f"detail columns differ: {starts}"
+
+
+# Glyphs whose width depends on the font. In a CJK locale '·' and '—' are often
+# rendered two cells wide, which silently pushes frame edges out of alignment.
+FORBIDDEN_IN_LAYOUT = "\u00b7\u2014\u2026\u201c\u201d\u2018\u2019\u2192\u25cf"
+BOX_DRAWING = set("─│┌┐└┘├┤┬┴┼╭╮╰╯╱╲╳▁▂▃▄▅▆▇█▉▊▋▌▍▎▏▐░▒▓▔▕")
+
+
+def test_layout_rows_avoid_ambiguous_width_glyphs():
+    """Only structural rows must be glyph-safe.
+
+    The card body legitimately contains IPA such as ``æ`` (ambiguous width by the
+    Unicode table). Structural rows — header, status bar, footer — must stick to
+    glyphs every font draws one cell wide, otherwise the frame edges drift.
+    """
+    session = session_for([make_word()], mode="dictation")
+    session.typed = "cachx"
+    session.submit()
+    lines = frame(session, width=72, height=22)
+    structural = [lines[0], lines[-2], lines[-1]]
+    for line in structural:
+        plain = term.strip_ansi(line)
+        for char in FORBIDDEN_IN_LAYOUT:
+            assert char not in plain, f"ambiguous-width glyph {char!r} in {plain!r}"
+        # Box drawing and blocks are "ambiguous" by the Unicode table but are
+        # one cell in every terminal font, so they are allowed.
+        for char in plain:
+            if char.isascii() or char in BOX_DRAWING:
+                continue
+            width = term.unicodedata.east_asian_width(char)
+            assert width in {"W", "F", "N", "H"}, (
+                f"{char!r} has ambiguous width ({width}); must not be used in layout")
+
+
+def test_footer_corner_sits_on_the_frame_edge():
+    session = session_for([make_word()])
+    for width in (56, 72, 96):
+        lines = [term.strip_ansi(line).rstrip() for line in frame(session, width=width, height=20)]
+        footer = lines[-1]
+        assert footer.endswith("─╯"), footer
+        assert term.text_width(footer) == width
+        # the corner must be the last cell, i.e. directly under the header's ╮
+        assert term.text_width(lines[0]) == width

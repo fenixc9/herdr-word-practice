@@ -214,6 +214,10 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     mode = _resolve_mode(settings, args.mode)
     size = args.size or int(settings.get("session_size", 10) or 10)
     now = time.time()
+    # Drop states for words that no longer exist in this book (renamed book,
+    # edited custom wordlist) before planning, not on the exit path.
+    if prune_words(progress, {w.key for w in book.words}):
+        progress.save()
     session = build_session(settings, progress, book, mode, size, now=now)
 
     streak, today = _streak_and_today(progress, now)
@@ -277,7 +281,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         if settings.get("notify_on_finish", True) and result.total:
             herdr.notify(
                 f"背完 {result.total} 个单词",
-                f"正确 {result.correct}/{result.total} · "
+                f"正确 {result.correct}/{result.total} / "
                 f"用时 {int(result.elapsed)} 秒",
                 sound="done",
             )
@@ -293,8 +297,8 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     except KeyboardInterrupt:
         pass
     finally:
-        progress.save()
-        prune_words(progress, {w.key for w in book.words})
+        # Answers are persisted as they happen; just make sure the file is
+        # flushed once on the way out.
         progress.save()
     return 0
 
@@ -378,12 +382,12 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
         for row in _book_rows(book, progress, book.id == active):
             print(row)
     print()
-    print(term.style(" 开始训练: words drill   ·   帮助: words drill --help",
+    print(term.style(" 开始训练: words drill   |   帮助: words drill --help",
                      term.HEX["surface2"]))
     print()
     if getattr(args, "wait", False) and sys.stdin.isatty():
         try:
-            input(term.style(" 按回车关闭这个窗格…", term.HEX["surface2"]))
+            input(term.style(" 按回车关闭这个窗格", term.HEX["surface2"]))
         except EOFError:
             pass
     return 0
@@ -530,7 +534,7 @@ def cmd_settings(args: argparse.Namespace, settings: Settings, progress: Progres
         else:
             print(f"  {key:<26}{value}")
     print()
-    print(term.style(f" 发音引擎: {describe_provider()}  ·  "
+    print(term.style(f" 发音引擎: {describe_provider()}  |  "
                      f"口音: {settings.get('accent', 'us')}", term.HEX["surface2"]))
     print()
     return 0
@@ -618,7 +622,7 @@ def cmd_event(args: argparse.Namespace, settings: Settings, progress: Progress,
         body_bits.append(f"今日还差 {remaining} 个")
     if streak:
         body_bits.append(f"连续 {streak} 天")
-    body = " · ".join(body_bits) or "随时来一组"
+    body = " / ".join(body_bits) or "随时来一组"
     herdr.notify("该背单词了", body, sound="request")
 
     if settings.get("nudge", {}).get("auto_open", False):

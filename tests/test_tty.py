@@ -249,3 +249,19 @@ def test_background_probe_switches_the_palette(tmp_path, env):
     proc.wait(timeout=5)
     os.close(master)
     assert b"PALETTE=light" in output, output
+
+
+def test_escape_quits_promptly(one_word_book, env):
+    """Esc must not dawdle: the whole point is dropping in and out."""
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        started = time.time()
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=5) == 0
+        elapsed = time.time() - started
+        # Generous bound: this guards against the old ~120ms+clear-screen exit
+        # turning into "click and wait", not against scheduler noise.
+        assert elapsed < 0.8, f"quitting took {elapsed:.2f}s"
+    finally:
+        tui.close()

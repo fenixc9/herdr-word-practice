@@ -21,6 +21,7 @@ from .srs import MODE_HINTS, MODE_LABELS, next_due_label
 RESULT_HOLD_OK = 0.6
 RESULT_HOLD_BAD = 2.0
 TICK = 0.1
+ESCAPE_GRACE = 0.025   # how long a lone ESC waits to become an Escape key
 
 
 @dataclass
@@ -83,11 +84,11 @@ def frame_border(painter: Painter, title: str, subtitle: str = "",
     theme = painter.theme
     width = painter.width
     title_text = theme.paint(f" {title} ", "mauve", bold=True)
-    subtitle_text = theme.paint(f"· {subtitle} ", "overlay1") if subtitle else ""
+    subtitle_text = theme.paint(f"| {subtitle} ", "overlay1") if subtitle else ""
     right_text = theme.paint(f" {right} ", "subtext") if right else ""
     used = 1 + term.text_width(f" {title} ")
     if subtitle:
-        used += term.text_width(f"· {subtitle} ")
+        used += term.text_width(f"| {subtitle} ")
     right_used = term.text_width(f" {right} ") if right else 0
     # used already counts the leading "╭"; only "╮" is still to come.
     fill = max(0, width - used - right_used - 1)
@@ -112,7 +113,7 @@ def frame_footer(painter: Painter, keys: list[tuple[str, str]]) -> None:
         theme.paint(key, "lavender", bold=True) + theme.paint(f" {label}", "overlay1")
         for key, label in keys
     ]
-    text = theme.paint(" · ", "surface2").join(chunks)
+    text = theme.paint("  |  ", "surface2").join(chunks)
     # "╰─ " (3) + body + " ─╯" (3) must add up to exactly the frame width.
     painter.add(
         theme.paint("╰─ ", "surface2")
@@ -290,7 +291,7 @@ def _render_input(painter: Painter, session: DrillSession, word: Word) -> None:
     elif session.hints:
         body = theme.paint(word.word[: session.hints], "green")
     else:
-        body = theme.paint("开始输入…", "surface2")
+        body = theme.paint("开始输入...", "surface2")
 
     if session.phase == "result" and session.last_answer and session.last_answer.correct:
         box_color = "green"
@@ -365,13 +366,13 @@ def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
     if answer.correct:
         text = "✓  正确"
         if answer.hints:
-            text += f"  ·  用了 {answer.hints} 个提示"
+            text += f"  |  用了 {answer.hints} 个提示"
         else:
-            text += "  ·  一次拼对"
+            text += "  |  一次拼对"
         centered(painter, text, "green", bold=True)
     else:
         if answer.skipped:
-            centered(painter, "→  已跳过", "peach", bold=True)
+            centered(painter, "->  已跳过", "peach", bold=True)
         else:
             centered(painter, "✗  拼写错误", "red", bold=True)
         centered(painter, f"正确答案  {word.word}", "yellow", bold=True)
@@ -381,7 +382,7 @@ def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
     # After the verdict, connect the word to the things that make it stick:
     # collocations, near synonyms, and the root it grew from.
     if word.phr:
-        for line in term.wrap("搭配  " + " · ".join(word.phr[:2]),
+        for line in term.wrap("搭配  " + " / ".join(word.phr[:2]),
                               max(16, inner), max_lines=1):
             centered(painter, line, "overlay1")
     if word.syn:
@@ -403,11 +404,11 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
         percent = theme.paint(f"{int(session.progress * 100):3d}%", "subtext")
     else:
         progress_bar = theme.paint("▱" * bar_width, "surface2")
-        percent = theme.paint("  —", "subtext")
+        percent = theme.paint("  -", "subtext")
     stats = (theme.paint(f"✓{correct}", "green") + theme.paint("/", "surface2")
              + theme.paint(f"✗{done - correct}", "red"))
     acc = (theme.paint(f"{int(accuracy * 100)}%", "subtext") if done
-           else theme.paint("—", "surface2"))
+           else theme.paint("-", "surface2"))
     goal = theme.paint(f"今日 {today_count}/{daily_goal}", "blue") if daily_goal else ""
     elapsed = theme.paint(_format_clock(session.elapsed), "overlay1")
     mute = theme.paint("🔊", "teal") if sound_on else theme.paint("🔇", "surface2")
@@ -436,7 +437,7 @@ def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
         keys = [("⏎", "提交"), ("⇥", "提示"), ("⌃r", "发音"), ("⌃f", "收藏"),
                 ("⌃m", "掌握"), ("?", "帮助"), ("esc", "退出")]
     budget = painter.width - 6          # "╰─ " + " ─╯"
-    sep = theme.paint(" · ", "surface2")
+    sep = theme.paint("  |  ", "surface2")
 
     def render(selection) -> str:
         return sep.join(
@@ -467,7 +468,7 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
     centered(painter, f"正确率  {int(result.accuracy * 100)}%    {result.correct}/{result.total}",
              "text")
     pace = (f"{result.words_per_minute:.1f} 词/分"
-            if result.words_per_minute else "—")
+            if result.words_per_minute else "-")
     centered(painter, f"用时  {_format_clock(result.elapsed)}    {pace}", "subtext")
     painter.blank(1)
     dots = []
@@ -478,14 +479,14 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
     painter.blank(1)
     wrong = result.wrong_words
     if wrong:
-        for line in term.wrap("错词已进错词本：" + " · ".join(wrong[:6]),
+        for line in term.wrap("错词已进错词本：" + " / ".join(wrong[:6]),
                               max(10, painter.width - 8), max_lines=2):
             centered(painter, line, "peach")
     else:
         centered(painter, "全部拼对，漂亮。", "green")
     painter.blank(1)
     due = next_due_label(session.states)
-    if due != "—":
+    if due != "-":
         centered(painter, "下次复习  " + due, "overlay1")
 
     _fit(painter, painter.height - 2)
@@ -685,10 +686,13 @@ class RawTerminal:
         return self
 
     def __exit__(self, *exc) -> None:
+        # Restore the terminal and get out. No full-screen clear: in a herdr
+        # popup the pane closes right after us, and asking the host to repaint
+        # the whole viewport is what makes closing feel sticky.
         if self.alt_screen:
-            term.emit("\x1b[?7h\x1b[?25h\x1b[?1049l")
+            term.emit("\x1b[0m\x1b[?7h\x1b[?25h\x1b[?1049l")
         else:
-            term.emit("\x1b[?7h\x1b[?25h\x1b[2J\x1b[H")
+            term.emit("\x1b[0m\x1b[?7h\x1b[?25h\r\n")
         if self.saved is not None and self.fd is not None:
             try:
                 import termios
@@ -769,7 +773,8 @@ class DrillApp:
                         time.sleep(timeout)
                         self._draw()
                         continue
-                    ready, _, _ = select.select([self.input_fd], [], [], timeout)
+                    wait = ESCAPE_GRACE if buffer == b"\x1b" else timeout
+                    ready, _, _ = select.select([self.input_fd], [], [], min(wait, timeout))
                     if not ready and buffer:
                         # Timeout with a dangling byte: it is a bare ESC.
                         keys, buffer = flush_keys(buffer)
@@ -824,12 +829,12 @@ class DrillApp:
         if key == Keys.CTRL_F:
             if self.on_favorite is not None and session.current:
                 fav = self.on_favorite(session.current)
-                self._flash(f"{'已收藏' if fav else '已取消收藏'} · {session.current.word}")
+                self._flash(f"{'已收藏' if fav else '已取消收藏'}  {session.current.word}")
             return
         if key == Keys.CTRL_M:
             if self.on_master is not None and session.current:
                 self.on_master(session.current)
-                self._flash(f"已标记掌握 · {session.current.word}")
+                self._flash(f"已标记掌握  {session.current.word}")
             return
         if key == Keys.CTRL_S:
             self.sound_on = not self.sound_on
