@@ -197,3 +197,17 @@ def test_herdr_error_payloads_are_read_from_stderr(monkeypatch):
     assert herdr.run_herdr(["plugin", "pane", "open"]) is None
     _, error = herdr.open_pane_detailed("break")
     assert error == "ui_busy"
+
+
+def test_result_card_shows_collocations_and_etymology():
+    word = Word(key="b:deploy", book="b", word="deploy", ipa="/dɪˈplɔɪ/", pos="v.",
+                cn="部署", en="We deploy twice a day.", zh="我们每天部署两次。",
+                syn=("release",), root="de-（去掉）+ ploy（折叠）",
+                phr=("deploy to production", "roll out a release"))
+    session = DrillSession(words=[word], mode="dictation")
+    session.typed = "deploi"
+    session.submit()
+    text = term.strip_ansi("\n".join(frame(session, height=26)))
+    assert "deploy to production" in text
+    assert "de-（去掉）" in text
+    assert "近义" in text

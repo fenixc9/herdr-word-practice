@@ -32,6 +32,7 @@ class Word:
     zh: str
     syn: tuple[str, ...] = field(default_factory=tuple)
     root: str = ""
+    phr: tuple[str, ...] = field(default_factory=tuple)
 
     @property
     def length_hint(self) -> str:
@@ -54,6 +55,8 @@ class Word:
             data["syn"] = list(self.syn)
         if self.root:
             data["root"] = self.root
+        if self.phr:
+            data["phr"] = list(self.phr)
         return data
 
 
@@ -84,6 +87,7 @@ JSON_ALIASES = {
     "cn": ("cn", "meaning", "zh_meaning", "translation"),
     "en": ("en", "example", "sentence"),
     "zh": ("zh", "example_zh", "example_translation"),
+    "phr": ("phr", "phrases", "collocations"),
 }
 
 
@@ -106,16 +110,21 @@ def _optional_str(raw: dict, name: str) -> str:
     return value.strip() if isinstance(value, str) else ""
 
 
+def _string_list(raw: dict, name: str, where: str) -> tuple[str, ...]:
+    value = _pick(raw, name) or []
+    if isinstance(value, str):
+        value = [part for part in value.split(",")]
+    if not isinstance(value, list):
+        raise WordbookError(f"{where}: '{name}' must be a list of strings")
+    return tuple(str(item).strip() for item in value if str(item).strip())
+
+
 def _parse_word_json(raw: object, book_id: str, where: str) -> Word:
     if not isinstance(raw, dict):
         raise WordbookError(f"{where}: each word must be an object")
     word = _require_str(raw, "w", where)
-    syn_raw = raw.get("syn") or []
-    if isinstance(syn_raw, str):
-        syn_raw = [syn_raw]
-    if not isinstance(syn_raw, list):
-        raise WordbookError(f"{where}: 'syn' must be a list of strings")
-    syn = tuple(str(item).strip() for item in syn_raw if str(item).strip())
+    syn = _string_list(raw, "syn", where)
+    phr = _string_list(raw, "phr", where)
     return Word(
         key=f"{book_id}:{word.lower()}",
         book=book_id,
@@ -127,6 +136,7 @@ def _parse_word_json(raw: object, book_id: str, where: str) -> Word:
         zh=_optional_str(raw, "zh"),
         syn=syn,
         root=str(raw.get("root") or "").strip(),
+        phr=phr,
     )
 
 
@@ -159,7 +169,7 @@ def parse_book(raw: object, path: Path | None = None, custom: bool = False) -> W
     )
 
 
-TSV_COLUMNS = ("w", "ipa", "pos", "cn", "en", "zh", "syn", "root")
+TSV_COLUMNS = ("w", "ipa", "pos", "cn", "en", "zh", "syn", "root", "phr")
 
 
 def parse_tsv(text: str, path: Path) -> Wordbook:
@@ -195,6 +205,7 @@ def parse_tsv(text: str, path: Path) -> Wordbook:
             "zh": raw["zh"].strip(),
             "syn": [part.strip() for part in raw["syn"].split(",") if part.strip()],
             "root": raw["root"].strip(),
+            "phr": [part.strip() for part in raw["phr"].split(",") if part.strip()],
         }, book_id, f"{path} line {line_no}")
         if word.key in seen:
             raise WordbookError(f"{path} line {line_no}: duplicate '{word.word}'")

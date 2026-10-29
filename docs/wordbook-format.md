@@ -4,7 +4,8 @@
 
 ## TSV
 
-每行一个词，8 列用 `Tab` 分隔；列不够时后面的留空即可（末尾的 `syn` 和 `root` 最常省略）。
+每行一个词，9 列用 `Tab` 分隔；列不够时后面的留空即可（末尾的 `syn`、`root`、`phr`
+最常省略）。
 文件开头可以有 `# key=value` 元数据行。
 
 ```tsv
@@ -12,7 +13,7 @@
 # name=程序员英语
 # name_en=Coding English
 # description=vibe coding 里天天见的技术词
-deploy	/dɪˈplɔɪ/	v.	部署	We deploy twice a day behind a flag.	我们每天在开关后面部署两次。	release,roll out	de-（去掉）+ ploy（折叠）
+deploy	/dɪˈplɔɪ/	v.	部署	We deploy twice a day behind a flag.	我们每天在开关后面部署两次。	release,roll out	de-（去掉）+ ploy（折叠）	deploy to production,roll out a release
 ```
 
 | 列 | 键 | 必填 | 说明 |
@@ -24,7 +25,8 @@ deploy	/dɪˈplɔɪ/	v.	部署	We deploy twice a day behind a flag.	我们每天
 | 5 | `en` | 否 | 英文例句 |
 | 6 | `zh` | 否 | 例句的中文翻译 |
 | 7 | `syn` | 否 | 近义词，用 `,` 分隔 |
-| 8 | `root` | 否 | 词根/助记 |
+| 8 | `root` | 否 | 词根/词源/助记 |
+| 9 | `phr` | 否 | 常见搭配，用 `,` 分隔；答完题后显示 |
 
 元数据键：
 
@@ -62,7 +64,8 @@ Keep a ______ ready before you deploy.
   "words": [
     {"w": "cache", "ipa": "/kæʃ/", "pos": "n.", "cn": "缓存",
      "en": "The cache hides the real latency.", "zh": "缓存掩盖了真实延迟。",
-     "syn": ["store", "buffer"], "root": "cach（藏）"},
+     "syn": ["store", "buffer"], "root": "cach（藏）",
+     "phr": ["cache hit", "cache miss"]},
     {"word": "rollback", "meaning": "回滚"}
   ]
 }
@@ -76,8 +79,10 @@ Keep a ______ ready before you deploy.
 | `cn` | `meaning`, `zh_meaning`, `translation` |
 | `en` | `example`, `sentence` |
 | `zh` | `example_zh`, `example_translation` |
+| `phr` | `phrases`, `collocations` |
 
-`ipa` / `pos` / `syn` / `root` 只认本名。只有 `w`（单词）和 `cn`（释义）是必填的。
+`ipa` / `pos` / `syn` / `root` 只认本名。只有 `w`（单词）和 `cn`（释义）是必填的；
+其余留空时界面上对应行直接不显示。
 
 ## CSV
 

@@ -125,8 +125,10 @@ description = "背单词：学习进度"
 | `cet6` | CET-6 进阶 | 320 | 六级进阶词，也是技术文档里的常客 |
 | `coding` | 程序员英语 | 277 | 日志、commit、文档里天天见的词 |
 
-每个词都有音标、词性、中文释义、英文例句 + 中文翻译、近义词，部分有词根拆解。
-例句都是技术或日常语境，比如 `The cache hides the real latency.`
+每个词都有音标、词性、中文释义、英文例句 + 中文翻译、近义词；答错/答对之后还会给出
+常见搭配（436 个词）和词源拆解（110 个词），比如 `deploy` → `deploy to production`、
+`de-（去掉）+ ploy（折叠）→ 展开`。例句都是技术或日常语境，比如
+`The cache hides the real latency.`
 
 ```bash
 herdr words books                     # 词书列表 + 每本的学习状态
@@ -228,7 +230,7 @@ herdr words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 104 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 109 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 

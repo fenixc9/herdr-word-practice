@@ -102,3 +102,33 @@ def test_import_book_from_csv(tmp_path):
 def test_import_book_missing_file(tmp_path):
     with pytest.raises(data.WordbookError):
         data.import_book(tmp_path / "nope.csv", tmp_path / "state")
+
+def test_phrases_and_roots_are_parsed():
+    coding = data.find_book("coding")
+    with_phr = [w for w in coding.words if w.phr]
+    with_root = [w for w in coding.words if w.root]
+    assert len(with_phr) > 200, "most coding words should carry collocations"
+    assert len(with_root) > 80
+    deploy = next(w for w in coding.words if w.word == "deploy")
+    assert "deploy to production" in deploy.phr
+
+
+def test_phrases_roundtrip_through_json(tmp_path):
+    source = tmp_path / "mine.json"
+    source.write_text(json.dumps({
+        "id": "mine", "name": "短语表",
+        "words": [{"w": "cache", "cn": "缓存",
+                   "phrases": ["cache hit", "cache miss"],
+                   "root": "cacher（藏）"}],
+    }, ensure_ascii=False), encoding="utf-8")
+    book = data.import_book(source, tmp_path / "state")
+    word = book.words[0]
+    assert word.phr == ("cache hit", "cache miss")
+    assert word.root == "cacher（藏）"
+
+
+def test_tsv_ninth_column_is_phrases(tmp_path):
+    text = ("# id=x\n"
+            "cache\t/kæʃ/\tn.\t缓存\tthe cache\t缓存\tstore\tcach\tcache hit,cache miss\n")
+    book = data.parse_tsv(text, tmp_path / "x.tsv")
+    assert book.words[0].phr == ("cache hit", "cache miss")

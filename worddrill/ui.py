@@ -342,6 +342,7 @@ def _quality_label(quality: int) -> str:
 
 
 def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
+    word = answer.word
     if answer.correct:
         text = "✓  正确"
         if answer.hints:
@@ -349,16 +350,26 @@ def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
         else:
             text += "  ·  一次拼对"
         centered(painter, text, "green", bold=True)
-        return
-    if answer.skipped:
-        centered(painter, "→  已跳过", "peach", bold=True)
     else:
-        centered(painter, "✗  拼写错误", "red", bold=True)
-    centered(painter, f"正确答案  {answer.word.word}", "yellow", bold=True)
-    if answer.typed.strip():
-        centered(painter, f"你输入的是  {answer.typed.strip()}", "surface2")
-    if answer.word.syn:
-        centered(painter, "近义  " + " / ".join(answer.word.syn[:3]), "overlay1")
+        if answer.skipped:
+            centered(painter, "→  已跳过", "peach", bold=True)
+        else:
+            centered(painter, "✗  拼写错误", "red", bold=True)
+        centered(painter, f"正确答案  {word.word}", "yellow", bold=True)
+        if answer.typed.strip():
+            centered(painter, f"你输入的是  {answer.typed.strip()}", "surface2")
+
+    # After the verdict, connect the word to the things that make it stick:
+    # collocations, near synonyms, and the root it grew from.
+    if word.phr:
+        for line in term.wrap("搭配  " + " · ".join(word.phr[:2]),
+                              max(16, inner), max_lines=1):
+            centered(painter, line, "overlay1")
+    if word.syn:
+        centered(painter, "近义  " + " / ".join(word.syn[:3]), "overlay1")
+    if word.root:
+        for line in term.wrap("词源  " + word.root, max(16, inner), max_lines=1):
+            centered(painter, line, "surface2")
 
 
 def _render_status(painter: Painter, session: DrillSession, today_count: int,
