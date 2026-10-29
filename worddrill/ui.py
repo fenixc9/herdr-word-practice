@@ -428,14 +428,15 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
 def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
     theme = painter.theme
     if session.phase == "done":
-        keys = [("⏎", "再来一组"), ("⇥", "进度"), ("esc", "退出")]
+        keys = [("⏎", "再来一组"), ("⇥", "进度"), ("esc/⌃c", "退出")]
     elif session.phase == "result":
-        keys = [("⏎", "下一张"), ("⌃r", "发音"), ("⌃f", "收藏"), ("esc", "退出")]
+        keys = [("⏎", "下一张"), ("⌃r", "发音"), ("⌃f", "收藏"), ("esc/⌃c", "退出")]
     elif variant == "selfcheck":
-        keys = [("1-4", "自评"), ("⌃r", "发音"), ("⌃f", "收藏"), ("?", "帮助"), ("esc", "退出")]
+        keys = [("1-4", "自评"), ("⌃r", "发音"), ("⌃f", "收藏"), ("?", "帮助"),
+                ("esc/⌃c", "退出")]
     else:
         keys = [("⏎", "提交"), ("⇥", "提示"), ("⌃r", "发音"), ("⌃f", "收藏"),
-                ("⌃m", "掌握"), ("?", "帮助"), ("esc", "退出")]
+                ("⌃m", "掌握"), ("?", "帮助"), ("esc/⌃c", "退出")]
     budget = painter.width - 6          # "╰─ " + " ─╯"
     sep = theme.paint("  |  ", "surface2")
 
@@ -491,7 +492,7 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
 
     _fit(painter, painter.height - 2)
     bottom_rule(painter)
-    frame_footer(painter, [("⏎", "再来一组"), ("⇥", "进度"), ("esc", "退出")])
+    frame_footer(painter, [("⏎", "再来一组"), ("⇥", "进度"), ("esc/⌃c", "退出")])
     return painter.render()
 
 
@@ -510,7 +511,7 @@ def _render_help(painter: Painter, session: DrillSession) -> list[str]:
     while len(painter.rows) < painter.height - 1:
         painter.blank(1)
     bottom_rule(painter)
-    frame_footer(painter, [("?", "关闭"), ("esc", "退出")])
+    frame_footer(painter, [("?", "关闭"), ("esc/⌃c", "退出")])
     return painter.render()
 
 
@@ -534,7 +535,7 @@ def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     _fit(painter, painter.height - 3)
     bottom_rule(painter)
     _render_status(painter, session, 0, 0, True)
-    frame_footer(painter, [("esc", "退出")])
+    frame_footer(painter, [("esc/⌃c", "退出")])
     return painter.render()
 
 

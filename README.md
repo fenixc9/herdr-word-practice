@@ -142,7 +142,8 @@ description = "背单词：学习进度"
 | `Ctrl+S` | 静音开关（会写进设置） |
 | `1`–`4` | 自测模式：不认识 / 模糊 / 认识 / 太简单 |
 | `?` | 帮助 |
-| `Esc` | 退出（自动保存） |
+| `Esc` | 退出（自动保存）。herdr 客户端会为单独 Esc 等一次超时才转发，觉得慢就按 `Ctrl+C` |
+| `Ctrl+C` | 退出（同样保存）——不经过 Esc 消歧，立刻生效 |
 
 ## 记忆曲线
 
@@ -318,7 +319,26 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 回归测试守着：顶栏/底栏必须收口到同一列、输入框三条边等宽、状态栏与底栏不得出现
 宽度不确定字形（`·`、`—`、`…`、`→`、`●`）。
 
-**关窗有点慢？**
+**按 Esc 关窗有点慢？（herdr 侧，不是插件）**
+
+现象：所有弹窗（包括 herdr 内置的）都要等一会儿才关。
+
+原因在 herdr 客户端：它收到单独 `Esc` 后要等一个 input timeout / 一次 flush，才能判断这是
+"纯 Esc" 还是 Alt 组合键的开头。client 日志里能直接看到：
+
+```
+WARN herdr::raw_input: flushing lone escape after input timeout;
+     if this follows an alt chord or focus switch it may reach the pane as plain esc
+```
+
+验证方法：绕过 client、直接用 API 送 Esc，窗格 40ms 就消失：
+
+```bash
+herdr pane send-keys <PANE_ID> esc     # 40ms
+```
+
+**绕过办法**：按 `Ctrl+C` 退出。控制字符没有 Esc 消歧，client 会立刻转发。
+底栏提示现在也写成 `esc/⌃c 退出`。
 
 现在默认用 `split`，按 Esc → 窗格消失实测 **40ms**（含落盘、关窗）。
 
