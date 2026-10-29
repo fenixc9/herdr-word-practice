@@ -226,3 +226,25 @@ def test_install_script_dry_run_is_harmless(tmp_path):
     assert "dry-run" in result.stdout
     assert not (tmp_path / "config.toml").exists(), "dry-run must not write config"
     assert not (tmp_path / "bin" / "words").exists()
+
+
+def test_setup_wires_keybindings_and_the_words_command(env, tmp_path):
+    """`herdr plugin action invoke herdr-word-practice.setup` must be idempotent."""
+    env["HERDR_CONFIG"] = str(tmp_path / "config.toml")
+    env["WORDS_BIN_DIR"] = str(tmp_path / "bin")
+
+    first = run(["setup", "--json"], env)
+    assert first.returncode == 0, first.stderr
+    payload = json.loads(first.stdout)
+    text = (tmp_path / "config.toml").read_text()
+    assert text.count("herdr-word-practice.drill") == 1
+    assert "prefix+shift+w" in text and "prefix+alt+w" in text
+
+    link = tmp_path / "bin" / "words"
+    assert link.is_symlink()
+    assert Path(os.path.realpath(link)).name == "words"
+
+    second = json.loads(run(["setup", "--json"], env).stdout)
+    assert (tmp_path / "config.toml").read_text() == text, "second run must not duplicate"
+    assert any("已配置" in step for step in second["steps"])
+    assert payload["dry_run"] is False

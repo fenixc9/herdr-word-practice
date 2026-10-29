@@ -433,6 +433,7 @@ words stats [--json] [--wait]
 words books [--json] [--words BOOK]
 words import PATH [--id ID] [--name NAME] [--use]
 words settings [key=value ...] [--json]
+words setup [--dry-run] [--json]     # 写键位 + 链接 words + 重载（setup action 调的就是它）
 words reset [--yes]
 words doctor [--json]
 ```
@@ -464,7 +465,7 @@ words doctor [--json]
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q                                        # 138 个测试（含真实 pty 端到端）
+python3 -m pytest tests/ -q                                        # 139 个测试（含真实 pty 端到端）
 python3 -m flake8 --max-line-length=100 worddrill/ main.py tests/  # 风格检查
 python3 main.py drill --once --width 76 --height 20 -b coding      # 看渲染
 ```
@@ -523,6 +524,16 @@ WARN herdr::raw_input: flushing lone escape after input timeout;
 绕过办法：按 **`Ctrl+C`** 退出（控制字符不参与 Esc 消歧，立刻转发）。底栏也写成 `esc/⌃c 退出`。
 
 插件本身退出很快：按 Esc/Ctrl+C 到窗格消失实测 **40ms**（含落盘）。
+
+### `herdr plugin install` 失败？
+
+```bash
+herdr plugin install fenixc9/herdr-word-practice --ref main -y   # -y 用于非交互
+herdr plugin log list --plugin herdr-word-practice              # 看 install/setup 的输出
+```
+
+要求 herdr `>= 0.9.1`。如果你之前用 `link` 装过同一个 id，先
+`herdr plugin unlink herdr-word-practice`，两者不能同时存在。
 
 ### 键位不生效？
 
