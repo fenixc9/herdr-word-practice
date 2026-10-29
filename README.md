@@ -4,7 +4,7 @@
 
 一个 herdr 插件：按 `prefix+w`，弹出一张卡片，打一个词，90 秒后回到代码。
 它借鉴了 [TypeWords](https://github.com/zyronon/TypeWords) 的思路——**靠打字回忆，而不是翻看**——
-再把「间隔重复 + 打字判分 + 音标/例句/词根」压进一个能塞进 popup 的终端界面。
+再把「间隔重复 + 打字判分 + 音标/例句/词根」压进一个能塞进侧栏的终端界面。
 
 ```
 ╭ words · 默写 ─────────────────────────────────────────── 3/10  🔥5 ╮
@@ -33,7 +33,8 @@
 - **打字，不是选择。** 选择题会让你认词，打字才逼你拼出来。拼错就是没记住，这个信号比「我感觉我会」可靠得多。
 - **一张卡片。** 没有列表、没有菜单、没有进度页要先翻。打开就想打，打完就能走。
 - **可以随时中断。** Esc 立刻退出并保存；没打完的那组下次接着来，不会清零。
-- **只占用眼前这一小块。** popup 悬浮在当前 tab 上，不抢布局，关掉就回到原来的光标位置。
+- **只占用眼前这一小块。** 在当前 tab 里 split 出一块，Esc 一按就收回去（实测 40ms），
+  不用切 tab、也不会把布局搞乱。
 - **主动提醒但不烦人。** agent 干完活变空闲时才提醒，45 分钟内只提醒一次，23:00–08:00 静默。
 
 ## 安装
@@ -251,7 +252,8 @@ words settings nudge.enabled=false   # 关掉空闲提醒
   读 payload 里的状态，只有 `idle`/`done` 才考虑提醒，再套上节流和静默时段，
   最多发一条 `herdr notification show`。默认不自动开窗格（`nudge.auto_open = true` 可以开）。
   注意 herdr 0.9.x 里 `agent.idle` **不是**合法事件名，会告警。
-- `[[panes]] break`：popup，72% × 70%，跑 `main.py drill`。
+- `[[panes]] break`：split，跑 `main.py drill`。
+  （原来是 popup，但 popup 关闭时要 1s 左右，split 只要 40ms，对「90 秒一组」来说太不值。）
 - `[[panes]] stats`：popup，跑 `main.py stats --wait`。
 - `[[actions]]`：八个动作（各模式 + 进度 + 手动提醒）。**action 没有 PTY**，
   所以每个交互动作都是 `main.py open-pane …`，由它去调 `herdr plugin pane open`。
@@ -318,9 +320,16 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 
 **关窗有点慢？**
 
-按 Esc 到进程退出约 40ms（含落盘），退出时不清屏、只恢复光标和换行，
-避免让 herdr 多做一次全屏重绘。如果仍然觉得慢，多半是宿主在关闭 pane 时的动画/重绘，
-可以 `herdr --version` 看看是否有新版本。
+现在默认用 `split`，按 Esc → 窗格消失实测 **40ms**（含落盘、关窗）。
+
+早期版本用的是 `popup`：进程 40ms 就退了，但弹窗在屏幕上要挂 1 秒多才收掉。
+如果你的 herdr 版本对 popup 处理不同，可以改 manifest 里 `break` 的 placement 对比：
+
+```toml
+[[panes]]
+id = "break"
+placement = "popup"   # 需要同时加 width = "72%" / height = "70%"
+```
 
 **其他常查项**
 

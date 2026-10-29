@@ -19,7 +19,7 @@ id = "herdr.words"
 name = "herdr words"
 version = "1.0.0"
 min_herdr_version = "0.9.0"
-description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a popup, with typing recall, phonetics, and 1100+ bundled words."
+description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a split pane, with typing recall, phonetics, and 1100+ bundled words."
 platforms = ["linux", "macos"]
 
 # Prepare state/config directories once per server start, and print a one-line
@@ -34,14 +34,13 @@ command = ["python3", "main.py", "startup"]
 on = "pane.agent_status_changed"
 command = ["python3", "main.py", "event"]
 
-# The drill itself. `popup` is right for a break: it floats over the work,
-# does not disturb the layout, and hands focus back on Esc.
+# The drill itself. `split` (not `popup`): a split pane closes the moment the
+# process exits, while a popup lingers noticeably longer — for a 90-second
+# break-time drill, snappy dismissal matters more than floating on top.
 [[panes]]
 id = "break"
 title = "herdr words"
-placement = "popup"
-width = "72%"
-height = "70%"
+placement = "split"
 command = ["python3", "main.py", "drill"]
 
 # A read-only progress view, kept open until you press Enter.
