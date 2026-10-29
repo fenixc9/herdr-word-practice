@@ -279,7 +279,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 136 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 137 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
@@ -318,6 +318,14 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 
 回归测试守着：顶栏/底栏必须收口到同一列、输入框三条边等宽、状态栏与底栏不得出现
 宽度不确定字形（`·`、`—`、`…`、`→`、`●`）。
+
+**输入单词没反应？**
+
+已在 2026-10-29 修复：界面在"终端尺寸没变"时会跳过重绘，导致敲键后不刷新，
+只有拼完（自动提交）或按回车才看得见。现在每次按键都强制重绘。
+
+如果还遇到类似"输入无响应"，先确认窗格是聚焦的（`herdr pane current`），
+再 `words drill` 在普通 shell 里跑一次对比。
 
 **按 Esc 关窗有点慢？（herdr 侧，不是插件）**
 

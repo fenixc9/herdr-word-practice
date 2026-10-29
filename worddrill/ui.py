@@ -783,7 +783,7 @@ class DrillApp:
                             self._handle(key)
                             if self.quit:
                                 break
-                            self._draw()
+                            self._draw_after_key()
                         continue
                     if ready:
                         try:
@@ -798,7 +798,7 @@ class DrillApp:
                             self._handle(key)
                             if self.quit:
                                 break
-                            self._draw()
+                            self._draw_after_key()
             finally:
                 signal.signal(signal.SIGWINCH, old_handler)
         return self.result
@@ -949,6 +949,15 @@ class DrillApp:
         self._autoplay_at = time.time() + 0.015
 
     # -- drawing ---------------------------------------------------------
+    def _draw_after_key(self) -> None:
+        """Repaint after a keystroke, even if the terminal size is unchanged.
+
+        ``_draw`` skips repaints when nothing "structural" changed, which is the
+        right optimisation for idle ticks but wrong for input: typing a letter
+        only mutates the session, so the frame must still be redrawn.
+        """
+        self._draw(force=True)
+
     def _draw(self, force: bool = False) -> None:
         width, height = term.terminal_size()
         if not force and (width, height) == self._last_size and not self.flash_until:

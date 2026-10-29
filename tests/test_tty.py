@@ -265,3 +265,23 @@ def test_escape_quits_promptly(one_word_book, env):
         assert elapsed < 0.8, f"quitting took {elapsed:.2f}s"
     finally:
         tui.close()
+
+
+def test_partial_typing_is_visible_immediately(one_word_book, env):
+    """Typing must repaint even before the word is complete.
+
+    Regression: the redraw was skipped whenever the terminal size had not
+    changed, so keystrokes were invisible until auto-submit.
+    """
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        for char in "cac":
+            tui.send(char)
+            time.sleep(0.05)
+        screen = tui.read_until(lambda text: "│ cac" in text, timeout=3)
+        assert "│ cac" in screen, f"typed text never appeared:\n{screen}"
+        tui.send("\x1b")
+        tui.proc.wait(timeout=10)
+    finally:
+        tui.close()
