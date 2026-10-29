@@ -26,9 +26,12 @@ TICK = 0.1
 @dataclass
 class Theme:
     colors: bool = True
+    palette: str = ""      # "", "dark", "light"
 
     def __post_init__(self) -> None:
         self.colors = bool(self.colors) and term.color_supported()
+        if self.palette:
+            term.set_palette(self.palette)
 
     def paint(self, text: str, fg_color: str | None = None, bg_color: str | None = None,
               bold: bool = False, dim: bool = False, italic: bool = False,
@@ -593,13 +596,30 @@ def flush_keys(buffer: bytes) -> tuple[list[str], bytes]:
     return keys, rest
 
 
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 class RawTerminal:
-    def __init__(self) -> None:
+    """Raw keyboard mode plus the smallest screen plumbing that always works.
+
+    Alternate screen and synchronized output both look nicer in a full-screen
+    terminal, but they are exactly the features a multiplexer's pane emulator
+    may defer, which shows up as a permanently blank pane. So the defaults are
+    the conservative ones: draw in place, clear behind us, restore the cursor.
+    Opt in with WORDS_TUI_ALT_SCREEN=1 / WORDS_TUI_SYNC=1 when running in a
+    terminal you control.
+    """
+
+    def __init__(self, probe: bool = True) -> None:
+        self.probe = probe
         try:
             self.fd: int | None = sys.stdin.fileno()
         except (OSError, ValueError, AttributeError):
             self.fd = None
         self.saved = None
+        self.alt_screen = _env_flag("WORDS_TUI_ALT_SCREEN")
+        self.palette: str | None = None
 
     def __enter__(self) -> "RawTerminal":
         try:
@@ -612,15 +632,23 @@ class RawTerminal:
             tty.setraw(self.fd)
         except (ImportError, OSError, ValueError):
             self.saved = None
-        term.emit("\x1b[?1049h\x1b[?25l\x1b[?7l")
-        if term.truecolor_supported():
-            term.emit("\x1b[?2026h")
+        # Probing is opt-in: a multiplexer pane does not answer OSC 11, and even
+        # if it did, the default palette already works on both backgrounds.
+        self.palette = (term.probe_background(self.fd)
+                        if self.probe and self.saved and _env_flag("WORDS_THEME_PROBE")
+                        else None)
+        if self.palette:
+            term.set_palette(self.palette)
+        if self.alt_screen:
+            term.emit("\x1b[?1049h")
+        term.emit("\x1b[?25l\x1b[?7l\x1b[2J\x1b[H")
         return self
 
     def __exit__(self, *exc) -> None:
-        if term.truecolor_supported():
-            term.emit("\x1b[?2026l")
-        term.emit("\x1b[?7h\x1b[?25h\x1b[?1049l")
+        if self.alt_screen:
+            term.emit("\x1b[?7h\x1b[?25h\x1b[?1049l")
+        else:
+            term.emit("\x1b[?7h\x1b[?25h\x1b[2J\x1b[H")
         if self.saved is not None and self.fd is not None:
             try:
                 import termios
@@ -638,9 +666,12 @@ class DrillApp:
                  sound_on: bool = True, on_pronounce=None, on_favorite=None,
                  on_master=None, on_toggle_sound=None, on_result=None,
                  autoplay: bool | str = False, input_fd: int | None = None,
-                 output=None):
+                 output=None, palette: str = "auto"):
         self.session = session
-        self.theme = theme or Theme()
+        self.palette_mode = (palette or "auto").lower()
+        if self.palette_mode not in {"dark", "light"}:
+            self.palette_mode = "auto"
+        self.theme = theme or Theme(palette=self.palette_mode)
         self.streak = streak
         self.today_count = today_count
         self.daily_goal = daily_goal
@@ -670,9 +701,10 @@ class DrillApp:
         self._resized = False
         self._last_size = (0, 0)
         self._session_end_handled = False
+        self.sync_output = _env_flag("WORDS_TUI_SYNC")
 
     def run(self) -> SessionResult | None:
-        with RawTerminal():
+        with RawTerminal(probe=self.palette_mode == "auto"):
             old_handler = signal.getsignal(signal.SIGWINCH)
             signal.signal(signal.SIGWINCH, self._on_resize)
             try:
@@ -882,5 +914,13 @@ class DrillApp:
             daily_goal=self.daily_goal, sound_on=self.sound_on,
             help_open=self.help_open, message=self.message,
         )
-        self.output.write("\x1b[H" + "\r\n".join(lines))
+        # One self-contained frame: home, paint, erase the rest, done. Sync
+        # mode, when enabled, wraps this frame and is closed before returning,
+        # so a pane emulator that defers synchronized updates still ends up
+        # with a committed screen.
+        frame = "\x1b[H" + "\r\n".join(lines) + "\x1b[J"
+        if self.sync_output:
+            self.output.write("\x1b[?2026h" + frame + "\x1b[?2026l")
+        else:
+            self.output.write(frame)
         self.output.flush()

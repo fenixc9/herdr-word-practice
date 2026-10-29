@@ -211,3 +211,77 @@ def test_result_card_shows_collocations_and_etymology():
     assert "deploy to production" in text
     assert "de-（去掉）" in text
     assert "近义" in text
+
+
+def test_palettes_have_the_same_keys_and_contrast():
+    dark, light = term.HEX_DARK, term.HEX_LIGHT
+    assert set(dark) == set(light)
+    # Text must contrast with its own background in each palette.
+    assert term.luminance(dark["text"]) > 0.5
+    assert term.luminance(light["text"]) < 0.2
+    assert term.luminance(term.HEX_LIGHT["base"]) > 0.8
+
+
+def test_osc11_replies_choose_the_right_palette():
+    assert term.parse_osc11(b"\x1b]11;rgb:1e1e/1e1e/2e2e\x07") == "dark"
+    assert term.parse_osc11(b"\x1b]11;rgb:ffff/ffff/ffff\x1b\\") == "light"
+    assert term.parse_osc11(b"\x1b]11;rgb:0000/0000/0000\x07") == "dark"
+    assert term.parse_osc11(b"no reply here") is None
+
+
+def test_probe_returns_none_without_a_terminal():
+    assert term.probe_background(None) is None
+
+
+def test_theme_switches_the_module_palette():
+    Theme(palette="light")
+    assert term.PALETTE == "light" and term.HEX["green"] == term.HEX_LIGHT["green"]
+    Theme(palette="dark")
+    assert term.PALETTE == "dark" and term.HEX["green"] == term.HEX_DARK["green"]
+    Theme(palette="auto")
+    assert term.PALETTE == "auto" and term.HEX["green"] == term.HEX_UNIVERSAL["green"]
+
+
+def test_structural_colors_use_the_terminal_default_foreground():
+    rendered = term.style("word", "text")
+    assert rendered == "word", "body text must not carry a fixed color"
+    assert "\x1b[38" not in rendered
+    assert term.style("hint", "subtext").startswith("\x1b[2m"), "hierarchy via dim"
+
+
+def test_default_accents_survive_both_backgrounds():
+    def contrast(a, b):
+        hi, lo = sorted((term.luminance(a), term.luminance(b)), reverse=True)
+        return (hi + 0.05) / (lo + 0.05)
+
+    for name in ("green", "red", "peach", "teal", "mauve", "blue", "yellow"):
+        color = term.HEX_UNIVERSAL[name]
+        assert contrast(color, "#1e1e2e") > 3.0, f"{name} too dark on dark bg"
+        assert contrast(color, "#ffffff") > 3.0, f"{name} too pale on light bg"
+
+
+def test_draw_does_not_leave_synchronized_output_open():
+    import io
+
+    session = session_for([make_word()])
+    out = io.StringIO()
+    app = DrillApp(session, output=out, input_fd=None)
+    app._draw(force=True)
+    text = out.getvalue()
+    assert "herdr words" in term.strip_ansi(text)
+    assert text.count("\x1b[?2026h") == text.count("\x1b[?2026l"), "sync must be balanced"
+    assert text.endswith("\x1b[?2026l") or "\x1b[?2026h" not in text
+    assert "\x1b[?1049h" not in text, "alt screen is opt-in only"
+
+
+def test_sync_mode_wraps_each_frame_when_enabled(monkeypatch):
+    import io
+
+    session = session_for([make_word()])
+    out = io.StringIO()
+    app = DrillApp(session, output=out, input_fd=None)
+    app.sync_output = True
+    app._draw(force=True)
+    text = out.getvalue()
+    assert text.startswith("\x1b[?2026h")
+    assert text.endswith("\x1b[?2026l")

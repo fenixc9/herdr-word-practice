@@ -98,6 +98,13 @@ def _resolve_book(settings: Settings, state_dir: Path, override: str | None) -> 
         return books[0]
 
 
+def _resolve_palette(settings: Settings, override: str | None) -> str:
+    """auto | dark | light — ``auto`` asks the terminal for its background."""
+    choice = (override or os.environ.get("WORDS_THEME")
+              or settings.get("theme") or "auto").lower()
+    return choice if choice in {"auto", "dark", "light"} else "auto"
+
+
 def _resolve_mode(settings: Settings, override: str | None) -> str:
     mode = (override or os.environ.get("HERDR_WORDS_MODE")
             or settings.get("mode") or "smart").lower()
@@ -212,6 +219,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     streak, today = _streak_and_today(progress, now)
     goal = int(settings.get("daily_goal", 20) or 0)
     sound = bool(settings.get("sound", True)) and not args.no_sound
+    palette_mode = _resolve_palette(settings, args.theme)
     accent = str(settings.get("accent", "us") or "us").lower()
     if args.accent:
         accent = args.accent
@@ -277,7 +285,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         session, streak=streak, today_count=today, daily_goal=goal,
         sound_on=sound, on_pronounce=on_pronounce, on_favorite=on_favorite,
         on_master=on_master, on_toggle_sound=on_toggle_sound,
-        on_result=on_result, autoplay=args.autoplay,
+        on_result=on_result, autoplay=args.autoplay, palette=palette_mode,
     )
     try:
         app.run()
@@ -296,6 +304,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
 def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
               state_dir: Path) -> int:
     now = time.time()
+    term.set_palette(_resolve_palette(settings, getattr(args, "theme", None)))
     books = available_books(state_dir)
     active = settings.get("book") or (books[0].id if books else "")
     streak, today = _streak_and_today(progress, now)
@@ -702,6 +711,8 @@ def build_parser() -> argparse.ArgumentParser:
     drill.add_argument("-n", "--size", type=int, help="这一组的词数")
     drill.add_argument("--no-sound", action="store_true", help="关闭发音")
     drill.add_argument("--accent", choices=("us", "uk"), help="发音口音")
+    drill.add_argument("--theme", choices=("auto", "dark", "light"),
+                       help="界面配色（默认 auto：读终端背景色）")
     drill.add_argument("--no-color", action="store_true", help="关闭颜色")
     drill.add_argument("--plan", action="store_true", help="只列出本轮单词，不进界面")
     drill.add_argument("--once", action="store_true", help="渲染一帧后退出（用于预览）")
@@ -716,6 +727,7 @@ def build_parser() -> argparse.ArgumentParser:
     stats.add_argument("--json", action="store_true")
     stats.add_argument("--wait", action="store_true",
                        help="打印后等待回车（用于窗格）")
+    stats.add_argument("--theme", choices=("auto", "dark", "light"))
     stats.set_defaults(func=cmd_stats)
 
     books = sub.add_parser("books", help="列出词书")

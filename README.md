@@ -237,6 +237,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 | `daily_goal` | `20` | 状态栏里的每日目标 |
 | `sound` | `true` | 答对时是否发音 |
 | `accent` | `us` | 发音口音：`us` / `uk` |
+| `theme` | `auto` | 配色：`auto`（深浅背景都能看）/ `dark` / `light` |
 | `auto_pronounce` | `true` | 答对后自动读一遍 |
 | `notify_on_finish` | `true` | 练完弹一条通知 |
 | `nudge.enabled` | `true` | agent 空闲时是否提醒 |
@@ -275,7 +276,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 119 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 128 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
@@ -290,6 +291,26 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 
 更细的设计取舍见 [docs/design.md](docs/design.md)，词书格式见
 [docs/wordbook-format.md](docs/wordbook-format.md)。
+
+## 排错
+
+**弹出后一片空白？**
+
+1. 先确认宿主主题：`words stats --theme light` 和 `--theme dark` 各看一次，
+   哪个看得清就 `words settings theme=light`（或 `dark`）固定下来。
+   默认的 `auto` 用终端自身前景色画正文、用深浅背景都能读的中间调画强调色，
+   所以正常情况不需要改。
+2. 确认进程起来了：`pgrep -f "main.py drill"` 应该有输出。
+3. 看 herdr 侧日志：`herdr plugin log list`，失败的调用会带 stderr。
+4. `words doctor` 会打印 python、目录、发音引擎、词书是否正常。
+
+**其他常查项**
+
+- 没声音：`words doctor` 里 pronunciation 是否 ok；或 `words settings sound=false`
+  确认不是音量问题。
+- 键位不生效：`herdr config check`，再 `herdr server reload-config`。
+- 进度看着不对：`words stats`，或直接看
+  `~/.local/state/herdr/plugins/herdr.words/progress.json`。
 
 ## 已知边界
 

@@ -208,3 +208,44 @@ def test_enter_on_summary_starts_another_session(one_word_book, env):
     day = list(progress["days"].values())[0]
     assert day["sessions"] >= 2, "finishing and restarting are both counted"
     assert progress["words"]["one:cache"]["correct"] == 1
+
+
+def test_background_probe_switches_the_palette(tmp_path, env):
+    """If the terminal answers OSC 11 with white, the TUI must use light colors."""
+    import pty as _pty
+
+    script = tmp_path / "probe.py"
+    script.write_text(
+        "import sys; sys.path.insert(0, %r)\n"
+        "from worddrill import term\n"
+        "import tty; tty.setraw(0)\n"
+        "print('PALETTE=' + str(term.probe_background(0, timeout=2.0)))\n"
+        "raise SystemExit(0)\n" % str(ROOT))
+    master, slave = _pty.openpty()
+    proc = subprocess.Popen([sys.executable, str(script)], stdin=slave,
+                            stdout=slave, stderr=slave, env=env,
+                            start_new_session=True)
+    os.close(slave)
+    query = b""
+    deadline = time.time() + 5
+    while time.time() < deadline and b"\x1b]11;?" not in query:
+        ready, _, _ = select.select([master], [], [], 0.2)
+        if ready:
+            query += os.read(master, 256)
+    os.write(master, b"\x1b]11;rgb:ffff/ffff/ffff\x07")
+    output = b""
+    while time.time() < deadline:
+        ready, _, _ = select.select([master], [], [], 0.2)
+        if ready:
+            try:
+                chunk = os.read(master, 4096)
+            except OSError:
+                break
+            if not chunk:
+                break
+            output += chunk
+        if proc.poll() is not None:
+            break
+    proc.wait(timeout=5)
+    os.close(master)
+    assert b"PALETTE=light" in output, output
