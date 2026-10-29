@@ -276,7 +276,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 128 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 133 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
@@ -303,6 +303,15 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 2. 确认进程起来了：`pgrep -f "main.py drill"` 应该有输出。
 3. 看 herdr 侧日志：`herdr plugin log list`，失败的调用会带 stderr。
 4. `words doctor` 会打印 python、目录、发音引擎、词书是否正常。
+
+**中文/边框看起来错位？**
+
+宽度计算按显示列（CJK = 2 列）走，并且有测试守着：输入框三条边必须等宽、
+顶栏和底栏必须收口、窄窗口下按键提示宁可整条去掉也不切断汉字。
+
+如果是你的终端把某些"窄符号"（`✓ ✗ · —`）渲染成了 2 列，看起来会偏：
+`words settings theme=light` 不会改变这一点，但可以在窄窗口下少用符号视图——
+或者直接开宽一点的窗格（默认 popup 是 72% × 70%）。
 
 **其他常查项**
 

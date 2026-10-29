@@ -192,11 +192,11 @@ def _book_rows(book: Wordbook, progress: Progress, active: bool) -> list[str]:
     states = progress.state_map()
     counts = status_counts(book.words, states)
     mark = term.style("◆", term.HEX["teal"]) if active else " "
-    label = f"{mark} {book.id:<8}{book.name}"
+    label = f"{mark} {term.pad(book.id, 8)}{book.name}"
     detail = (f"共 {len(book.words):>4}  新 {counts['new']:>4}  "
               f"学习中 {counts['learning']:>3}  复习 {counts['review']:>3}  "
               f"已掌握 {counts['mastered']:>3}")
-    return [f"{label:<28}{term.style(detail, term.HEX['surface2'])}"]
+    return [term.pad(label, 30) + term.style(detail, term.HEX["surface2"])]
 
 
 def _meter(value: int, goal: int, width: int = 22) -> str:
@@ -241,7 +241,8 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
                              ensure_ascii=False))
         else:
             for index, item in enumerate(payload, 1):
-                print(f"{index:>2}. {item['word']:<18}{item['pos']:<8}{item['cn']}")
+                print(f"{index:>2}. {term.pad(item['word'], 18)}"
+                      f"{term.pad(item['pos'], 8)}{item['cn']}")
         return 0
 
     if args.once or not sys.stdin.isatty():
@@ -368,7 +369,7 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
     bar_width = 44
     for label, value, colour in segments:
         cells = int(round(bar_width * value / total))
-        print(f"  {label:<6}{term.style('█' * cells, colour)}"
+        print(f"  {term.pad(label, 7)}{term.style('█' * cells, colour)}"
               f"{'░' * (bar_width - cells)} {value:>4}")
 
     _print_block("最近 7 天", _week_rows(progress, now))
@@ -435,7 +436,8 @@ def cmd_books(args: argparse.Namespace, settings: Settings, progress: Progress,
     if args.words:
         book = _resolve_book(settings, state_dir, args.words)
         for word in book.words:
-            line = f"{word.word:<18}{word.ipa:<20}{word.pos:<8}{word.cn}"
+            line = (term.pad(word.word, 18) + term.pad(word.ipa, 20)
+                    + term.pad(word.pos, 8) + word.cn)
             print(term.strip_ansi(line))
         return 0
 
@@ -690,7 +692,7 @@ def cmd_doctor(args: argparse.Namespace, settings: Settings, progress: Progress,
         for name, ok, detail in checks:
             mark = (term.style("ok  ", term.HEX["green"]) if ok
                     else term.style("fail", term.HEX["red"]))
-            print(f"  {mark} {name:<16}{detail}")
+            print(f"  {mark} {term.pad(name, 16)}{detail}")
     return 0 if all(ok for _, ok, _ in checks) else 1
 
 

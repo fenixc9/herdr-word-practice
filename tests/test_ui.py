@@ -285,3 +285,58 @@ def test_sync_mode_wraps_each_frame_when_enabled(monkeypatch):
     text = out.getvalue()
     assert text.startswith("\x1b[?2026h")
     assert text.endswith("\x1b[?2026l")
+
+
+def test_input_box_edges_line_up():
+    session = session_for([make_word()])
+    lines = [term.strip_ansi(line) for line in frame(session, width=70, height=18)]
+    box = [line for line in lines if "输入" in line or line.strip().startswith("│ ") or "╰" in line]
+    widths = {term.text_width(line.rstrip()) for line in box[:3]}
+    assert len(widths) == 1, f"input box edges differ: {sorted(widths)}"
+    left_edges = {len(line) - len(line.lstrip(" ")) for line in box[:3]}
+    assert len(left_edges) == 1, f"input box left edges differ: {left_edges}"
+
+
+def test_header_and_footer_close_the_frame():
+    session = session_for([make_word()])
+    for width in (52, 70, 100):
+        lines = [term.strip_ansi(line).rstrip() for line in frame(session, width=width, height=20)]
+        assert term.text_width(lines[0]) == width, "header must span the frame"
+        assert lines[0].endswith("╮")
+        assert term.text_width(lines[-1]) == width
+        assert lines[-1].endswith("─╯"), f"footer must close the frame: {lines[-1]!r}"
+
+
+def test_footer_keeps_quit_hint_when_space_is_tight():
+    session = session_for([make_word()])
+    for width in (34, 44, 56):
+        lines = [term.strip_ansi(line).rstrip() for line in frame(session, width=width, height=20)]
+        assert "esc" in lines[-1], f"quit hint dropped at width {width}: {lines[-1]!r}"
+        assert term.text_width(lines[-1]) == width
+
+
+def test_no_line_is_wider_than_the_frame():
+    for mode in ("follow", "dictation", "spelling", "selfcheck"):
+        session = session_for([make_word()], mode=mode)
+        for width in (40, 48, 60):
+            for line in frame(session, width=width, height=22):
+                assert term.text_width(line) == width
+
+
+def test_cjk_and_ascii_columns_align():
+    """Rows padded by display width, not character count."""
+    from worddrill.cli import _book_rows
+    from worddrill.store import Progress
+    from pathlib import Path as _Path
+    import tempfile
+
+    book = __import__("worddrill.data", fromlist=["find_book"]).find_book("cet4")
+    coding = __import__("worddrill.data", fromlist=["find_book"]).find_book("coding")
+    with tempfile.TemporaryDirectory() as tmp:
+        progress = Progress.load(_Path(tmp))
+        rows = [_book_rows(b, progress, False)[0] for b in (book, coding)]
+    starts = set()
+    for row in rows:
+        plain = term.strip_ansi(row)
+        starts.add(term.text_width(plain[: plain.index("共")]))
+    assert len(starts) == 1, f"detail columns differ: {starts}"

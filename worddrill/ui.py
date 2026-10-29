@@ -89,7 +89,8 @@ def frame_border(painter: Painter, title: str, subtitle: str = "",
     if subtitle:
         used += term.text_width(f"· {subtitle} ")
     right_used = term.text_width(f" {right} ") if right else 0
-    fill = max(0, width - used - right_used - 2)
+    # used already counts the leading "╭"; only "╮" is still to come.
+    fill = max(0, width - used - right_used - 1)
     painter.add(
         theme.paint("╭", "surface2") + title_text + subtitle_text
         + theme.paint("─" * fill, "surface1") + right_text
@@ -112,9 +113,10 @@ def frame_footer(painter: Painter, keys: list[tuple[str, str]]) -> None:
         for key, label in keys
     ]
     text = theme.paint(" · ", "surface2").join(chunks)
+    # "╰─ " (3) + body + " ─╯" (3) must add up to exactly the frame width.
     painter.add(
         theme.paint("╰─ ", "surface2")
-        + term.truncate("  " + text, max(0, painter.width - 4))
+        + term.pad(term.truncate(text, max(0, painter.width - 6)), max(0, painter.width - 6))
         + theme.paint(" ─╯", "surface2")
     )
 
@@ -205,6 +207,17 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
     return painter.render()
 
 
+def rpad(text: str, width: int) -> str:
+    """Pad on the right to a *display* width (CJK is two cells, not two chars)."""
+    return term.pad(text, width)
+
+
+def lpad(text: str, width: int) -> str:
+    """Pad on the left to a *display* width."""
+    space = width - term.text_width(text)
+    return " " * space + text if space > 0 else term.truncate(text, width)
+
+
 def _card_meta(word: Word) -> str:
     return "  ".join(part for part in (word.ipa, word.pos) if part)
 
@@ -288,7 +301,10 @@ def _render_input(painter: Painter, session: DrillSession, word: Word) -> None:
 
     content_width = max(4, inner_width - 1)
     caret = theme.paint("▏", "mauve", reverse=True) if session.phase == "typing" else " "
-    painter.add(" " * left_pad + theme.paint("╭─ 输入 " + "─" * (box_width - 8) + "╮", box_color))
+    # The label "╭─ 输入 " is 8 cells (CJK counts double), so the fill has to be
+    # box_width - 9 to make the top edge exactly as wide as the sides below it.
+    painter.add(" " * left_pad
+                + theme.paint("╭─ 输入 " + "─" * (box_width - 9) + "╮", box_color))
     painter.add(
         " " * left_pad
         + theme.paint("│ ", box_color)
@@ -395,10 +411,17 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
     goal = theme.paint(f"今日 {today_count}/{daily_goal}", "blue") if daily_goal else ""
     elapsed = theme.paint(_format_clock(session.elapsed), "overlay1")
     mute = theme.paint("🔊", "teal") if sound_on else theme.paint("🔇", "surface2")
-    line = "   ".join(
-        part for part in (progress_bar, percent, stats, acc, goal, elapsed, mute)
-        if part)
-    painter.add(" " + term.truncate(line, painter.width - 2))
+    parts = [part for part in (progress_bar, percent, stats, acc, goal, elapsed, mute)
+             if part]
+    # Drop whole segments from the right instead of slicing a CJK glyph in half.
+    budget = painter.width - 2
+    kept: list[str] = []
+    for part in parts:
+        trial = "   ".join([*kept, part])
+        if term.text_width(term.strip_ansi(trial)) > budget:
+            break
+        kept.append(part)
+    painter.add(" " + term.pad("   ".join(kept), budget))
 
 
 def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
@@ -412,11 +435,28 @@ def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
     else:
         keys = [("⏎", "提交"), ("⇥", "提示"), ("⌃r", "发音"), ("⌃f", "收藏"),
                 ("⌃m", "掌握"), ("?", "帮助"), ("esc", "退出")]
-    painter.add(" " + term.truncate(
-        theme.paint(" · ", "surface2").join(
+    budget = painter.width - 6          # "╰─ " + " ─╯"
+    sep = theme.paint(" · ", "surface2")
+
+    def render(selection) -> str:
+        return sep.join(
             theme.paint(key, "lavender", bold=True) + theme.paint(f" {label}", "overlay1")
-            for key, label in keys
-        ), painter.width - 2))
+            for key, label in selection)
+
+    # Always keep the first and last hint (quit stays reachable); fill the middle
+    # only as far as it fits, so nothing is ever cut mid-glyph.
+    kept = [keys[0]]
+    for item in keys[1:-1]:
+        trial = term.text_width(term.strip_ansi(render([*kept, item, keys[-1]])))
+        if trial > budget:
+            break
+        kept.append(item)
+    kept.append(keys[-1])
+    body = render(kept)
+    if term.text_width(term.strip_ansi(body)) > budget:
+        body = term.truncate(body, budget)
+    painter.add(theme.paint("╰─ ", "surface2") + term.pad(body, budget)
+                + theme.paint(" ─╯", "surface2"))
 
 
 def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> list[str]:
