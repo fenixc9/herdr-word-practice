@@ -163,3 +163,23 @@ def test_timing_is_tracked_per_word():
     assert session.last_answer is not None
     assert session.last_answer.seconds == pytest.approx(4.5)
     assert session.elapsed == pytest.approx(4.5)
+
+
+def test_words_per_minute_is_zero_for_instant_sessions():
+    session = DrillSession(words=[make_word("cache")], mode="follow", now=Clock())
+    for char in "cache":
+        session.type_char(char)
+    assert session.result().words_per_minute == 0.0
+
+
+def test_words_per_minute_uses_elapsed_time():
+    clock = Clock()
+    session = DrillSession(words=[make_word("a"), make_word("b")], mode="follow",
+                           now=clock)
+    for target in ("a", "b"):
+        for char in target:
+            session.type_char(char)
+        clock.tick(15)
+        session.advance()
+    result = session.result()
+    assert result.words_per_minute == pytest.approx(4.0)

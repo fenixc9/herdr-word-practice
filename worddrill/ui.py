@@ -419,8 +419,9 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
     painter.blank(1)
     centered(painter, f"正确率  {int(result.accuracy * 100)}%    {result.correct}/{result.total}",
              "text")
-    centered(painter, f"用时  {_format_clock(result.elapsed)}    "
-                      f"{result.words_per_minute:.1f} 词/分", "subtext")
+    pace = (f"{result.words_per_minute:.1f} 词/分"
+            if result.words_per_minute else "—")
+    centered(painter, f"用时  {_format_clock(result.elapsed)}    {pace}", "subtext")
     painter.blank(1)
     dots = []
     for answer in result.answers:
@@ -436,7 +437,9 @@ def _render_summary(painter: Painter, session: DrillSession, theme: Theme) -> li
     else:
         centered(painter, "全部拼对，漂亮。", "green")
     painter.blank(1)
-    centered(painter, "下次复习  " + next_due_label(session.states), "overlay1")
+    due = next_due_label(session.states)
+    if due != "—":
+        centered(painter, "下次复习  " + due, "overlay1")
 
     _fit(painter, painter.height - 2)
     bottom_rule(painter)

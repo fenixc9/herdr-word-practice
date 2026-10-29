@@ -47,7 +47,10 @@ class SessionResult:
 
     @property
     def words_per_minute(self) -> float:
-        return self.total / (self.elapsed / 60.0) if self.elapsed > 0 else 0.0
+        # Below a second the ratio is noise (tests, autoplay, ultra-fast cards).
+        if self.elapsed < 1.0 or not self.total:
+            return 0.0
+        return self.total / (self.elapsed / 60.0)
 
     @property
     def wrong_words(self) -> list[str]:

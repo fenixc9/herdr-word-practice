@@ -274,7 +274,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 116 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 118 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
