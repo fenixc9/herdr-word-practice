@@ -254,8 +254,15 @@ def plan_session(request: PlanRequest) -> list[Word]:
     rng.shuffle(new_words)
 
     allowance = max(0, request.daily_new_limit - request.new_today)
-    new_budget = max(1 if size >= 4 else 0, int(round(size * 0.4)))
-    new_budget = min(new_budget, allowance)
+    if due_words:
+        # Mix reviews with a slice of new words, and respect the daily cap.
+        new_budget = min(max(1 if size >= 4 else 0, int(round(size * 0.4))),
+                         allowance)
+    else:
+        # Nothing is due, so the whole round should be new material. The daily
+        # cap is a soft target for the first round of the day; it must not turn
+        # "again" into a repeat of the cards you just answered.
+        new_budget = size
 
     picked: list[Word] = []
     seen: set[str] = set()

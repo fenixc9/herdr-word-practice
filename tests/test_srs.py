@@ -207,3 +207,57 @@ def test_next_due_label_reads_naturally():
     state = srs.WordState(status=srs.STATUS_REVIEW, due=time.time() + 3600)
     label = srs.next_due_label({"k": state}, now=time.time())
     assert "小时" in label or "分" in label
+
+
+def test_second_smart_round_does_not_repeat_the_first():
+    """Everything you just answered sits in 'learning' until its step is due.
+
+    A fresh round right after must still bring new material, even when the daily
+    new-word allowance is already spent.
+    """
+    words = [word(f"w{i:02d}") for i in range(40)]
+    states: dict[str, srs.WordState] = {}
+    now = 1_000_000.0
+
+    first = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=10, now=now, seed=1,
+        daily_new_limit=8, new_today=0))
+    assert len(first) == 10
+    for item in first:
+        srs.grade(states.setdefault(item.key, srs.WordState()), 4, now=now)
+
+    second = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=10, now=now + 1,
+        daily_new_limit=8, new_today=len(first)))
+    overlap = {w.key for w in first} & {w.key for w in second}
+    assert not overlap, f"second round repeats {len(overlap)} words"
+    assert len(second) == 10
+
+
+def test_due_reviews_come_first_in_a_mixed_round():
+    words = [word(f"w{i:02d}") for i in range(30)]
+    states: dict[str, srs.WordState] = {}
+    now = 1_000_000.0
+    for item in words[:3]:
+        states[item.key] = srs.WordState(status=srs.STATUS_REVIEW, reps=2,
+                                         due=now - 60, interval=srs.DAY)
+    plan = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=10, now=now, seed=2))
+    due_keys = {item.key for item in words[:3]}
+    assert due_keys.issubset({item.key for item in plan})
+
+
+def test_learning_words_return_only_when_due():
+    words = [word(f"w{i:02d}") for i in range(20)]
+    states: dict[str, srs.WordState] = {"b:w00": srs.WordState()}
+    now = 1_000_000.0
+    srs.grade(states["b:w00"], 4, now=now)          # due in ten minutes
+
+    early = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=5, now=now + 1))
+    assert "b:w00" not in {item.key for item in early}
+
+    later = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=5,
+        now=now + srs.LEARNING_STEP + 1))
+    assert later[0].key == "b:w00"
