@@ -74,6 +74,7 @@ HELP_LINES = [
     ("Ctrl+F", "收藏 / 取消收藏"),
     ("Ctrl+M", "标记为已掌握"),
     ("Ctrl+S", "静音开关"),
+    ("Ctrl+B", "切换词书"),
     ("?", "打开这个帮助"),
     ("1-4", "自测模式：不认识 / 模糊 / 认识 / 太简单"),
 ]
@@ -161,7 +162,8 @@ def _fit(painter: Painter, limit: int) -> None:
 def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
                  *, streak: int = 0, today_count: int = 0, daily_goal: int = 0,
                  sound_on: bool = True, help_open: bool = False,
-                 message: str = "") -> list[str]:
+                 message: str = "", books=None, book_id: str = "",
+                 book_menu: bool = False, book_cursor: int = 0) -> list[str]:
     painter = Painter(width, height, theme)
     mode_label = MODE_LABELS.get(session.mode, session.mode)
 
@@ -173,6 +175,8 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
 
     if help_open:
         return _render_help(painter, session)
+    if book_menu and books:
+        return _render_books(painter, books, book_id, book_cursor)
     if not session.words:
         return _render_empty(painter, session)
     if session.phase == "done":
@@ -517,6 +521,31 @@ def _render_help(painter: Painter, session: DrillSession) -> list[str]:
     return painter.render()
 
 
+def _render_books(painter: Painter, books, current: str, cursor: int) -> list[str]:
+    theme = painter.theme
+    painter.blank(1)
+    centered(painter, "选择词书", "mauve", bold=True)
+    painter.blank(1)
+    for index, book in enumerate(books[:9], start=1):
+        active = book["id"] == current
+        prefix = "▸ " if index - 1 == cursor else "  "
+        line = (theme.paint(f"{prefix}{index}", "lavender", bold=True) + "  "
+                + theme.paint(book["name"], "text" if active else "subtext")
+                + theme.paint(f"  {book['size']} 词", "surface2"))
+        painter.add(" " * 4 + line)
+    painter.blank(1)
+    if books:
+        chosen = books[min(cursor, len(books) - 1)]
+        if chosen.get("detail"):
+            for line in term.wrap(chosen["detail"], max(16, painter.width - 10),
+                                  max_lines=2):
+                centered(painter, line, "overlay1")
+    _fit(painter, painter.height - 2)
+    bottom_rule(painter)
+    frame_footer(painter, [("1-9", "选择"), ("↑↓", "移动"), ("esc/⌃c", "取消")])
+    return painter.render()
+
+
 def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     hint = {
         "favorites": ("收藏夹还是空的",
@@ -557,6 +586,7 @@ class Keys:
     CTRL_M = "ctrl-m"
     CTRL_S = "ctrl-s"
     CTRL_L = "ctrl-l"
+    CTRL_B = "ctrl-b"
     UP = "up"
     DOWN = "down"
     LEFT = "left"
@@ -567,7 +597,7 @@ KEY_BYTES = {
     b"\x1b": Keys.ESC, b"\r": Keys.ENTER, b"\n": Keys.ENTER, b"\t": Keys.TAB,
     b"\x7f": Keys.BACKSPACE, b"\x08": Keys.BACKSPACE, b"\x03": Keys.CTRL_C,
     b"\x12": Keys.CTRL_R, b"\x06": Keys.CTRL_F,
-    b"\x13": Keys.CTRL_S, b"\x0c": Keys.CTRL_L,
+    b"\x13": Keys.CTRL_S, b"\x0c": Keys.CTRL_L, b"\x02": Keys.CTRL_B,
 }
 
 ESCAPE_SEQUENCES = {
@@ -713,7 +743,8 @@ class DrillApp:
                  sound_on: bool = True, on_pronounce=None, on_favorite=None,
                  on_master=None, on_toggle_sound=None, on_result=None,
                  autoplay: bool | str = False, input_fd: int | None = None,
-                 output=None, palette: str = "auto"):
+                 output=None, palette: str = "auto", books=None,
+                 book_id: str = "", on_switch_book=None):
         self.session = session
         self.palette_mode = (palette or "auto").lower()
         if self.palette_mode not in {"dark", "light"}:
@@ -748,6 +779,11 @@ class DrillApp:
         self._resized = False
         self._last_size = (0, 0)
         self._session_end_handled = False
+        self.books = list(books or [])
+        self.book_id = book_id
+        self.on_switch_book = on_switch_book
+        self.book_menu = False
+        self.book_cursor = 0
         self.sync_output = _env_flag("WORDS_TUI_SYNC")
 
     def run(self) -> SessionResult | None:
@@ -819,8 +855,18 @@ class DrillApp:
                 self.help_open = False
                 self._draw(force=True)
             return
+        if self.book_menu:
+            self._handle_book_menu(key)
+            return
         if key == "?":
             self.help_open = True
+            self._draw(force=True)
+            return
+        if key == Keys.CTRL_B and self.books:
+            self.book_menu = True
+            self.book_cursor = next(
+                (index for index, book in enumerate(self.books)
+                 if book["id"] == self.book_id), 0)
             self._draw(force=True)
             return
         if key == Keys.ESC:
@@ -969,6 +1015,42 @@ class DrillApp:
         self._draw(force=True)
 
     # -- drawing ---------------------------------------------------------
+    def _handle_book_menu(self, key: str) -> None:
+        if key in {Keys.ESC, Keys.CTRL_C, Keys.CTRL_B}:
+            self.book_menu = False
+            self._draw(force=True)
+            return
+        if key in {Keys.UP, "k"}:
+            self.book_cursor = (self.book_cursor - 1) % max(1, len(self.books))
+            self._draw(force=True)
+            return
+        if key in {Keys.DOWN, "j"}:
+            self.book_cursor = (self.book_cursor + 1) % max(1, len(self.books))
+            self._draw(force=True)
+            return
+        if key.isdigit() and key != "0":
+            index = int(key) - 1
+            if 0 <= index < len(self.books):
+                self._pick_book(index)
+            return
+        if key == Keys.ENTER:
+            self._pick_book(self.book_cursor)
+
+    def _pick_book(self, index: int) -> None:
+        if not (0 <= index < len(self.books)):
+            return
+        book = self.books[index]
+        self.book_menu = False
+        if book["id"] == self.book_id:
+            self._draw(force=True)
+            return
+        if self.on_switch_book is not None:
+            self.on_switch_book(book["id"])
+
+    def set_books(self, books, current: str) -> None:
+        self.books = list(books)
+        self.book_id = current
+
     def _draw_after_key(self) -> None:
         """Repaint after a keystroke, even if the terminal size is unchanged.
 
@@ -988,6 +1070,8 @@ class DrillApp:
             streak=self.streak, today_count=self.today_count,
             daily_goal=self.daily_goal, sound_on=self.sound_on,
             help_open=self.help_open, message=self.message,
+            books=self.books, book_id=self.book_id,
+            book_menu=self.book_menu, book_cursor=self.book_cursor,
         )
         # One self-contained frame: home, paint, erase the rest, done. Sync
         # mode, when enabled, wraps this frame and is closed before returning,

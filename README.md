@@ -140,6 +140,7 @@ description = "背单词：学习进度"
 | `Ctrl+F` | 收藏 / 取消收藏 |
 | `Ctrl+M` | 标记为已掌握（不再出现在智能复习里） |
 | `Ctrl+S` | 静音开关（会写进设置） |
+| `Ctrl+B` | 切换词书（列表里按数字或 ↑↓+⏎ 选，立即切过去） |
 | `1`–`4` | 自测模式：不认识 / 模糊 / 认识 / 太简单 |
 | `?` | 帮助 |
 | `Esc` | 退出（自动保存）。herdr 客户端会为单独 Esc 等一次超时才转发，觉得慢就按 `Ctrl+C` |
@@ -174,6 +175,7 @@ description = "背单词：学习进度"
 `The cache hides the real latency.`
 
 ```bash
+# 训练中直接按 Ctrl+B 切词书（会记住选择）
 words books                     # 词书列表 + 每本的学习状态
 words books --words coding      # 打印整本词书的单词
 words drill -b coding -m dictation

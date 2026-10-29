@@ -316,3 +316,34 @@ def test_partial_typing_is_visible_immediately(one_word_book, env):
         tui.proc.wait(timeout=10)
     finally:
         tui.close()
+
+
+def test_ctrl_b_switches_wordbook(tmp_path, env):
+    """Ctrl+B lists the wordbooks; picking one switches the book for real."""
+    for book_id, name, words in (("one", "一个词", "cache"), ("two", "两个词", "deploy")):
+        source = tmp_path / f"{book_id}.tsv"
+        source.write_text(f"# id={book_id}\n# name={name}\n{words}\t\tv.\t释义\n",
+                          encoding="utf-8")
+        subprocess.run([sys.executable, str(MAIN), "import", str(source), "--use"],
+                       cwd=str(ROOT), env=env, check=True, capture_output=True)
+
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        tui.send("\x02")                       # Ctrl+B
+        menu = tui.read_until(lambda text: "选择词书" in text, timeout=5)
+        assert "选择词书" in menu
+        assert "两个词" in menu, f"other books should be listed:\n{menu}"
+
+        tui.send("j")                          # move to the next entry
+        tui.send("\r")                         # pick it
+        switched = tui.read_until(lambda text: "deploy" in text, timeout=8)
+        assert "deploy" in switched, f"book did not switch:\n{switched}"
+
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()
+
+    settings = json.loads((tmp_path / "config" / "settings.json").read_text())
+    assert settings["book"] == "two", "the choice must persist"

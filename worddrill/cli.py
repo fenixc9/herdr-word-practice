@@ -275,6 +275,15 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         settings.save()
         return bool(settings.data["sound"])
 
+    book_entries = [
+        {
+            "id": item.id,
+            "name": item.name,
+            "size": len(item.words),
+            "detail": item.description,
+        }
+        for item in available_books(state_dir)
+    ]
     holder: dict[str, DrillApp] = {}
 
     def on_result(result: SessionResult, event: str) -> None:
@@ -299,11 +308,22 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
             # Keep the summary on screen but surface the numbers in a pane.
             herdr.open_pane("stats", placement="popup", focus=False)
 
+    def on_switch_book(new_book_id: str) -> None:
+        """Switch wordbook from inside the TUI and start that book's round."""
+        settings.data["book"] = new_book_id
+        settings.save()
+        active = _resolve_book(settings, state_dir, new_book_id)
+        fresh = build_session(settings, progress, active, mode, size)
+        new_streak, new_today = _streak_and_today(progress)
+        holder["app"].set_books(book_entries, active.id)
+        holder["app"].restart(fresh, streak=new_streak, today_count=new_today)
+
     app = DrillApp(
         session, streak=streak, today_count=today, daily_goal=goal,
         sound_on=sound, on_pronounce=on_pronounce, on_favorite=on_favorite,
         on_master=on_master, on_toggle_sound=on_toggle_sound,
         on_result=on_result, autoplay=args.autoplay, palette=palette_mode,
+        books=book_entries, book_id=book.id, on_switch_book=on_switch_book,
     )
     holder["app"] = app
     try:
