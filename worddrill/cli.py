@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -763,6 +764,23 @@ def _herdr_config() -> Path:
     return base / "herdr" / "config.toml"
 
 
+def _words_on_path(bin_dir: Path) -> bool:
+    """Is ``words`` reachable from a login shell?
+
+    Actions run with herdr's own environment, which may not include
+    ``~/.local/bin`` even when the user's shell does — so ask the shell.
+    """
+    shell = os.environ.get("SHELL") or "/bin/sh"
+    if ":" + str(bin_dir) + ":" in ":" + os.environ.get("PATH", "") + ":":
+        return True
+    try:
+        proc = subprocess.run([shell, "-lc", "command -v words"],
+                              capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
+
+
 def cmd_setup(args: argparse.Namespace, settings: Settings, progress: Progress,
               state_dir: Path) -> int:
     """Wire the plugin into herdr: keybindings, the `words` command, reload.
@@ -793,7 +811,7 @@ def cmd_setup(args: argparse.Namespace, settings: Settings, progress: Progress,
     # 2. the `words` command
     target = root / "scripts" / "words"
     link = bin_dir / "words"
-    on_path = str(bin_dir) in os.environ.get("PATH", "").split(os.pathsep)
+    on_path = _words_on_path(bin_dir)
     if link.is_symlink() and Path(os.path.realpath(link)) == Path(os.path.realpath(target)):
         steps.append(f"words 命令: 已指向 {target}")
     else:
