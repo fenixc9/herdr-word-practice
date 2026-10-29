@@ -199,3 +199,17 @@ def test_drill_without_a_tty_does_not_hang(env):
     result = run(["drill", "-n", "2"], env)
     assert result.returncode == 0
     assert "herdr words" in result.stdout
+
+
+def test_install_script_dry_run_is_harmless(tmp_path):
+    env = dict(os.environ)
+    env["HERDR_CONFIG"] = str(tmp_path / "config.toml")
+    env["WORDS_BIN_DIR"] = str(tmp_path / "bin")
+    env["PATH"] = f"{tmp_path / 'bin'}:" + env.get("PATH", "")
+    result = subprocess.run(
+        ["sh", str(ROOT / "scripts" / "install.sh"), "--dry-run"],
+        cwd=str(ROOT), env=env, capture_output=True, text=True, timeout=60)
+    assert result.returncode == 0, result.stderr
+    assert "dry-run" in result.stdout
+    assert not (tmp_path / "config.toml").exists(), "dry-run must not write config"
+    assert not (tmp_path / "bin" / "words").exists()

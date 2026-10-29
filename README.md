@@ -38,26 +38,46 @@
 
 ## 安装
 
+一条命令：
+
 ```bash
-herdr plugin link ~/project/herdr-english-learn    # 本地目录
-herdr plugin list                                  # 应当看到 herdr.words
+cd ~/project/herdr-english-learn
+./scripts/install.sh
 ```
 
-需要 `python3`（3.9+，只用标准库）、`herdr >= 0.9.0`。发音用系统 TTS，
-按 `espeak-ng` → `espeak` → `say` → `spd-say` 的顺序取第一个可用的；都没有就安静地跳过。
+它做四件事（幂等，可以反复跑）：
 
-命令行工具叫 `words`，把它放进 PATH：
+1. `herdr plugin link` 把插件注册到 herdr
+2. 把 `words` 软链到 `~/.local/bin`（命令行入口）
+3. 往 `~/.config/herdr/config.toml` 追加 `prefix+w` / `prefix+shift+w` / `prefix+alt+w`
+4. `herdr server reload-config` + 自检
+
+先看看会改什么：`./scripts/install.sh --dry-run`。
+
+装完按 **`prefix+w`** 就能开始。卸载：
 
 ```bash
+herdr plugin unlink herdr.words
+rm -f ~/.local/bin/words
+# 键位留在 config.toml 里，不需要就删掉那三块 [[keys.command]]
+```
+
+### 前置条件
+
+- `herdr >= 0.9.0`（`herdr --version`）
+- `python3 >= 3.9`，只用标准库，无需 pip 安装任何东西
+- 发音可选：按 `espeak-ng` → `espeak` → `say` → `spd-say` 的顺序取第一个可用的；
+  一个都没有也能用，只是没声音（`words doctor` 会标出来）
+
+### 手工安装（等价）
+
+```bash
+herdr plugin link ~/project/herdr-english-learn
 ln -s ~/project/herdr-english-learn/scripts/words ~/.local/bin/words
-words --version
-words doctor
+herdr server reload-config
 ```
 
-（不想装也行：`python3 ~/project/herdr-english-learn/main.py drill` 等价，
-在插件目录里 `./scripts/words drill` 也可以。）
-
-绑定按键（`~/.config/herdr/config.toml`）：
+键位写进 `~/.config/herdr/config.toml`：
 
 ```toml
 [[keys.command]]
@@ -78,25 +98,6 @@ type = "plugin_action"
 command = "herdr.words.stats"
 description = "背单词：学习进度"
 ```
-
-然后 `herdr server reload-config`，按 `prefix+w` 就能开始。
-
-## 八种模式
-
-| 模式 | 命令 | 给什么 | 练什么 |
-| --- | --- | --- | --- |
-| 智能复习 | `-m smart` | 该复习的词 + 少量新词 | 默认模式：先还债，再学新 |
-| 自由练习 | `-m free` | 这本词书里随便挑的词 | 不管记忆曲线，想练就练 |
-| 跟打 | `-m follow` | 单词、音标、释义、例句 | 建立拼写手感，最适合第一次见 |
-| 默写 | `-m dictation` | 长度提示 + 挖空例句 | 从语境回忆拼写 |
-| 看中文拼写 | `-m spelling` | 只有中文释义 | 最硬的回忆：从意义找形式 |
-| 自测 | `-m selfcheck` | 单词 + 释义，按 1–4 自评 | 通勤/开会时不动手也能过 |
-| 错词本 | `-m review` | 拼错过的词 | 专治反复错的词 |
-| 收藏夹 | `-m favorites` | 你按过 Ctrl+F 的词 | 自己攒的难词表 |
-
-`smart` 会看每个词的状态：到期的先来，其次是学习中、错得多的，最后才补新词
-（每天新词上限默认 8 个，可在设置里改）。新词第一次出现用「跟打」露出全词，
-之后再遇到就变成挖空默写——这是 TypeWords 里「先跟打后默写」的思路。
 
 ## 和 TypeWords 的对应关系
 
@@ -274,10 +275,11 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 118 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 119 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
+- `scripts/install.sh` 安装（link 插件 + words 命令 + 键位 + 重载）
 - `worddrill/data.py` 词书解析（TSV/CSV/JSON）
 - `worddrill/srs.py` SM-2 变体与组题策略
 - `worddrill/session.py` 打字/提示/判分状态机
