@@ -379,8 +379,12 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
     correct = sum(1 for a in session.answers if a.correct)
     accuracy = correct / done if done else 0.0
     bar_width = max(6, min(20, painter.width // 4))
-    progress_bar = theme.paint(term.bar(session.progress, bar_width), "mauve")
-    percent = theme.paint(f"{int(session.progress * 100):3d}%", "subtext")
+    if session.total:
+        progress_bar = theme.paint(term.bar(session.progress, bar_width), "mauve")
+        percent = theme.paint(f"{int(session.progress * 100):3d}%", "subtext")
+    else:
+        progress_bar = theme.paint("▱" * bar_width, "surface2")
+        percent = theme.paint("  —", "subtext")
     stats = (theme.paint(f"✓{correct}", "green") + theme.paint("/", "surface2")
              + theme.paint(f"✗{done - correct}", "red"))
     acc = (theme.paint(f"{int(accuracy * 100)}%", "subtext") if done
@@ -481,8 +485,8 @@ def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     for line in term.wrap(hint[1], max(16, painter.width - 10), max_lines=2):
         centered(painter, line, "subtext")
     painter.blank(1)
-    centered(painter, "换模式：  herdr words drill -m smart", "overlay1")
-    centered(painter, "换词书：  herdr words books", "overlay1")
+    centered(painter, "换模式：  words drill -m smart", "overlay1")
+    centered(painter, "换词书：  words books", "overlay1")
     _fit(painter, painter.height - 3)
     bottom_rule(painter)
     _render_status(painter, session, 0, 0, True)

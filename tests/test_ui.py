@@ -88,6 +88,8 @@ def test_empty_session_explains_itself():
     text = term.strip_ansi("\n".join(frame(session)))
     assert "收藏夹还是空的" in text
     assert "Ctrl+F" in text
+    assert "words drill -m smart" in text
+    assert "100%" not in text, "an empty session has no progress to celebrate"
 
 
 def test_help_overlay_lists_shortcuts():

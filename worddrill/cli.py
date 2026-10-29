@@ -368,7 +368,7 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
         for row in _book_rows(book, progress, book.id == active):
             print(row)
     print()
-    print(term.style(" 开始训练: herdr words drill   ·   帮助: herdr words drill --help",
+    print(term.style(" 开始训练: words drill   ·   帮助: words drill --help",
                      term.HEX["surface2"]))
     print()
     if getattr(args, "wait", False) and sys.stdin.isatty():
