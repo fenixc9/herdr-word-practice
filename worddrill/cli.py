@@ -463,9 +463,9 @@ def cmd_import(args: argparse.Namespace, settings: Settings, progress: Progress,
 
 def _coerce(raw: str):
     lowered = raw.strip().lower()
-    if lowered in {"true", "yes", "on", "1"}:
+    if lowered in {"true", "yes", "on"}:
         return True
-    if lowered in {"false", "no", "off", "0"}:
+    if lowered in {"false", "no", "off"}:
         return False
     if lowered in {"none", "null"}:
         return None
@@ -474,6 +474,11 @@ def _coerce(raw: str):
             return caster(raw)
         except ValueError:
             continue
+    if raw.strip()[:1] in "[{":
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError:
+            pass
     return raw
 
 

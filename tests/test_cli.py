@@ -101,6 +101,14 @@ def test_settings_roundtrip_from_the_cli(env, tmp_path):
     assert len(plan["words"]) == 6, "settings should drive the default size"
 
 
+def test_settings_accept_json_values(env, tmp_path):
+    result = run(["settings", "nudge.quiet_hours=[22,7]", "sound=false"], env)
+    assert result.returncode == 0
+    stored = json.loads((tmp_path / "config" / "settings.json").read_text())
+    assert stored["nudge"]["quiet_hours"] == [22, 7]
+    assert stored["sound"] is False
+
+
 def test_bad_setting_is_ignored(env):
     result = run(["settings", "nonsense"], env)
     assert result.returncode == 0
