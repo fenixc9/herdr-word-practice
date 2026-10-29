@@ -67,6 +67,8 @@ DEFAULT_SETTINGS: dict = {
     "session_size": 10,
     "daily_new_limit": 8,
     "daily_goal": 20,
+    "quiz_every_sessions": 3,
+    "quiz_size": 3,
     "theme": "auto",
     "notify_on_finish": True,
     "nudge": {

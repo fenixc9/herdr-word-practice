@@ -157,7 +157,12 @@ def test_plan_avoids_mastered_words_in_follow_modes():
 @pytest.mark.parametrize("mode", srs.MODES)
 def test_every_mode_plans_without_crashing(mode):
     words = [word(f"w{i}") for i in range(15)]
-    plan = srs.plan_session(srs.PlanRequest(words=words, states={}, mode=mode,
+    states: dict[str, srs.WordState] = {}
+    if mode == "quiz":
+        # A quiz only draws from words you have already practised.
+        for item in words[:6]:
+            srs.grade(states.setdefault(item.key, srs.WordState()), 4, now=0)
+    plan = srs.plan_session(srs.PlanRequest(words=words, states=states, mode=mode,
                                             size=5, now=0, seed=11))
     assert len(plan) == 5
     assert len({item.key for item in plan}) == 5
@@ -251,3 +256,31 @@ def test_learning_words_return_only_when_due():
         words=words, states=states, mode="smart", size=5,
         now=now + srs.LEARNING_STEP + 1))
     assert later[0].key == "b:w00"
+
+
+def test_quiz_mode_only_uses_studied_words():
+    words = [word(f"w{i:02d}") for i in range(20)]
+    states: dict[str, srs.WordState] = {}
+    now = 1_000_000.0
+    for item in words[:4]:                       # only these four were practised
+        srs.grade(states.setdefault(item.key, srs.WordState()), 4, now=now)
+
+    plan = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="quiz", size=5, now=now))
+    studied = {item.key for item in words[:4]}
+    assert {item.key for item in plan} == studied, "quiz must not introduce new words"
+
+
+def test_quiz_prefix_leads_a_smart_round():
+    words = [word(f"w{i:02d}") for i in range(30)]
+    states: dict[str, srs.WordState] = {}
+    now = 1_000_000.0
+    for item in words[:5]:
+        srs.grade(states.setdefault(item.key, srs.WordState()), 4, now=now)
+
+    plan = srs.plan_session(srs.PlanRequest(
+        words=words, states=states, mode="smart", size=8, now=now,
+        quiz_count=3, seed=4))
+    assert [item.key for item in plan[:3]] == [item.key for item in words[:3]]
+    assert len(plan) == 8
+    assert len({item.key for item in plan}) == 8

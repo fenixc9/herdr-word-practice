@@ -72,6 +72,7 @@ HELP_LINES = [
     ("Esc", "退出（自动保存）"),
     ("Ctrl+K", "标记为已掌握"),
     ("Ctrl+B", "切换词书"),
+    ("Ctrl+Q", "现在来一次小测验"),
     ("?", "打开这个帮助"),
     ("1-4", "自测模式：不认识 / 模糊 / 认识 / 太简单"),
 ]
@@ -160,14 +161,22 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
                  *, streak: int = 0, today_count: int = 0, daily_goal: int = 0,
                  help_open: bool = False,
                  message: str = "", books=None, book_id: str = "",
-                 book_menu: bool = False, book_cursor: int = 0) -> list[str]:
+                 book_menu: bool = False, book_cursor: int = 0,
+                 book_name: str = "", quiz_prefix: int = 0) -> list[str]:
     painter = Painter(width, height, theme)
     mode_label = MODE_LABELS.get(session.mode, session.mode)
+    if quiz_prefix and session.index < quiz_prefix:
+        mode_label = "小测验"
+    subtitle = mode_label
+    if book_name:
+        # Keep the header honest about which book you are actually drilling.
+        room = max(6, width // 3)
+        subtitle = f"{term.truncate(book_name, room)} | {mode_label}"
 
     header_right = f"{min(session.index + 1, session.total)}/{session.total}"
     if streak:
         header_right += f"  🔥{streak}"
-    frame_border(painter, "herdr words", mode_label, header_right)
+    frame_border(painter, "herdr words", subtitle, header_right)
     top_rule(painter)
 
     if help_open:
@@ -229,6 +238,9 @@ def _render_card(painter: Painter, session: DrillSession, word: Word,
     show_word = variant == "follow" or session.phase == "result"
     if show_word:
         centered(painter, word.word, "text", bold=True)
+    elif variant == "cloze" and session.phase == "typing":
+        # Fill-in-the-blank: most letters hidden, a few left as scaffolding.
+        centered(painter, word.cloze(), "surface2", bold=True)
     else:
         # Masked prompt: show length as underscores, keeping spaces/hyphens.
         centered(painter, word.length_hint, "surface2", bold=True)
@@ -576,6 +588,7 @@ class Keys:
     CTRL_C = "ctrl-c"
     CTRL_K = "ctrl-k"
     CTRL_B = "ctrl-b"
+    CTRL_Q = "ctrl-q"
     UP = "up"
     DOWN = "down"
     LEFT = "left"
@@ -585,7 +598,7 @@ class Keys:
 KEY_BYTES = {
     b"\x1b": Keys.ESC, b"\r": Keys.ENTER, b"\n": Keys.ENTER, b"\t": Keys.TAB,
     b"\x7f": Keys.BACKSPACE, b"\x08": Keys.BACKSPACE, b"\x03": Keys.CTRL_C,
-    b"\x02": Keys.CTRL_B, b"\x0b": Keys.CTRL_K,
+    b"\x02": Keys.CTRL_B, b"\x0b": Keys.CTRL_K, b"\x11": Keys.CTRL_Q,
 }
 
 ESCAPE_SEQUENCES = {
@@ -731,7 +744,8 @@ class DrillApp:
                  on_master=None, on_result=None,
                  autoplay: bool | str = False, input_fd: int | None = None,
                  output=None, palette: str = "auto", books=None,
-                 book_id: str = "", on_switch_book=None):
+                 book_id: str = "", on_switch_book=None, book_name: str = "",
+                 quiz_prefix: int = 0, on_quiz=None):
         self.session = session
         self.palette_mode = (palette or "auto").lower()
         if self.palette_mode not in {"dark", "light"}:
@@ -767,6 +781,9 @@ class DrillApp:
         self.on_switch_book = on_switch_book
         self.book_menu = False
         self.book_cursor = 0
+        self.book_name = book_name
+        self.quiz_prefix = quiz_prefix
+        self.on_quiz = on_quiz
         self.sync_output = _env_flag("WORDS_TUI_SYNC")
 
     def run(self) -> SessionResult | None:
@@ -844,6 +861,9 @@ class DrillApp:
         if key == "?":
             self.help_open = True
             self._draw(force=True)
+            return
+        if key == Keys.CTRL_Q and self.on_quiz is not None:
+            self.on_quiz()
             return
         if key == Keys.CTRL_B and self.books:
             self.book_menu = True
@@ -1009,9 +1029,11 @@ class DrillApp:
         if self.on_switch_book is not None:
             self.on_switch_book(book["id"])
 
-    def set_books(self, books, current: str) -> None:
+    def set_books(self, books, current: str, name: str = "") -> None:
         self.books = list(books)
         self.book_id = current
+        if name:
+            self.book_name = name
 
     def _draw_after_key(self) -> None:
         """Repaint after a keystroke, even if the terminal size is unchanged.
@@ -1034,6 +1056,7 @@ class DrillApp:
             help_open=self.help_open, message=self.message,
             books=self.books, book_id=self.book_id,
             book_menu=self.book_menu, book_cursor=self.book_cursor,
+            book_name=self.book_name, quiz_prefix=self.quiz_prefix,
         )
         # One self-contained frame: home, paint, erase the rest, done. Sync
         # mode, when enabled, wraps this frame and is closed before returning,

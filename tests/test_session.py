@@ -183,3 +183,37 @@ def test_words_per_minute_uses_elapsed_time():
         session.advance()
     result = session.result()
     assert result.words_per_minute == pytest.approx(4.0)
+
+
+def test_quiz_alternates_cloze_and_dictation():
+    words = [make_word("cache"), make_word("deploy"), make_word("retry"),
+             make_word("schema")]
+    session = DrillSession(words=words, mode="quiz")
+    variants = []
+    for word in words:
+        variants.append(session.prompt_variant())
+        session.typed = word.word
+        session.submit()
+        session.advance()
+    assert variants == ["cloze", "dictation", "cloze", "dictation"]
+
+
+def test_quiz_prefix_cards_use_quiz_variants_in_a_smart_round():
+    words = [make_word("cache"), make_word("deploy")]
+    session = DrillSession(words=words, mode="smart")
+    session.quiz_prefix = 1
+    assert session.prompt_variant() == "cloze"
+    assert session.is_quiz_card() is True
+    session.typed = "cache"
+    session.submit()
+    session.advance()
+    assert session.is_quiz_card() is False
+
+
+def test_cloze_masks_most_letters_but_keeps_scaffolding():
+    word = make_word("pronunciation")
+    masked = word.cloze()
+    assert masked.startswith("p"), "the first letter always shows"
+    assert masked.count("_") > len(word.word) // 2
+    assert masked.replace(" ", "").__len__() == 1 + (len(word.word) - 1) * 2 - \
+        (len(word.word) - 1)

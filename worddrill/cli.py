@@ -119,8 +119,24 @@ def _streak_and_today(progress: Progress, now: float | None = None) -> tuple[int
     return streak, count
 
 
+def _quiz_due(settings: Settings, progress: Progress) -> int:
+    """How many quiz cards this round should start with.
+
+    ``quiz_every_sessions`` (default 3) means: after every three finished rounds,
+    the next smart round opens with a short quiz. 0 disables it.
+    """
+    every = int(settings.get("quiz_every_sessions", 3) or 0)
+    if every <= 0:
+        return 0
+    sessions = int(progress.totals().get("sessions", 0))
+    if sessions <= 0 or sessions % every:
+        return 0
+    return int(settings.get("quiz_size", 3) or 3)
+
+
 def _plan(settings: Settings, progress: Progress, book: Wordbook, mode: str,
-          size: int | None, now: float | None = None) -> list:
+          size: int | None, now: float | None = None,
+          quiz_count: int = 0) -> list:
     now = time.time() if now is None else now
     request = PlanRequest(
         words=book.words,
@@ -130,14 +146,17 @@ def _plan(settings: Settings, progress: Progress, book: Wordbook, mode: str,
         now=now,
         daily_new_limit=int(settings.get("daily_new_limit", 8) or 0),
         new_today=progress.new_today(now),
+        quiz_count=quiz_count,
     )
     return plan_session(request)
 
 
 def build_session(settings: Settings, progress: Progress, book: Wordbook,
                   mode: str, size: int | None = None,
-                  now: float | None = None) -> DrillSession:
-    words = _plan(settings, progress, book, mode, size, now)
+                  now: float | None = None,
+                  quiz_count: int = 0) -> DrillSession:
+    words = _plan(settings, progress, book, mode, size, now,
+                  quiz_count=0 if mode == "quiz" else quiz_count)
     states = progress.state_map()
 
     def on_answer(word, state: WordState, answer, correct: bool) -> None:
@@ -149,10 +168,12 @@ def build_session(settings: Settings, progress: Progress, book: Wordbook,
                                now=stamp)
         progress.save()
 
-    return DrillSession(
+    session = DrillSession(
         words=words, mode=mode, book_label=book.name, on_answer=on_answer,
         states=states,
     )
+    session.quiz_prefix = quiz_count if mode != "quiz" else 0
+    return session
 
 
 # --------------------------------------------------------------------------
@@ -217,7 +238,9 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     # edited custom wordlist) before planning, not on the exit path.
     if prune_words(progress, {w.key for w in book.words}):
         progress.save()
-    session = build_session(settings, progress, book, mode, size, now=now)
+    quiz_count = _quiz_due(settings, progress) if mode == "smart" else 0
+    session = build_session(settings, progress, book, mode, size, now=now,
+                            quiz_count=quiz_count)
 
     streak, today = _streak_and_today(progress, now)
     goal = int(settings.get("daily_goal", 20) or 0)
@@ -281,8 +304,11 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
             return
         if event == "again":
             # Pick a fresh set of words and keep the UI running.
-            fresh = build_session(settings, progress, book, mode, size)
+            due = _quiz_due(settings, progress) if mode == "smart" else 0
+            fresh = build_session(settings, progress, book, mode, size,
+                                  quiz_count=due)
             new_streak, new_today = _streak_and_today(progress)
+            app.quiz_prefix = getattr(fresh, "quiz_prefix", 0)
             app.restart(fresh, streak=new_streak, today_count=new_today)
         elif event == "stats":
             # Keep the summary on screen but surface the numbers in a pane.
@@ -295,14 +321,27 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         active = _resolve_book(settings, state_dir, new_book_id)
         fresh = build_session(settings, progress, active, mode, size)
         new_streak, new_today = _streak_and_today(progress)
-        holder["app"].set_books(book_entries, active.id)
-        holder["app"].restart(fresh, streak=new_streak, today_count=new_today)
+        app = holder["app"]
+        app.quiz_prefix = getattr(fresh, "quiz_prefix", 0)
+        app.set_books(book_entries, active.id, active.name)
+        app.restart(fresh, streak=new_streak, today_count=new_today)
+
+    def on_quiz() -> None:
+        """Start a short quiz right now, without leaving the drill."""
+        fresh = build_session(settings, progress, book, "quiz",
+                              int(settings.get("quiz_size", 3) or 3))
+        app = holder["app"]
+        app.quiz_prefix = 0
+        app.restart(fresh, streak=_streak_and_today(progress)[0],
+                    today_count=_streak_and_today(progress)[1])
 
     app = DrillApp(
         session, streak=streak, today_count=today, daily_goal=goal,
         on_master=on_master, on_result=on_result,
         autoplay=args.autoplay, palette=palette_mode,
         books=book_entries, book_id=book.id, on_switch_book=on_switch_book,
+        book_name=book.name, quiz_prefix=getattr(session, "quiz_prefix", 0),
+        on_quiz=on_quiz,
     )
     holder["app"] = app
     try:

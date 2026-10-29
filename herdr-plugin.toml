@@ -100,6 +100,12 @@ description = "看见单词自评认识程度，按 1-4 打分"
 command = ["python3", "main.py", "open-pane", "break", "-m", "selfcheck"]
 
 [[actions]]
+id = "quiz"
+title = "Words: 小测验"
+description = "只考学过的词：一半遮字母填空，一半默写"
+command = ["python3", "main.py", "open-pane", "break", "-m", "quiz"]
+
+[[actions]]
 id = "review"
 title = "Words: 错词本"
 description = "只练之前拼错过的词"

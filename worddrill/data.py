@@ -45,6 +45,25 @@ class Word:
     def length_hint(self) -> str:
         return " ".join("_" if ch.isalpha() else ch for ch in self.word)
 
+    def cloze(self, reveal_every: int = 3) -> str:
+        """The word with most letters hidden — a fill-in-the-blank prompt.
+
+        The first letter always shows, then one letter every ``reveal_every``
+        characters, so ``cache`` becomes ``c _ _ h _``. Enough scaffolding to
+        recall the word, not enough to read it.
+        """
+        if not self.word:
+            return ""
+        out = []
+        for index, char in enumerate(self.word):
+            if not char.isalpha():
+                out.append(char)
+            elif index == 0 or index % reveal_every == 0:
+                out.append(char)
+            else:
+                out.append("_")
+        return " ".join(out)
+
     def blanked_example(self) -> str:
         if not self.en:
             return ""

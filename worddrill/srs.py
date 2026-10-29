@@ -27,7 +27,8 @@ STATUS_LEARNING = "learning"
 STATUS_REVIEW = "review"
 STATUS_MASTERED = "mastered"
 
-MODES = ("smart", "free", "follow", "dictation", "spelling", "selfcheck", "review")
+MODES = ("smart", "free", "follow", "dictation", "spelling", "selfcheck",
+         "quiz", "review")
 
 MODE_LABELS = {
     "smart": "智能复习",
@@ -36,6 +37,7 @@ MODE_LABELS = {
     "dictation": "默写",
     "spelling": "看中文拼写",
     "selfcheck": "自测",
+    "quiz": "小测验",
     "review": "错词本",
 }
 
@@ -46,6 +48,7 @@ MODE_HINTS = {
     "dictation": "只看中文和挖空例句，把单词默写出来。",
     "spelling": "只给中文释义，凭记忆拼出英文。",
     "selfcheck": "看见单词先自问：认识、模糊，还是完全不认识。",
+    "quiz": "只考学过的词：一半遮字母填空，一半完全默写。",
     "review": "只练之前拼错过的词。",
 }
 
@@ -182,6 +185,7 @@ class PlanRequest:
     daily_new_limit: int = 8
     new_today: int = 0
     seed: int | None = None
+    quiz_count: int = 0
 
 
 def plan_session(request: PlanRequest) -> list[Word]:
@@ -202,6 +206,16 @@ def plan_session(request: PlanRequest) -> list[Word]:
         pool = list(candidates)
         rng.shuffle(pool)
         return pool[:size]
+
+    if mode == "quiz":
+        # Only words you have actually practised: a quiz over unseen words is a
+        # dictation lesson, not a test.
+        studied = [w for w in candidates if state_of(w).reps > 0]
+        studied.sort(key=lambda w: (-state_of(w).wrong, state_of(w).last))
+        if not studied:
+            # Nothing studied yet — fall back to weak words, then anything.
+            studied = [w for w in candidates if state_of(w).wrong > 0]
+        return studied[:size]
 
     if mode == "review":
         weak = [w for w in candidates if state_of(w).is_weak()]
@@ -227,6 +241,14 @@ def plan_session(request: PlanRequest) -> list[Word]:
         fresh = [w for w in candidates if state_of(w).status == STATUS_NEW]
         rng.shuffle(fresh)
         return (due + fresh)[:size]
+
+    # A periodic quiz is injected at the head of a smart session: the words you
+    # have already practised, hardest first.
+    quiz_words: list[Word] = []
+    if request.quiz_count > 0:
+        studied = [w for w in candidates if state_of(w).reps > 0]
+        studied.sort(key=lambda w: (-state_of(w).wrong, state_of(w).last))
+        quiz_words = studied[: max(0, request.quiz_count)]
 
     # smart mode: due reviews first, then unseen words, and only then the words
     # that are still on a learning step but not due yet. Putting "learning" ahead
@@ -270,6 +292,10 @@ def plan_session(request: PlanRequest) -> list[Word]:
             picked.append(word)
             added += 1
 
+    # Quiz cards lead the round, and are never repeated later in it.
+    if quiz_words:
+        seen.update(w.key for w in quiz_words)
+        picked.extend(quiz_words)
     add(due_words)
     add(new_words, limit=new_budget)
     add(weak_words)

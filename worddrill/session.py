@@ -224,6 +224,11 @@ class DrillSession:
             mode=self.mode, book_label=self.book_label,
         )
 
+    def is_quiz_card(self, index: int | None = None) -> bool:
+        """True for the quiz cards that open a smart round."""
+        position = self.index if index is None else index
+        return position < int(getattr(self, "quiz_prefix", 0))
+
     def prompt_variant(self, word: Word | None = None) -> str:
         """How much of the card to reveal.
 
@@ -233,6 +238,9 @@ class DrillSession:
         word = word or self.current
         if self.mode == "selfcheck":
             return "selfcheck"
+        if self.mode == "quiz" or self.is_quiz_card():
+            # Alternate: masked fill-in-the-blank, then full dictation.
+            return "cloze" if self.index % 2 == 0 else "dictation"
         if self.mode in {"follow", "free"}:
             return "follow"
         if self.mode == "dictation":
