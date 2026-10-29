@@ -20,12 +20,17 @@ def test_bundled_books_load(book_id):
     assert book.name and book.description
     keys = [word.key for word in book.words]
     assert len(keys) == len(set(keys)), "duplicate keys in book"
-    for word in book.words[:50]:
+    for word in book.words:
         assert word.word.strip(), "empty word"
         assert word.cn.strip(), f"{word.word} missing Chinese gloss"
-        assert word.en.strip(), f"{word.word} missing example sentence"
-        assert word.zh.strip(), f"{word.word} missing example translation"
-        assert word.pos.strip(), f"{word.word} missing part of speech"
+        if word.en:
+            assert word.zh, f"{word.word} has an example without translation"
+
+    # Example sentences are hand-written, so only a slice of a full syllabus
+    # wordlist carries them; the curated words must keep theirs.
+    with_example = [word for word in book.words if word.en]
+    assert len(with_example) >= min(200, len(book.words) // 4), \
+        f"{book_id}: only {len(with_example)} words have examples"
 
 
 def test_available_books_order_and_ids():

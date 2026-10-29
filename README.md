@@ -161,18 +161,23 @@ description = "背单词：学习进度"
 
 ## 词书
 
-内置三本，共 1146 个词：
+内置三本，共 7085 个词：
 
 | id | 名称 | 词数 | 内容 |
 | --- | --- | --- | --- |
-| `cet4` | CET-4 核心 | 549 | 四级高频词，够用在阅读和写作 |
-| `cet6` | CET-6 进阶 | 320 | 六级进阶词，也是技术文档里的常客 |
-| `coding` | 程序员英语 | 277 | 日志、commit、文档里天天见的词 |
+| `cet4` | CET-4 核心 | 4537 | 四级大纲全词表（含音标、词性、中文释义） |
+| `cet6` | CET-6 进阶 | 2271 | 六级大纲全词表 |
+| `coding` | 程序员英语 | 277 | 日志、commit、文档里天天见的词（每词 2–3 条例句） |
 
-每个词都有音标、词性、中文释义、英文例句 + 中文翻译、近义词；答错/答对之后还会给出
-常见搭配（436 个词）和词源拆解（110 个词），比如 `deploy` → `deploy to production`、
-`de-（去掉）+ ploy（折叠）→ 展开`。例句都是技术或日常语境，比如
-`The cache hides the real latency.`
+**CET-4 / CET-6 是完整大纲词表**：每个词都有音标、词性、中文释义，数据来自
+[mahavivo/english-wordlists](https://github.com/mahavivo/english-wordlists)（MIT），
+用 `scripts/fetch-wordlists.py` 重新生成即可。
+
+**例句、近义词、搭配是手写的**，覆盖其中 1000 多个高频词（含全部 277 个程序员词）：
+答完题会给出长短两条例句、近义词、常见搭配（436 词）和词源拆解（110 词），
+比如 `deploy` → `deploy to production`、`de-（去掉）+ ploy（折叠）→ 展开`。
+
+手写内容存放在 `data/wordbooks/curated/`，重跑脚本时会自动合并，不会被覆盖。
 
 ```bash
 # 训练中直接按 Ctrl+B 切词书（会记住选择）
