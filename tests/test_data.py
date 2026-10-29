@@ -133,3 +133,34 @@ def test_tsv_ninth_column_is_phrases(tmp_path):
             "cache\t/kæʃ/\tn.\t缓存\tthe cache\t缓存\tstore\tcach\tcache hit,cache miss\n")
     book = data.parse_tsv(text, tmp_path / "x.tsv")
     assert book.words[0].phr == ("cache hit", "cache miss")
+
+
+def test_multiple_examples_are_loaded_and_ordered():
+    coding = data.find_book("coding")
+    word = next(w for w in coding.words if w.word == "typo")
+    assert len(word.examples) >= 2, "coding words should carry several examples"
+    assert word.examples[0] == (word.en, word.zh)
+    lengths = [len(en.split()) for en, _ in word.examples]
+    assert max(lengths) > min(lengths), "examples should vary in length"
+
+
+def test_sidecar_examples_are_deduped_against_the_primary(tmp_path):
+    book = tmp_path / "x.tsv"
+    book.write_text("# id=x\ncache\t\tv.\t缓存\tThe cache hides latency.\t缓存隐藏了延迟。\n",
+                    encoding="utf-8")
+    (tmp_path / "x.examples.tsv").write_text(
+        "cache\tThe cache hides latency. :: 缓存隐藏了延迟。\n"          # exact repeat
+        "cache\tThe cache hides latency, and it does so quietly. :: 重复。\n"  # extension
+        "cache\tA cold cache made the first request of the day slow. :: 冷缓存让当天第一个请求变慢。\n",
+        encoding="utf-8")
+    loaded = data.load_book(book)
+    word = loaded.words[0]
+    assert [en for en, _ in word.examples] == [
+        "The cache hides latency.",
+        "A cold cache made the first request of the day slow.",
+    ]
+
+
+def test_examples_sidecar_is_not_treated_as_a_wordbook():
+    ids = [book.id for book in data.available_books()]
+    assert not [book_id for book_id in ids if "examples" in book_id]

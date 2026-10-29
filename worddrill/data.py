@@ -7,7 +7,7 @@ JSON or CSV files imported into the plugin state directory.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 PLUGIN_ROOT = Path(__file__).resolve().parent.parent
@@ -32,6 +32,14 @@ class Word:
     syn: tuple[str, ...] = field(default_factory=tuple)
     root: str = ""
     phr: tuple[str, ...] = field(default_factory=tuple)
+    # Extra examples beyond the primary ``en``/``zh`` pair, shortest first.
+    extra_examples: tuple[tuple[str, str], ...] = field(default_factory=tuple)
+
+    @property
+    def examples(self) -> tuple[tuple[str, str], ...]:
+        """All examples for this word, primary one first."""
+        primary = ((self.en, self.zh),) if self.en else ()
+        return primary + self.extra_examples
 
     @property
     def length_hint(self) -> str:
@@ -56,6 +64,9 @@ class Word:
             data["root"] = self.root
         if self.phr:
             data["phr"] = list(self.phr)
+        if self.extra_examples:
+            data["ex"] = [f"{en} :: {zh}" if zh else en
+                          for en, zh in self.extra_examples]
         return data
 
 
@@ -222,6 +233,69 @@ def parse_tsv(text: str, path: Path) -> Wordbook:
     )
 
 
+EXAMPLES_SUFFIX = ".examples.tsv"
+
+
+def _split_example(text: str) -> tuple[str, str]:
+    """Parse ``english :: 中文`` (the Chinese half is optional)."""
+    english, _, chinese = text.partition("::")
+    return english.strip(), chinese.strip()
+
+
+def load_examples(path: Path) -> dict[str, tuple[tuple[str, str], ...]]:
+    """Read a sidecar file of extra examples keyed by word.
+
+    Keeping these out of the main wordbooks means examples can grow over time
+    without rewriting (or re-reviewing) a 70 KB data file.
+    """
+    table: dict[str, tuple[tuple[str, str], ...]] = {}
+    if not path.is_file():
+        return table
+    for line_no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        parts = [part for part in line.split("\t") if part.strip()]
+        if len(parts) < 2:
+            raise WordbookError(f"{path} line {line_no}: need word + at least one example")
+        word = parts[0].strip().lower()
+        examples = tuple(_split_example(part) for part in parts[1:])
+        table[word] = table.get(word, ()) + examples
+    return table
+
+
+def _normalize_example(text: str) -> str:
+    return " ".join(text.lower().split()).rstrip(".")
+
+
+def _attach_examples(book: Wordbook) -> Wordbook:
+    """Merge the sidecar examples into a freshly loaded book."""
+    sidecar = book.path.with_name(book.path.stem + EXAMPLES_SUFFIX)
+    table = load_examples(sidecar)
+    if not table:
+        return book
+    merged = []
+    for word in book.words:
+        extra = table.get(word.word.lower())
+        if not extra:
+            merged.append(word)
+            continue
+        seen = {_normalize_example(word.en)}
+        primary = _normalize_example(word.en)
+        unique = []
+        for english, chinese in extra:
+            key = _normalize_example(english)
+            if not key or key in seen:
+                continue        # the sidecar often repeats the primary sentence
+            if primary and key.startswith(primary):
+                # "Primary sentence, plus a clause" is not a second example: it
+                # spends a screen line saying what the reader already read.
+                continue
+            seen.add(key)
+            unique.append((english, chinese))
+        merged.append(replace(word, extra_examples=tuple(unique)))
+    return replace(book, words=tuple(merged))
+
+
 def load_book(path: Path, custom: bool = False) -> Wordbook:
     try:
         text = Path(path).read_text(encoding="utf-8")
@@ -229,12 +303,12 @@ def load_book(path: Path, custom: bool = False) -> Wordbook:
         raise WordbookError(f"wordbook not found: {path}") from None
     if Path(path).suffix.lower() in {".tsv", ".txt"}:
         book = parse_tsv(text, Path(path))
-        return Wordbook(**{**book.__dict__, "custom": custom})
+        return _attach_examples(Wordbook(**{**book.__dict__, "custom": custom}))
     try:
         raw = json.loads(text)
     except json.JSONDecodeError as exc:
         raise WordbookError(f"{path}: invalid JSON ({exc})") from None
-    return parse_book(raw, path=Path(path), custom=custom)
+    return _attach_examples(parse_book(raw, path=Path(path), custom=custom))
 
 
 def custom_books_dir(state_dir: Path) -> Path:
@@ -245,6 +319,8 @@ def available_books(state_dir: Path | None = None) -> list[Wordbook]:
     books: dict[str, Wordbook] = {}
     if BUNDLED_DIR.is_dir():
         for path in sorted(BUNDLED_DIR.glob("*.tsv")):
+            if path.name.endswith(EXAMPLES_SUFFIX):
+                continue        # sidecar example data, not a wordbook
             book = load_book(path)
             books[book.id] = book
         for path in sorted(BUNDLED_DIR.glob("*.json")):

@@ -240,29 +240,31 @@ def _render_card(painter: Painter, session: DrillSession, word: Word,
     if meaning:
         centered(painter, meaning, "subtext")
 
-    example = word.en
-    if variant in {"dictation"}:
-        example = word.blanked_example()
-    if variant == "spelling":
-        example = ""
-    if example:
-        painter.blank(1)
-        for line in term.wrap(example, inner, max_lines=2):
-            centered(painter, line, "surface2", italic=True)
-        if variant != "follow" and word.zh and session.phase != "result":
-            pass
-    elif word.en and variant == "follow":
-        painter.blank(1)
-        for line in term.wrap(word.en, inner, max_lines=2):
-            centered(painter, line, "surface2", italic=True)
+    # Examples: one on the card, a second one after the verdict, and (when the
+    # window is tall enough) a third in the verdict block. In dictation the first
+    # one is the masked sentence; the extra ones stay readable, which is what
+    # makes them useful as context rather than as a giveaway.
+    if variant != "spelling":
+        first_en, first_zh = word.en, word.zh
+        if variant == "dictation" and first_en:
+            first_en = word.blanked_example()
+        if first_en:
+            painter.blank(1)
+            for line in term.wrap(first_en, inner, max_lines=2):
+                centered(painter, line, "surface2", italic=True)
+            if variant == "follow" and first_zh:
+                for line in term.wrap(first_zh, inner, max_lines=1):
+                    centered(painter, line, "surface2")
 
-    if variant == "follow" and word.zh:
-        for line in term.wrap(word.zh, inner, max_lines=1):
-            centered(painter, line, "surface2")
-    if session.phase == "result" and session.last_answer and not session.last_answer.correct:
-        # In a result state the Chinese example translation helps the postmortem.
-        for line in term.wrap(word.zh, inner, max_lines=1):
-            centered(painter, line, "surface2")
+        extras = word.extra_examples[:2]
+        if extras and session.phase != "result":
+            painter.blank(1)
+            for english, chinese in extras[:1]:
+                for line in term.wrap(english, inner, max_lines=2):
+                    centered(painter, line, "overlay1", italic=True)
+                if chinese:
+                    for line in term.wrap(chinese, inner, max_lines=1):
+                        centered(painter, line, "surface2")
 
 
 def _render_input(painter: Painter, session: DrillSession, word: Word) -> None:
@@ -947,6 +949,24 @@ class DrillApp:
                 self.flash_until = 0.0
                 self._advance()
         self._autoplay_at = time.time() + 0.015
+
+    def restart(self, session: DrillSession, *, streak: int | None = None,
+                today_count: int | None = None) -> None:
+        """Swap in a fresh session and keep running (the "again" path)."""
+        self.session = session
+        if streak is not None:
+            self.streak = streak
+        if today_count is not None:
+            self.today_count = today_count
+        self.help_open = False
+        self.message = ""
+        self.message_until = 0.0
+        self.flash_until = 0.0
+        self.result = None
+        self._session_end_handled = False
+        self._autoplay_step = 0
+        self._autoplay_at = 0.0
+        self._draw(force=True)
 
     # -- drawing ---------------------------------------------------------
     def _draw_after_key(self) -> None:

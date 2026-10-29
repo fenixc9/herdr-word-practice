@@ -8,6 +8,7 @@ import fcntl
 import json
 import os
 import pty
+import threading
 import re
 import select
 import struct
@@ -44,25 +45,44 @@ class Tui:
         )
         os.close(slave)
         self.buffer = b""
+        self._lock = threading.Lock()
+        self._eof = False
+        # Always drain the pty. If the reader only runs inside read_until, the
+        # child eventually blocks on write() and stops handling input, which
+        # looks exactly like "the app hangs".
+        self._reader = threading.Thread(target=self._drain, daemon=True)
+        self._reader.start()
+
+    def _drain(self) -> None:
+        while True:
+            try:
+                ready, _, _ = select.select([self.master], [], [], 0.1)
+                if not ready:
+                    continue
+                chunk = os.read(self.master, 65536)
+            except OSError:
+                chunk = b""
+            if not chunk:
+                with self._lock:
+                    self._eof = True
+                return
+            with self._lock:
+                self.buffer += chunk
 
     def read_until(self, predicate, timeout: float = 10.0) -> str:
         deadline = time.time() + timeout
         while time.time() < deadline:
-            ready, _, _ = select.select([self.master], [], [], 0.1)
-            if ready:
-                try:
-                    chunk = os.read(self.master, 65536)
-                except OSError:
-                    break
-                if not chunk:
-                    break
-                self.buffer += chunk
+            with self._lock:
                 text = _strip(self.buffer)
-                if predicate(text):
-                    return text
-            if self.proc.poll() is not None:
+            if predicate(text):
+                with self._lock:        # consume: the next wait starts fresh
+                    self.buffer = b""
+                return text
+            if self._eof or self.proc.poll() is not None:
                 break
-        return _strip(self.buffer)
+            time.sleep(0.02)
+        with self._lock:
+            return _strip(self.buffer)
 
     def send(self, keys: str) -> None:
         os.write(self.master, keys.encode())
@@ -192,14 +212,25 @@ def test_stats_pane_waits_for_enter(tmp_path, env):
 
 
 def test_enter_on_summary_starts_another_session(one_word_book, env):
+    """⏎ on the summary must actually start a new round, not be a no-op."""
     tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
     try:
         tui.read_until(lambda text: "cache" in text)
         tui.send("cache")
         tui.read_until(lambda text: "训练完成" in text)
-        tui.send("\r")                      # 再来一组
-        again = tui.read_until(lambda text: "1/1" in text, timeout=8)
-        assert "1/1" in again, f"a new session should start:\n{again}"
+
+        tui.send("\r")                      # ⏎ 再来一组
+        time.sleep(0.15)
+        # The input box has to come back; "1/1" alone is also on the summary page.
+        again = tui.read_until(lambda text: "开始输入" in text, timeout=8)
+        assert "开始输入" in again, f"a new round never started:\n{again}"
+
+        # And it must accept typing.
+        for char in "cac":
+            tui.send(char)
+            time.sleep(0.05)
+        seen = tui.read_until(lambda text: "│ cac" in text, timeout=5)
+        assert "│ cac" in seen, f"new round does not accept input:\n{seen}"
         tui.send("\x1b")
         tui.proc.wait(timeout=10)
     finally:

@@ -275,6 +275,8 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         settings.save()
         return bool(settings.data["sound"])
 
+    holder: dict[str, DrillApp] = {}
+
     def on_result(result: SessionResult, event: str) -> None:
         progress.record_session()
         progress.save()
@@ -285,6 +287,17 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
                 f"用时 {int(result.elapsed)} 秒",
                 sound="done",
             )
+        app = holder.get("app")
+        if app is None:
+            return
+        if event == "again":
+            # Pick a fresh set of words and keep the UI running.
+            fresh = build_session(settings, progress, book, mode, size)
+            new_streak, new_today = _streak_and_today(progress)
+            app.restart(fresh, streak=new_streak, today_count=new_today)
+        elif event == "stats":
+            # Keep the summary on screen but surface the numbers in a pane.
+            herdr.open_pane("stats", placement="popup", focus=False)
 
     app = DrillApp(
         session, streak=streak, today_count=today, daily_goal=goal,
@@ -292,6 +305,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         on_master=on_master, on_toggle_sound=on_toggle_sound,
         on_result=on_result, autoplay=args.autoplay, palette=palette_mode,
     )
+    holder["app"] = app
     try:
         app.run()
     except KeyboardInterrupt:

@@ -238,14 +238,17 @@ def plan_session(request: PlanRequest) -> list[Word]:
         rng.shuffle(fresh)
         return (due + fresh)[:size]
 
-    # smart mode: due reviews, then learning, then weak, then new words.
+    # smart mode: due reviews first, then unseen words, and only then the words
+    # that are still on a learning step but not due yet. Putting "learning" ahead
+    # of "new" made a second round right after the first repeat the same cards:
+    # everything you just answered sits in `learning` until its step comes up.
     due_words = [w for w in candidates if state_of(w).is_due(now)]
     due_words.sort(key=lambda w: (state_of(w).due, -state_of(w).wrong))
-    learning = [w for w in candidates
-                if state_of(w).status == STATUS_LEARNING and w not in due_words]
-    learning.sort(key=lambda w: state_of(w).due)
-    weak_words = [w for w in candidates
-                  if state_of(w).is_weak() and w not in due_words and w not in learning]
+    later = [w for w in candidates
+             if not state_of(w).is_due(now)
+             and state_of(w).status in {STATUS_LEARNING, STATUS_REVIEW}]
+    later.sort(key=lambda w: state_of(w).due)
+    weak_words = [w for w in candidates if state_of(w).is_weak() and w not in due_words]
     weak_words.sort(key=lambda w: (-state_of(w).wrong, state_of(w).last))
     new_words = [w for w in candidates if state_of(w).status == STATUS_NEW]
     rng.shuffle(new_words)
@@ -271,15 +274,11 @@ def plan_session(request: PlanRequest) -> list[Word]:
             added += 1
 
     add(due_words)
-    add(learning)
-    add(weak_words)
     add(new_words, limit=new_budget)
-    if len(picked) < size:
-        soon = [w for w in candidates
-                if state_of(w).status in {STATUS_LEARNING, STATUS_REVIEW}
-                and w not in picked]
-        soon.sort(key=lambda w: state_of(w).due)
-        add(soon)
+    add(weak_words)
+    # Fill the rest of the round with cards that are not due yet, but only after
+    # the genuinely new material above.
+    add(later)
     if len(picked) < size:
         add(new_words)
     if len(picked) < size:
