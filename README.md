@@ -94,7 +94,7 @@ description = "背单词：学习进度"
 | `Enter` | 提交 / 下一张 / 完成页再来一组 |
 | `Tab` | 提示下一个字母（用过提示仍算对，但只给「认识」档） |
 | `Backspace` | 删一个字母 |
-| `Ctrl+R` | 重播发音 |
+| `Ctrl+R` | 重播发音（口音由 `accent` 设置决定） |
 | `Ctrl+F` | 收藏 / 取消收藏 |
 | `Ctrl+M` | 标记为已掌握（不再出现在智能复习里） |
 | `Ctrl+S` | 静音开关（会写进设置） |
@@ -132,6 +132,7 @@ description = "背单词：学习进度"
 herdr words books                     # 词书列表 + 每本的学习状态
 herdr words books --words coding      # 打印整本词书的单词
 herdr words drill -b coding -m dictation
+herdr words settings accent=uk         # 换英音
 herdr words settings book=coding      # 改成默认词书
 ```
 
@@ -192,6 +193,7 @@ herdr words settings nudge.enabled=false   # 关掉空闲提醒
 | `daily_new_limit` | `8` | 每天最多引入多少新词 |
 | `daily_goal` | `20` | 状态栏里的每日目标 |
 | `sound` | `true` | 答对时是否发音 |
+| `accent` | `us` | 发音口音：`us` / `uk` |
 | `auto_pronounce` | `true` | 答对后自动读一遍 |
 | `notify_on_finish` | `true` | 练完弹一条通知 |
 | `nudge.enabled` | `true` | agent 空闲时是否提醒 |
@@ -226,7 +228,7 @@ herdr words settings nudge.enabled=false   # 关掉空闲提醒
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 102 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 104 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 

@@ -21,6 +21,18 @@ def in_herdr() -> bool:
 
 
 def run_herdr(args: list[str], *, timeout: float = 5.0) -> dict | None:
+    """Run a herdr CLI call and return the JSON result, or None on failure."""
+    result = run_herdr_raw(args, timeout=timeout)
+    if result is None:
+        return None
+    if isinstance(result.get("error"), dict):
+        return None
+    payload = result.get("result") if isinstance(result.get("result"), dict) else result
+    return payload if isinstance(payload, dict) else {"raw": payload}
+
+
+def run_herdr_raw(args: list[str], *, timeout: float = 5.0) -> dict | None:
+    """Like :func:`run_herdr`, but also returns ``error`` payloads."""
     if not in_herdr() and not os.environ.get("HERDR_BIN_PATH"):
         return None
     try:
@@ -29,15 +41,14 @@ def run_herdr(args: list[str], *, timeout: float = 5.0) -> dict | None:
         )
     except (OSError, subprocess.TimeoutExpired):
         return None
-    if proc.returncode != 0:
-        return None
-    text = proc.stdout.strip()
+    # herdr writes success JSON to stdout and error JSON to stderr.
+    text = proc.stdout.strip() or proc.stderr.strip()
     if not text:
         return None
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        return {"raw": text}
+        return {"raw": text, "returncode": proc.returncode}
 
 
 def notify(title: str, body: str = "", *, sound: str = "none",
@@ -60,6 +71,29 @@ def open_pane(entrypoint: str, *, placement: str | None = None,
         args += ["--env", f"{key}={value}"]
     args.append("--focus" if focus else "--no-focus")
     return run_herdr(args, timeout=timeout)
+
+
+def open_pane_detailed(entrypoint: str, *, placement: str | None = None,
+                       env: dict[str, str] | None = None, focus: bool = True,
+                       timeout: float = 8.0) -> tuple[dict | None, str | None]:
+    """Open a pane and report *why* it failed, if it did.
+
+    ``ui_busy`` is special: it only means a popup is already on screen, which is
+    exactly the state the caller wanted, so the caller can treat it as success.
+    """
+    args = ["plugin", "pane", "open", "--plugin", PLUGIN_ID, "--entrypoint", entrypoint]
+    if placement:
+        args += ["--placement", placement]
+    for key, value in (env or {}).items():
+        args += ["--env", f"{key}={value}"]
+    args.append("--focus" if focus else "--no-focus")
+    raw = run_herdr_raw(args, timeout=timeout)
+    if raw is None:
+        return None, "herdr did not answer"
+    error = raw.get("error")
+    if isinstance(error, dict):
+        return None, str(error.get("code") or error.get("message") or "error")
+    return raw, None
 
 
 def plugin_root() -> Path:

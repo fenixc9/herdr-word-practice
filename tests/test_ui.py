@@ -158,3 +158,42 @@ def test_app_tolerates_a_pseudofile_stdin(monkeypatch):
 def test_theme_colors_can_be_disabled(monkeypatch):
     monkeypatch.setenv("NO_COLOR", "1")
     assert term.color_supported() is False
+
+def test_pronunciation_providers_switch_accent(monkeypatch):
+    from worddrill import audio
+
+    monkeypatch.delenv("WORDDRILL_NO_AUDIO", raising=False)
+    monkeypatch.delenv("WORDDRILL_SAY", raising=False)
+    calls = []
+
+    def fake_popen(argv, **kwargs):
+        calls.append(argv)
+        return object()
+
+    monkeypatch.setattr(audio.subprocess, "Popen", fake_popen)
+    monkeypatch.setattr(audio.shutil, "which", lambda name: f"/usr/bin/{name}")
+    assert audio.pronounce(make_word(), accent="uk") is True
+    assert calls and calls[-1][-1] == "cache"
+
+
+def test_audio_disabled_by_env(monkeypatch):
+    from worddrill import audio
+
+    monkeypatch.setenv("WORDDRILL_NO_AUDIO", "1")
+    assert audio.find_provider() is None
+    assert audio.pronounce(make_word()) is False
+
+
+def test_herdr_error_payloads_are_read_from_stderr(monkeypatch):
+    from worddrill import herdr
+
+    class FakeProc:
+        returncode = 1
+        stdout = ""
+        stderr = '{"error":{"code":"ui_busy","message":"a popup pane is already open"}}'
+
+    monkeypatch.setenv("HERDR_ENV", "1")
+    monkeypatch.setattr(herdr.subprocess, "run", lambda *a, **k: FakeProc())
+    assert herdr.run_herdr(["plugin", "pane", "open"]) is None
+    _, error = herdr.open_pane_detailed("break")
+    assert error == "ui_busy"

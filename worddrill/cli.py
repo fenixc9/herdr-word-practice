@@ -133,7 +133,6 @@ def _plan(settings: Settings, progress: Progress, book: Wordbook, mode: str,
 
 def build_session(settings: Settings, progress: Progress, book: Wordbook,
                   mode: str, size: int | None = None,
-                  autoplay: bool | str = False,
                   now: float | None = None) -> DrillSession:
     words = _plan(settings, progress, book, mode, size, now)
     states = progress.state_map()
@@ -147,12 +146,10 @@ def build_session(settings: Settings, progress: Progress, book: Wordbook,
                                now=stamp)
         progress.save()
 
-    session = DrillSession(
+    return DrillSession(
         words=words, mode=mode, book_label=book.name, on_answer=on_answer,
         states=states,
     )
-    session.autoplay = autoplay  # type: ignore[attr-defined]
-    return session
 
 
 # --------------------------------------------------------------------------
@@ -218,6 +215,10 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     streak, today = _streak_and_today(progress, now)
     goal = int(settings.get("daily_goal", 20) or 0)
     sound = bool(settings.get("sound", True)) and not args.no_sound
+    accent = str(settings.get("accent", "us") or "us").lower()
+    if args.accent:
+        accent = args.accent
+    provider = find_provider(accent)
 
     if not session.words:
         if args.json:
@@ -245,7 +246,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         return 0
 
     def on_pronounce(word) -> None:
-        pronounce(word, provider=find_provider())
+        pronounce(word, provider=provider)
 
     def on_favorite(word) -> None:
         state = progress.word_state(word.key)
@@ -521,7 +522,8 @@ def cmd_settings(args: argparse.Namespace, settings: Settings, progress: Progres
         else:
             print(f"  {key:<26}{value}")
     print()
-    print(term.style(f" 发音引擎: {describe_provider()}", term.HEX["surface2"]))
+    print(term.style(f" 发音引擎: {describe_provider()}  ·  "
+                     f"口音: {settings.get('accent', 'us')}", term.HEX["surface2"]))
     print()
     return 0
 
@@ -628,10 +630,17 @@ def cmd_open_pane(args: argparse.Namespace, settings: Settings, progress: Progre
         env["HERDR_WORDS_MODE"] = args.mode
     if args.book:
         env["HERDR_WORDS_BOOK"] = args.book
-    result = herdr.open_pane(entrypoint, placement=args.placement,
-                             env=env or None, focus=not args.no_focus)
-    if result is None:
-        herdr.stderr("无法打开窗格：herdr 命令失败")
+    result, error = herdr.open_pane_detailed(
+        entrypoint, placement=args.placement, env=env or None,
+        focus=not args.no_focus)
+    if error == "ui_busy":
+        # A popup is already open — the drill is right in front of the user, so
+        # pressing the key again is a no-op instead of an error.
+        if args.json:
+            print(json.dumps({"status": "already open"}, ensure_ascii=False))
+        return 0
+    if error is not None or result is None:
+        herdr.stderr(f"无法打开窗格: {error or 'unknown error'}")
         return 1
     if args.json:
         print(json.dumps(result, ensure_ascii=False))
@@ -694,6 +703,7 @@ def build_parser() -> argparse.ArgumentParser:
     drill.add_argument("-b", "--book", help="词书 id")
     drill.add_argument("-n", "--size", type=int, help="这一组的词数")
     drill.add_argument("--no-sound", action="store_true", help="关闭发音")
+    drill.add_argument("--accent", choices=("us", "uk"), help="发音口音")
     drill.add_argument("--no-color", action="store_true", help="关闭颜色")
     drill.add_argument("--plan", action="store_true", help="只列出本轮单词，不进界面")
     drill.add_argument("--once", action="store_true", help="渲染一帧后退出（用于预览）")

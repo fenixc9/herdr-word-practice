@@ -44,6 +44,7 @@ DEFAULT_SETTINGS: dict = {
     "daily_new_limit": 8,
     "daily_goal": 20,
     "sound": True,
+    "accent": "us",
     "auto_pronounce": True,
     "notify_on_finish": True,
     "nudge": {
