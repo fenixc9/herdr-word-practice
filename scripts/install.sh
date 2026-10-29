@@ -1,5 +1,5 @@
 #!/bin/sh
-# 安装 herdr words：链接插件、放好 words 命令、写入键位、重载 herdr 配置。
+# 安装 word-practice：链接插件、放好 words 命令、写入键位、重载 herdr 配置。
 #
 # 每一步都是幂等的，可以反复跑：
 #   ./scripts/install.sh          # 正常安装
@@ -13,7 +13,7 @@ here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 root=$(dirname -- "$here")
 config_file=${HERDR_CONFIG:-$HOME/.config/herdr/config.toml}
 bin_dir=${WORDS_BIN_DIR:-$HOME/.local/bin}
-marker="# herdr words: 在 vibe coding 的间隙背单词"
+marker="# word-practice: 在 vibe coding 的间隙背单词"
 
 say() { printf '%s\n' "$*"; }
 run() {
@@ -76,19 +76,19 @@ else
 [[keys.command]]
 key = \"prefix+w\"
 type = \"plugin_action\"
-command = \"herdr.words.drill\"
+command = \"herdr-word-practice.drill\"
 description = \"背单词\"
 
 [[keys.command]]
 key = \"prefix+shift+w\"
 type = \"plugin_action\"
-command = \"herdr.words.dictation\"
+command = \"herdr-word-practice.dictation\"
 description = \"背单词：默写\"
 
 [[keys.command]]
 key = \"prefix+alt+w\"
 type = \"plugin_action\"
-command = \"herdr.words.stats\"
+command = \"herdr-word-practice.stats\"
 description = \"背单词：学习进度\""
     if [ "$dry_run" = 1 ]; then
         say "  [dry-run] 追加 3 个 [[keys.command]] 到 $config_file"
@@ -113,5 +113,5 @@ fi
 say ""
 say "装好了。在 herdr 里按 prefix+w 开始（第一次会弹出一个卡片窗格）。"
 say "其他命令: words books · words stats · words settings · words doctor"
-say "卸载: herdr plugin unlink herdr.words && rm -f $bin_dir/words"
+say "卸载: herdr plugin unlink herdr-word-practice && rm -f $bin_dir/words"
 say "（键位会留在 config.toml 里，不需要就手动删掉那三块）"

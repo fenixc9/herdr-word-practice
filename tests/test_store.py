@@ -117,7 +117,7 @@ def test_day_key_uses_local_time(tmp_path):
 
 
 def test_state_dir_falls_back_to_the_shared_herdr_dir(tmp_path, monkeypatch):
-    shared = tmp_path / "state" / "herdr" / "plugins" / "herdr.words"
+    shared = tmp_path / "state" / "herdr" / "plugins" / store.PLUGIN_ID
     shared.mkdir(parents=True)
     monkeypatch.delenv("HERDR_PLUGIN_STATE_DIR", raising=False)
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
@@ -130,7 +130,7 @@ def test_state_dir_falls_back_to_the_shared_herdr_dir(tmp_path, monkeypatch):
 def test_state_dir_uses_xdg_when_no_shared_dir(tmp_path, monkeypatch):
     monkeypatch.delenv("HERDR_PLUGIN_STATE_DIR", raising=False)
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
-    assert store.default_state_dir() == tmp_path / "state" / "herdr-words"
+    assert store.default_state_dir() == tmp_path / "state" / store.PLUGIN_ID
 
 
 def test_distinct_word_counts(tmp_path):

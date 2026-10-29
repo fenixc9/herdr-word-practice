@@ -1,9 +1,9 @@
-# herdr-plugin.toml — manifest for the herdr words plugin.
+# herdr-plugin.toml — manifest for the herdr word-practice plugin.
 #
 # What it does: a small, keyboard-only vocabulary drill you can open in a
-# popup during the gaps between coding sessions. It keeps a spaced-repetition
-# schedule (a compact SM-2), three bundled wordbooks, and gets out of the way
-# in ~90 seconds.
+# split pane during the gaps between coding sessions. It keeps a
+# spaced-repetition schedule (a compact SM-2), three bundled wordbooks
+# (7000+ words), and gets out of the way in ~90 seconds.
 #
 # Design notes for whoever reads this next:
 #  - Pure Python 3 (stdlib only), so there is no [[build]] step at all. herdr
@@ -15,8 +15,8 @@
 #  - The event handler is deliberately cheap: it reads the payload, applies a
 #    throttle + quiet-hour check, and at most sparks a notification.
 
-id = "herdr.words"
-name = "herdr words"
+id = "herdr-word-practice"
+name = "Word Practice"
 version = "1.0.0"
 min_herdr_version = "0.9.0"
 description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a split pane, with typing recall, phonetics, and 7000+ bundled words."
@@ -39,14 +39,14 @@ command = ["python3", "main.py", "event"]
 # break-time drill, snappy dismissal matters more than floating on top.
 [[panes]]
 id = "break"
-title = "herdr words"
+title = "Word Practice"
 placement = "split"
 command = ["python3", "main.py", "drill"]
 
 # A read-only progress view, kept open until you press Enter.
 [[panes]]
 id = "stats"
-title = "herdr words · 进度"
+title = "Word Practice · 进度"
 placement = "popup"
 width = "80%"
 height = "85%"
@@ -58,7 +58,7 @@ command = ["python3", "main.py", "stats", "--wait"]
 #   [[keys.command]]
 #   key = "prefix+w"
 #   type = "plugin_action"
-#   command = "herdr.words.drill"
+#   command = "herdr-word-practice.drill"
 #   description = "背单词"
 #
 # Each mode gets its own action id so a single key can jump straight into

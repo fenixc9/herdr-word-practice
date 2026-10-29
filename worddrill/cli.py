@@ -1,4 +1,4 @@
-"""Command line entrypoint for the herdr words plugin.
+"""Command line entrypoint for the word-practice plugin.
 
 Everything the plugin does is reachable from here:
 
@@ -408,7 +408,7 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
         return 0
 
     print()
-    print(term.style(" herdr words ", fg_color=term.HEX["teal"], bold=True)
+    print(term.style(" word practice ", fg_color=term.HEX["teal"], bold=True)
           + term.style(f" v{__version__}", term.HEX["surface2"]))
     print(term.style(_hr(), term.HEX["surface2"]))
     print(f" 今日      {_meter(today, goal)}")
@@ -721,7 +721,7 @@ def cmd_startup(args: argparse.Namespace, settings: Settings, progress: Progress
     books = available_books(state_dir)
     due = due_count([w for book in books for w in book.words],
                     progress.state_map())
-    line = (f"herdr words v{__version__}: {len(books)} books, "
+    line = (f"word-practice v{__version__}: {len(books)} books, "
             f"{due} due, {today} today, streak {streak}")
     print(line)
     return 0

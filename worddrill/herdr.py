@@ -9,7 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-PLUGIN_ID = "herdr.words"
+PLUGIN_ID = "herdr-word-practice"
 
 
 def herdr_bin() -> str:

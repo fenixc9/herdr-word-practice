@@ -105,7 +105,7 @@ words import ~/mine.csv --use           # 导入并切为默认词书
 导入的文件会复制到状态目录：
 
 ```
-~/.local/state/herdr/plugins/herdr.words/books/mine.json
+~/.local/state/herdr/plugins/herdr-word-practice/books/mine.json
 ```
 
 统一转成 JSON 存放（哪怕你导入的是 TSV），因为这样才能保留元数据。

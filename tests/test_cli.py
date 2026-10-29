@@ -67,7 +67,7 @@ def test_once_renders_a_frame(env):
     assert result.returncode == 0
     lines = result.stdout.splitlines()
     assert len(lines) == 20
-    assert "herdr words" in lines[0]
+    assert "word practice" in lines[0]
 
 
 def test_stats_json_on_a_fresh_install(env):
@@ -146,7 +146,17 @@ def test_event_without_payload_reports_error(env):
     assert "no event payload" in result.stderr
 
 
+def quiet_hours_that_exclude_now() -> list[int]:
+    """A quiet window that cannot contain the current hour (tests are not
+    allowed to depend on what time the suite is run at)."""
+    import time
+    hour = time.localtime().tm_hour
+    other = (hour + 2) % 24
+    return [other, (other + 1) % 24]
+
+
 def test_event_nudges_when_agent_goes_idle(env, tmp_path):
+    run(["settings", f"nudge.quiet_hours={quiet_hours_that_exclude_now()}"], env)
     payload = json.dumps({"pane_id": "w1:p1", "status": "idle"})
     result = run(["event", "--payload", payload, "--json"], env)
     record = json.loads(result.stdout)
@@ -157,6 +167,7 @@ def test_event_nudges_when_agent_goes_idle(env, tmp_path):
 
 
 def test_event_is_throttled_on_the_second_idle(env):
+    run(["settings", f"nudge.quiet_hours={quiet_hours_that_exclude_now()}"], env)
     payload = json.dumps({"pane_id": "w1:p1", "status": "idle"})
     run(["event", "--payload", payload], env)
     second = run(["event", "--payload", payload, "--json"], env)
@@ -174,6 +185,7 @@ def test_event_ignores_non_idle_status(env):
 
 def test_event_respects_disabled_nudges(env, tmp_path):
     run(["settings", "nudge.enabled=false"], env)
+    run(["settings", f"nudge.quiet_hours={quiet_hours_that_exclude_now()}"], env)
     payload = json.dumps({"status": "done"})
     result = run(["event", "--payload", payload, "--json"], env)
     record = json.loads(result.stdout)
@@ -182,6 +194,7 @@ def test_event_respects_disabled_nudges(env, tmp_path):
 
 
 def test_event_force_bypasses_throttle(env):
+    run(["settings", f"nudge.quiet_hours={quiet_hours_that_exclude_now()}"], env)
     payload = json.dumps({"status": "idle"})
     run(["event", "--payload", payload], env)
     forced = json.loads(run(["event", "--payload", payload, "--force", "--json"], env).stdout)
@@ -191,14 +204,14 @@ def test_event_force_bypasses_throttle(env):
 def test_startup_prepares_directories(env, tmp_path):
     result = run(["startup"], env)
     assert result.returncode == 0
-    assert "herdr words v" in result.stdout
+    assert "word-practice v" in result.stdout
     assert (tmp_path / "state" / "books").is_dir()
 
 
 def test_drill_without_a_tty_does_not_hang(env):
     result = run(["drill", "-n", "2"], env)
     assert result.returncode == 0
-    assert "herdr words" in result.stdout
+    assert "word practice" in result.stdout
 
 
 def test_install_script_dry_run_is_harmless(tmp_path):

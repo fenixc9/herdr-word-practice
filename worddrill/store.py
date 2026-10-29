@@ -44,8 +44,8 @@ def default_state_dir() -> Path:
         return shared
     xdg = os.environ.get("XDG_STATE_HOME")
     if xdg:
-        return Path(xdg) / "herdr-words"
-    return Path.home() / ".local" / "state" / "herdr-words"
+        return Path(xdg) / "herdr-word-practice"
+    return Path.home() / ".local" / "state" / PLUGIN_ID
 
 
 def default_config_dir() -> Path:
@@ -57,8 +57,8 @@ def default_config_dir() -> Path:
         return shared
     xdg = os.environ.get("XDG_CONFIG_HOME")
     if xdg:
-        return Path(xdg) / "herdr-words"
-    return Path.home() / ".config" / "herdr-words"
+        return Path(xdg) / "herdr-word-practice"
+    return Path.home() / ".config" / "herdr-word-practice"
 
 
 DEFAULT_SETTINGS: dict = {

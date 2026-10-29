@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""把公开的四六级大纲词表转换成 herdr words 的词书格式。
+"""把公开的四六级大纲词表转换成 word-practice 的词书格式。
 
 用法::
 

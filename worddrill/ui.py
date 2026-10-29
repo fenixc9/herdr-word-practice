@@ -177,7 +177,7 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
     header_right = f"{min(session.index + 1, session.total)}/{session.total}"
     if streak:
         header_right += f"  🔥{streak}"
-    frame_border(painter, "herdr words", subtitle, header_right)
+    frame_border(painter, "word practice", subtitle, header_right)
     top_rule(painter)
 
     if help_open:

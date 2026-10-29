@@ -1,0 +1,12 @@
+Third-party data
+===============
+
+data/wordbooks/cet4.tsv and data/wordbooks/cet6.tsv are derived from
+mahavivo/english-wordlists (https://github.com/mahavivo/english-wordlists),
+distributed under the MIT License. The lists were downloaded and parsed by
+scripts/fetch-wordlists.py, then merged with the hand-written layer in
+data/wordbooks/curated/.
+
+Example sentences, collocations, synonyms and etymology notes in
+data/wordbooks/curated/ and data/wordbooks/*.examples.tsv were written for
+this project.
