@@ -284,3 +284,9 @@ def test_quiz_prefix_leads_a_smart_round():
     assert [item.key for item in plan[:3]] == [item.key for item in words[:3]]
     assert len(plan) == 8
     assert len({item.key for item in plan}) == 8
+
+
+def test_quiz_defaults_to_every_two_rounds():
+    from worddrill import store
+    assert store.DEFAULT_SETTINGS["quiz_every_sessions"] == 2
+    assert store.DEFAULT_SETTINGS["quiz_size"] == 3

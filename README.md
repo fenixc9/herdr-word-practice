@@ -143,7 +143,7 @@ description = "背单词：学习进度"
 
 ### 定期小测验
 
-每完成 3 组（可改），下一组「智能复习」会以 3 道**小测验**开场：
+每完成 2 组（可改），下一组「智能复习」会以 3 道**小测验**开场：
 
 ```
 ╭ herdr words | 程序员英语  | 小测验 ──────────────── 1/8 ╮
@@ -156,6 +156,7 @@ description = "背单词：学习进度"
 - 第 2、4、6… 题是**完全默写**：只给音标、释义、例句
 - 题目只从**学过**的词里出（`reps > 0`），错得多的优先
 - 想立刻测一次，按 `Ctrl+Q`；或 `words drill -m quiz`
+- 调频率：`words settings quiz_every_sessions=1`（每组都测）、`quiz_size=5`（每次 5 题）
 
 ## 键盘
 
@@ -270,7 +271,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 | `session_size` | `10` | 一组多少个词 |
 | `daily_new_limit` | `8` | 每天最多引入多少新词 |
 | `daily_goal` | `20` | 状态栏「今日 x/20 词」的目标值 |
-| `quiz_every_sessions` | `3` | 每完成 N 组，下一组开头自动插入小测验；`0` 关闭 |
+| `quiz_every_sessions` | `2` | 每完成 N 组，下一组开头自动插入小测验；`0` 关闭 |
 | `quiz_size` | `3` | 定时插入的测验题数 |
 | `theme` | `auto` | 配色：`auto`（深浅背景都能看）/ `dark` / `light` |
 | `notify_on_finish` | `true` | 练完弹一条通知 |
