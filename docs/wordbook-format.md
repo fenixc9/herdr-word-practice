@@ -35,7 +35,7 @@ deploy	/dɪˈplɔɪ/	v.	部署	We deploy twice a day behind a flag.	我们每天
 | `id` | 词书 id，命令行里 `-b` 用它。缺省时取文件名 |
 | `name` | 显示名，例如 `程序员英语` |
 | `name_en` | 英文名，可省 |
-| `description` | 一句话说明，`herdr words books` 里显示 |
+| `description` | 一句话说明，`words books` 里显示 |
 
 解析很严格，坏数据会直接报错而不是悄悄跳过——因为你自己也会是这份数据的使用者：
 
@@ -97,9 +97,9 @@ schema,表结构
 ## 导入
 
 ```bash
-herdr words import ~/mine.tsv                 # id 取自元数据或文件名
-herdr words import ~/mine.json --id mine --name 我的词
-herdr words import ~/mine.csv --use           # 导入并切为默认词书
+words import ~/mine.tsv                 # id 取自元数据或文件名
+words import ~/mine.json --id mine --name 我的词
+words import ~/mine.csv --use           # 导入并切为默认词书
 ```
 
 导入的文件会复制到状态目录：
@@ -109,4 +109,4 @@ herdr words import ~/mine.csv --use           # 导入并切为默认词书
 ```
 
 统一转成 JSON 存放（哪怕你导入的是 TSV），因为这样才能保留元数据。
-想改内容，直接改这个 JSON 再 `herdr words books` 看效果即可；删掉文件就等于删掉词书。
+想改内容，直接改这个 JSON 再 `words books` 看效果即可；删掉文件就等于删掉词书。

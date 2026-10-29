@@ -112,3 +112,20 @@ def test_day_key_uses_local_time(tmp_path):
     progress = store.Progress.load(tmp_path)
     stamp = time.mktime((2026, 10, 29, 13, 30, 0, 0, 0, -1))
     assert progress.day_key(stamp) == "2026-10-29"
+
+
+def test_state_dir_falls_back_to_the_shared_herdr_dir(tmp_path, monkeypatch):
+    shared = tmp_path / "state" / "herdr" / "plugins" / "herdr.words"
+    shared.mkdir(parents=True)
+    monkeypatch.delenv("HERDR_PLUGIN_STATE_DIR", raising=False)
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
+    assert store.default_state_dir() == shared
+
+    monkeypatch.setenv("HERDR_PLUGIN_STATE_DIR", str(tmp_path / "elsewhere"))
+    assert store.default_state_dir() == tmp_path / "elsewhere"
+
+
+def test_state_dir_uses_xdg_when_no_shared_dir(tmp_path, monkeypatch):
+    monkeypatch.delenv("HERDR_PLUGIN_STATE_DIR", raising=False)
+    monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
+    assert store.default_state_dir() == tmp_path / "state" / "herdr-words"

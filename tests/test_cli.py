@@ -34,7 +34,7 @@ def test_help_and_version(env):
                     "doctor"):
         assert command in result.stdout
     version = run(["--version"], env)
-    assert version.returncode == 0 and "herdr words" in version.stdout
+    assert version.returncode == 0 and version.stdout.startswith("words ")
 
 
 def test_doctor_reports_environment(env):

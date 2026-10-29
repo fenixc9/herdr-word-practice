@@ -690,10 +690,10 @@ def cmd_doctor(args: argparse.Namespace, settings: Settings, progress: Progress,
 # --------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="herdr words",
+        prog="words",
         description="在 vibe coding 的间隙背单词（间隔重复 + 打字回忆）。",
     )
-    parser.add_argument("--version", action="version", version=f"herdr words {__version__}")
+    parser.add_argument("--version", action="version", version=f"words {__version__}")
     sub = parser.add_subparsers(dest="command")
 
     drill = sub.add_parser("drill", help="开始一组训练")

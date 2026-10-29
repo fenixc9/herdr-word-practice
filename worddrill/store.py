@@ -12,15 +12,36 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterator
 
+from .herdr import PLUGIN_ID
 from .srs import STATUS_NEW, WordState
 
 STATE_VERSION = 1
 
 
+def _herdr_plugin_dir(kind: str) -> Path:
+    """Where herdr puts per-plugin state/config when it runs us."""
+    if kind == "state":
+        xdg = os.environ.get("XDG_STATE_HOME")
+        base = Path(xdg) if xdg else Path.home() / ".local" / "state"
+        return base / "herdr" / "plugins" / PLUGIN_ID
+    xdg = os.environ.get("XDG_CONFIG_HOME")
+    base = Path(xdg) if xdg else Path.home() / ".config"
+    return base / "herdr" / "plugins" / "config" / PLUGIN_ID
+
+
 def default_state_dir() -> Path:
+    """State directory, shared between herdr panes and a plain shell.
+
+    herdr injects HERDR_PLUGIN_STATE_DIR for panes and actions. When the CLI is
+    run from a shell there is no injection, so reuse the same directory if it
+    exists — otherwise progress would silently fork in two.
+    """
     env = os.environ.get("HERDR_PLUGIN_STATE_DIR")
     if env:
         return Path(env)
+    shared = _herdr_plugin_dir("state")
+    if shared.is_dir():
+        return shared
     xdg = os.environ.get("XDG_STATE_HOME")
     if xdg:
         return Path(xdg) / "herdr-words"
@@ -31,6 +52,9 @@ def default_config_dir() -> Path:
     env = os.environ.get("HERDR_PLUGIN_CONFIG_DIR")
     if env:
         return Path(env)
+    shared = _herdr_plugin_dir("config")
+    if shared.is_dir():
+        return shared
     xdg = os.environ.get("XDG_CONFIG_HOME")
     if xdg:
         return Path(xdg) / "herdr-words"

@@ -7,7 +7,7 @@
 再把「间隔重复 + 打字判分 + 音标/例句/词根」压进一个能塞进 popup 的终端界面。
 
 ```
-╭ herdr words · 默写 ─────────────────────────────────────────── 3/10  🔥5 ╮
+╭ words · 默写 ─────────────────────────────────────────── 3/10  🔥5 ╮
 ├──────────────────────────────────────────────────────────────────────────┤
                                                                             
                               _ _ _ _ _ _ _ _                               
@@ -45,6 +45,17 @@ herdr plugin list                                  # 应当看到 herdr.words
 
 需要 `python3`（3.9+，只用标准库）、`herdr >= 0.9.0`。发音用系统 TTS，
 按 `espeak-ng` → `espeak` → `say` → `spd-say` 的顺序取第一个可用的；都没有就安静地跳过。
+
+命令行工具叫 `words`，把它放进 PATH：
+
+```bash
+ln -s ~/project/herdr-english-learn/scripts/words ~/.local/bin/words
+words --version
+words doctor
+```
+
+（不想装也行：`python3 ~/project/herdr-english-learn/main.py drill` 等价，
+在插件目录里 `./scripts/words drill` 也可以。）
 
 绑定按键（`~/.config/herdr/config.toml`）：
 
@@ -91,7 +102,7 @@ description = "背单词：学习进度"
 
 功能对齐（TypeWords → 这里）：
 
-| TypeWords | herdr words |
+| TypeWords | words |
 | --- | --- |
 | 跟打 / 默写 / 自测 / 看中文拼写 | 同名三种打字模式 + 自测（`-m follow/dictation/spelling/selfcheck`） |
 | 智能模式（记忆曲线） | `-m smart`，SM-2 变体，到期优先 |
@@ -100,7 +111,7 @@ description = "背单词：学习进度"
 | 例句 | 每个词一句技术/日常语境例句 + 中文翻译，默写时挖空 |
 | 短语搭配 | 436 个词带常见搭配，答完显示 |
 | 近义词 / 词根词源 | 全部词有近义词；110 个词有词源拆解 |
-| 错误统计 | `herdr words stats`：正确率、每日柱状、每词对错次数 |
+| 错误统计 | `words stats`：正确率、每日柱状、每词对错次数 |
 | 收藏 / 错词本 / 已掌握 | `favorites` / `review` 模式 + `Ctrl+M` 标记掌握 |
 | 多词书 | 三本内置 + 自定义导入 |
 | 键盘音效 | 只有发音，没有按键音效（便携性优先，见下） |
@@ -160,11 +171,11 @@ description = "背单词：学习进度"
 `The cache hides the real latency.`
 
 ```bash
-herdr words books                     # 词书列表 + 每本的学习状态
-herdr words books --words coding      # 打印整本词书的单词
-herdr words drill -b coding -m dictation
-herdr words settings accent=uk         # 换英音
-herdr words settings book=coding      # 改成默认词书
+words books                     # 词书列表 + 每本的学习状态
+words books --words coding      # 打印整本词书的单词
+words drill -b coding -m dictation
+words settings accent=uk         # 换英音
+words settings book=coding      # 改成默认词书
 ```
 
 ### 导入自己的词表
@@ -173,10 +184,10 @@ herdr words settings book=coding      # 改成默认词书
 
 ```bash
 # 两列 CSV：单词,释义
-herdr words import ~/words.csv --id mine --name 我的词 --use
+words import ~/words.csv --id mine --name 我的词 --use
 
 # TSV 带完整字段（推荐，见 docs/wordbook-format.md）
-herdr words import ~/words.tsv
+words import ~/words.tsv
 ```
 
 JSON 里的键可以写短名（`w`/`cn`/`en`）也可以写长名（`word`/`meaning`/`example`），
@@ -185,13 +196,13 @@ JSON 里的键可以写短名（`w`/`cn`/`en`）也可以写长名（`word`/`mea
 ## 命令行
 
 ```
-herdr words drill [-m MODE] [-b BOOK] [-n SIZE] [--no-sound] [--plan] [--once]
-herdr words stats [--json] [--wait]
-herdr words books [--json] [--words BOOK]
-herdr words import PATH [--id ID] [--name NAME] [--use]
-herdr words settings [key=value ...] [--json]
-herdr words reset [--yes]
-herdr words doctor [--json]
+words drill [-m MODE] [-b BOOK] [-n SIZE] [--no-sound] [--plan] [--once]
+words stats [--json] [--wait]
+words books [--json] [--words BOOK]
+words import PATH [--id ID] [--name NAME] [--use]
+words settings [key=value ...] [--json]
+words reset [--yes]
+words doctor [--json]
 ```
 
 - `drill --plan` 只列出这一轮会练哪些词，不进界面（适合先看看今天的安排）。
@@ -205,13 +216,13 @@ herdr words doctor [--json]
 ## 设置
 
 ```bash
-herdr words settings                       # 看当前设置
-herdr words settings session_size=8        # 每组 8 个词
-herdr words settings daily_goal=30         # 每日目标 30 个
-herdr words settings book=coding           # 默认词书
-herdr words settings nudge.min_gap_minutes=30
-herdr words settings nudge.quiet_hours=[23,8]   # JSON 值也行
-herdr words settings nudge.enabled=false   # 关掉空闲提醒
+words settings                       # 看当前设置
+words settings session_size=8        # 每组 8 个词
+words settings daily_goal=30         # 每日目标 30 个
+words settings book=coding           # 默认词书
+words settings nudge.min_gap_minutes=30
+words settings nudge.quiet_hours=[23,8]   # JSON 值也行
+words settings nudge.enabled=false   # 关掉空闲提醒
 ```
 
 默认值：
@@ -253,13 +264,17 @@ herdr words settings nudge.enabled=false   # 关掉空闲提醒
 ~/.config/herdr/plugins/config/herdr.words/settings.json
 ```
 
+在 herdr 外面用 `words …` 时，会自动沿用同一个目录（如果它已存在），
+所以终端里练的和 popup 里练的是同一份进度；只有完全没有 herdr 时才会落到
+`~/.local/state/herdr-words/`。
+
 `progress.json` 是人类可读的 JSON，坏了会自动备份成 `progress.corrupt-<ts>.json` 并重新开始，
-不会让插件起不来。`herdr words reset --yes` 清空进度。
+不会让插件起不来。`words reset --yes` 清空进度。
 
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q       # 114 个测试，含真实 pty 的端到端跑测
+python3 -m pytest tests/ -q       # 116 个测试，含真实 pty 的端到端跑测
 python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
 ```
 
