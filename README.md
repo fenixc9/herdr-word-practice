@@ -24,8 +24,8 @@
                                                                             
                                                                             
 ├──────────────────────────────────────────────────────────────────────────┤
- ▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱    20%   ✓2/✗0   100%   今日 12/20   01:14   🔊          
- ⏎ 提交 · ⇥ 提示 · ⌃r 发音 · ⌃f 收藏 · ⌃m 掌握 · ? 帮助 · esc 退出          
+ ▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱    20%   ✓2/✗0   100%   今日 12/20   01:14              
+ ⏎ 提交  |  ⇥ 提示  |  ⌃k 掌握  |  ⌃b 词书  |  ? 帮助  |  esc/⌃c 退出       
 ```
 
 ## 为什么是这个形态
@@ -67,7 +67,7 @@ rm -f ~/.local/bin/words
 
 - `herdr >= 0.9.0`（`herdr --version`）
 - `python3 >= 3.9`，只用标准库，无需 pip 安装任何东西
-- 发音可选：按 `espeak-ng` → `espeak` → `say` → `spd-say` 的顺序取第一个可用的；
+
   一个都没有也能用，只是没声音（`words doctor` 会标出来）
 
 ### 手工安装（等价）
@@ -109,14 +109,14 @@ description = "背单词：学习进度"
 | 跟打 / 默写 / 自测 / 看中文拼写 | 同名三种打字模式 + 自测（`-m follow/dictation/spelling/selfcheck`） |
 | 智能模式（记忆曲线） | `-m smart`，SM-2 变体，到期优先 |
 | 自由模式 | `-m free`，不管曲线，随便练 |
-| 音标 + 美/英发音 | 音标展示；`accent=us/uk` 切换 TTS 口音 |
+| 音标 | 每个词带音标（TTS 发音已移除） |
 | 例句 | 每个词一句技术/日常语境例句 + 中文翻译，默写时挖空 |
 | 短语搭配 | 436 个词带常见搭配，答完显示 |
 | 近义词 / 词根词源 | 全部词有近义词；110 个词有词源拆解 |
 | 错误统计 | `words stats`：正确率、每日柱状、每词对错次数 |
-| 收藏 / 错词本 / 已掌握 | `favorites` / `review` 模式 + `Ctrl+M` 标记掌握 |
+| 错词本 / 已掌握 | `review` 模式 + `Ctrl+K` 标记掌握 |
 | 多词书 | 三本内置 + 自定义导入 |
-| 键盘音效 | 只有发音，没有按键音效（便携性优先，见下） |
+| 键盘音效 / 朗读 | 都没做（终端里做音效收益低，朗读则交给系统 TTS 更合适） |
 | 文章背单词 | 未实现——这里的场景是「90 秒一组」，文章属于坐着学而不是间隙学 |
 
 刻意不一样的地方：
@@ -136,10 +136,7 @@ description = "背单词：学习进度"
 | `Enter` | 提交 / 下一张 / 完成页再来一组 |
 | `Tab` | 提示下一个字母（用过提示仍算对，但只给「认识」档） |
 | `Backspace` | 删一个字母 |
-| `Ctrl+R` | 重播发音（口音由 `accent` 设置决定） |
-| `Ctrl+F` | 收藏 / 取消收藏 |
-| `Ctrl+M` | 标记为已掌握（不再出现在智能复习里） |
-| `Ctrl+S` | 静音开关（会写进设置） |
+| `Ctrl+K` | 标记为已掌握（不再出现在智能复习里） |
 | `Ctrl+B` | 切换词书（列表里按数字或 ↑↓+⏎ 选，立即切过去） |
 | `1`–`4` | 自测模式：不认识 / 模糊 / 认识 / 太简单 |
 | `?` | 帮助 |
@@ -184,7 +181,6 @@ description = "背单词：学习进度"
 words books                     # 词书列表 + 每本的学习状态
 words books --words coding      # 打印整本词书的单词
 words drill -b coding -m dictation
-words settings accent=uk         # 换英音
 words settings book=coding      # 改成默认词书
 ```
 
@@ -218,7 +214,7 @@ words doctor [--json]
 - `drill --plan` 只列出这一轮会练哪些词，不进界面（适合先看看今天的安排）。
 - `drill --once` 渲染一帧就退出，方便在没有 tty 的地方预览。
 - `stats --wait` 打印后等回车，用于 herdr 里的进度窗格。
-- `doctor` 检查 python、目录、发音引擎、herdr CLI、词书是否就绪。
+- `doctor` 检查 python、目录、herdr CLI、词书是否就绪。
 
 在 herdr 外面直接 `python3 main.py drill` 也能用，状态保存在
 `~/.local/state/herdr/plugins/herdr.words/`。
@@ -244,10 +240,7 @@ words settings nudge.enabled=false   # 关掉空闲提醒
 | `session_size` | `10` | 一组多少个词 |
 | `daily_new_limit` | `8` | 每天最多引入多少新词 |
 | `daily_goal` | `20` | 状态栏里的每日目标 |
-| `sound` | `true` | 答对时是否发音 |
-| `accent` | `us` | 发音口音：`us` / `uk` |
 | `theme` | `auto` | 配色：`auto`（深浅背景都能看）/ `dark` / `light` |
-| `auto_pronounce` | `true` | 答对后自动读一遍 |
 | `notify_on_finish` | `true` | 练完弹一条通知 |
 | `nudge.enabled` | `true` | agent 空闲时是否提醒 |
 | `nudge.min_gap_minutes` | `45` | 两次提醒的最小间隔 |
@@ -312,7 +305,7 @@ python3 main.py drill --once --no-color --width 76 --height 20   # 看渲染
    所以正常情况不需要改。
 2. 确认进程起来了：`pgrep -f "main.py drill"` 应该有输出。
 3. 看 herdr 侧日志：`herdr plugin log list`，失败的调用会带 stderr。
-4. `words doctor` 会打印 python、目录、发音引擎、词书是否正常。
+4. `words doctor` 会打印 python、目录、herdr CLI、词书是否正常。
 
 **中文/边框看起来错位？**
 
@@ -368,8 +361,6 @@ placement = "popup"   # 需要同时加 width = "72%" / height = "70%"
 
 **其他常查项**
 
-- 没声音：`words doctor` 里 pronunciation 是否 ok；或 `words settings sound=false`
-  确认不是音量问题。
 - 键位不生效：`herdr config check`，再 `herdr server reload-config`。
 - 进度看着不对：`words stats`，或直接看
   `~/.local/state/herdr/plugins/herdr.words/progress.json`。
@@ -377,6 +368,6 @@ placement = "popup"   # 需要同时加 width = "72%" / height = "70%"
 ## 已知边界
 
 - 只在 Linux / macOS 上验证过（manifest 里也是这么声明的）；Windows 没测。
-- 发音依赖系统 TTS，音色取决于装了什么。
+- 不做发音：朗读交给系统的 `say`/`spd-say` 或查词典 App 更合适。
 - 词书是手写的精选集，不是完整四六级词库——够用来养成习惯，不够应付报名考试。
 - 没有云同步：换机器需要自己拷 `progress.json`。

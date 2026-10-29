@@ -25,7 +25,6 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__, herdr, term
-from .audio import describe_provider, find_provider, pronounce
 from .data import (
     BUNDLED_DIR,
     Wordbook,
@@ -165,11 +164,11 @@ def plain(text: str) -> str:
 
 def frame(session: DrillSession, width: int = 78, height: int = 24, *,
           streak: int = 0, today: int = 0, goal: int = 0,
-          sound: bool = True, help_open: bool = False, color: bool = True,
+          help_open: bool = False, color: bool = True,
           message: str = "") -> str:
     lines = __import__("worddrill.ui", fromlist=["render_drill"]).render_drill(
         session, Theme(), width, height, streak=streak, today_count=today,
-        daily_goal=goal, sound_on=sound, help_open=help_open, message=message,
+        daily_goal=goal, help_open=help_open, message=message,
     )
     if not color:
         lines = [plain(line) for line in lines]
@@ -222,19 +221,14 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
 
     streak, today = _streak_and_today(progress, now)
     goal = int(settings.get("daily_goal", 20) or 0)
-    sound = bool(settings.get("sound", True)) and not args.no_sound
     palette_mode = _resolve_palette(settings, args.theme)
-    accent = str(settings.get("accent", "us") or "us").lower()
-    if args.accent:
-        accent = args.accent
-    provider = find_provider(accent)
 
     if not session.words:
         if args.json:
             print(json.dumps({"words": [], "mode": mode, "book": book.id}))
             return 0
         print(frame(session, color=not args.no_color, streak=streak,
-                    today=today, goal=goal, sound=sound))
+                    today=today, goal=goal))
         return 0
 
     if args.plan:
@@ -252,28 +246,14 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     if args.once or not sys.stdin.isatty():
         print(frame(session, width=args.width, height=args.height,
                     color=not args.no_color, streak=streak, today=today,
-                    goal=goal, sound=sound))
+                    goal=goal))
         return 0
-
-    def on_pronounce(word) -> None:
-        pronounce(word, provider=provider)
-
-    def on_favorite(word) -> None:
-        state = progress.word_state(word.key)
-        state.fav = not state.fav
-        progress.set_word_state(word.key, state)
-        progress.save()
 
     def on_master(word) -> None:
         state = progress.word_state(word.key)
         mark_mastered(state)
         progress.set_word_state(word.key, state)
         progress.save()
-
-    def on_toggle_sound() -> bool:
-        settings.data["sound"] = not bool(settings.data.get("sound", True))
-        settings.save()
-        return bool(settings.data["sound"])
 
     book_entries = [
         {
@@ -320,9 +300,8 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
 
     app = DrillApp(
         session, streak=streak, today_count=today, daily_goal=goal,
-        sound_on=sound, on_pronounce=on_pronounce, on_favorite=on_favorite,
-        on_master=on_master, on_toggle_sound=on_toggle_sound,
-        on_result=on_result, autoplay=args.autoplay, palette=palette_mode,
+        on_master=on_master, on_result=on_result,
+        autoplay=args.autoplay, palette=palette_mode,
         books=book_entries, book_id=book.id, on_switch_book=on_switch_book,
     )
     holder["app"] = app
@@ -568,8 +547,6 @@ def cmd_settings(args: argparse.Namespace, settings: Settings, progress: Progres
         else:
             print(f"  {key:<26}{value}")
     print()
-    print(term.style(f" 发音引擎: {describe_provider()}  |  "
-                     f"口音: {settings.get('accent', 'us')}", term.HEX["surface2"]))
     print()
     return 0
 
@@ -713,9 +690,6 @@ def cmd_doctor(args: argparse.Namespace, settings: Settings, progress: Progress,
     checks.append(("python", sys.version_info >= (3, 9), sys.version.split()[0]))
     checks.append(("state dir", state_dir.is_dir(), str(state_dir)))
     checks.append(("config dir", _config_dir().is_dir(), str(_config_dir())))
-    provider = find_provider()
-    checks.append(("pronunciation", provider is not None,
-                   " ".join(provider) if provider else "no TTS binary found"))
     checks.append(("herdr cli", herdr.herdr_bin() is not None,
                    herdr.herdr_bin() or "herdr not on PATH"))
     books = available_books(state_dir)
@@ -749,8 +723,6 @@ def build_parser() -> argparse.ArgumentParser:
     drill.add_argument("-m", "--mode", choices=MODES, help="训练模式")
     drill.add_argument("-b", "--book", help="词书 id")
     drill.add_argument("-n", "--size", type=int, help="这一组的词数")
-    drill.add_argument("--no-sound", action="store_true", help="关闭发音")
-    drill.add_argument("--accent", choices=("us", "uk"), help="发音口音")
     drill.add_argument("--theme", choices=("auto", "dark", "light"),
                        help="界面配色（默认 auto：读终端背景色）")
     drill.add_argument("--no-color", action="store_true", help="关闭颜色")

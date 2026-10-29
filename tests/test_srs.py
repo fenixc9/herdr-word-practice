@@ -137,14 +137,6 @@ def test_free_mode_shows_the_word_like_follow():
     assert session.prompt_variant() == "follow"
 
 
-def test_plan_favorites_mode_only_favorites():
-    words = [word(f"w{i}") for i in range(6)]
-    states = {words[2].key: srs.WordState(fav=True)}
-    plan = srs.plan_session(srs.PlanRequest(
-        words=words, states=states, mode="favorites", size=4, now=0))
-    assert [item.key for item in plan] == [words[2].key]
-
-
 def test_plan_is_deterministic_for_a_seed():
     words = [word(f"w{i}") for i in range(30)]
     first = srs.plan_session(srs.PlanRequest(words=words, states={}, mode="smart",
@@ -165,12 +157,10 @@ def test_plan_avoids_mastered_words_in_follow_modes():
 @pytest.mark.parametrize("mode", srs.MODES)
 def test_every_mode_plans_without_crashing(mode):
     words = [word(f"w{i}") for i in range(15)]
-    states = {words[0].key: srs.WordState(fav=True)}
-    plan = srs.plan_session(srs.PlanRequest(words=words, states=states, mode=mode,
+    plan = srs.plan_session(srs.PlanRequest(words=words, states={}, mode=mode,
                                             size=5, now=0, seed=11))
-    expected = 1 if mode == "favorites" else 5
-    assert len(plan) == expected
-    assert len({item.key for item in plan}) == expected
+    assert len(plan) == 5
+    assert len({item.key for item in plan}) == 5
 
 
 def test_status_counts_and_due_count():

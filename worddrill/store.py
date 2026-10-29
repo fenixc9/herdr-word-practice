@@ -67,10 +67,7 @@ DEFAULT_SETTINGS: dict = {
     "session_size": 10,
     "daily_new_limit": 8,
     "daily_goal": 20,
-    "sound": True,
-    "accent": "us",
     "theme": "auto",
-    "auto_pronounce": True,
     "notify_on_finish": True,
     "nudge": {
         "enabled": True,

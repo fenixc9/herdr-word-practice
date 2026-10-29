@@ -27,8 +27,7 @@ STATUS_LEARNING = "learning"
 STATUS_REVIEW = "review"
 STATUS_MASTERED = "mastered"
 
-MODES = ("smart", "free", "follow", "dictation", "spelling", "selfcheck",
-         "review", "favorites")
+MODES = ("smart", "free", "follow", "dictation", "spelling", "selfcheck", "review")
 
 MODE_LABELS = {
     "smart": "智能复习",
@@ -38,7 +37,6 @@ MODE_LABELS = {
     "spelling": "看中文拼写",
     "selfcheck": "自测",
     "review": "错词本",
-    "favorites": "收藏夹",
 }
 
 MODE_HINTS = {
@@ -49,7 +47,6 @@ MODE_HINTS = {
     "spelling": "只给中文释义，凭记忆拼出英文。",
     "selfcheck": "看见单词先自问：认识、模糊，还是完全不认识。",
     "review": "只练之前拼错过的词。",
-    "favorites": "只练你收藏的词。",
 }
 
 
@@ -69,7 +66,6 @@ class WordState:
     status: str = STATUS_NEW
     correct: int = 0
     wrong: int = 0
-    fav: bool = False
     hint_used: int = 0
     streak: int = 0
 
@@ -91,7 +87,6 @@ class WordState:
         } else STATUS_NEW
         state.correct = int(raw.get("correct", 0) or 0)
         state.wrong = int(raw.get("wrong", 0) or 0)
-        state.fav = bool(raw.get("fav", False))
         state.hint_used = int(raw.get("hint_used", 0) or 0)
         state.streak = int(raw.get("streak", 0) or 0)
         return state
@@ -102,7 +97,7 @@ class WordState:
             "ease": round(self.ease, 3), "interval": round(self.interval, 3),
             "due": round(self.due, 3), "last": round(self.last, 3),
             "first_seen": round(self.first_seen, 3), "status": self.status,
-            "correct": self.correct, "wrong": self.wrong, "fav": self.fav,
+            "correct": self.correct, "wrong": self.wrong,
             "hint_used": self.hint_used, "streak": self.streak,
         }
 
@@ -205,11 +200,6 @@ def plan_session(request: PlanRequest) -> list[Word]:
     if mode == "free":
         # No schedule, no budgets: a random handful of this book, nothing more.
         pool = list(candidates)
-        rng.shuffle(pool)
-        return pool[:size]
-
-    if mode == "favorites":
-        pool = [w for w in candidates if state_of(w).fav]
         rng.shuffle(pool)
         return pool[:size]
 

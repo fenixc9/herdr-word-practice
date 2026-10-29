@@ -12,7 +12,7 @@ from worddrill.srs import WordState  # noqa: E402
 
 def test_progress_roundtrip(tmp_path):
     progress = store.Progress.load(tmp_path)
-    state = WordState(reps=2, correct=2, status="review", due=99.0, fav=True)
+    state = WordState(reps=2, correct=2, status="review", due=99.0)
     progress.set_word_state("b:cache", state)
     progress.record_answer("b:cache", correct=True, elapsed=3.5, was_new=True,
                            now=100.0)
@@ -21,7 +21,7 @@ def test_progress_roundtrip(tmp_path):
 
     reloaded = store.Progress.load(tmp_path)
     again = reloaded.word_state("b:cache")
-    assert again.reps == 2 and again.fav is True
+    assert again.reps == 2 and again.correct == 2
     assert reloaded.day(now=100.0)["correct"] == 1
     assert reloaded.day(now=100.0)["new"] == 1
     assert reloaded.day(now=100.0)["sessions"] == 1

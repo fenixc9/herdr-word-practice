@@ -120,7 +120,7 @@ def one_word_book(tmp_path, env):
 
 
 def test_typing_the_word_records_progress(one_word_book, env):
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
     try:
         screen = tui.read_until(lambda text: "cache" in text)
         assert "cache" in screen, f"card never rendered:\n{screen}"
@@ -147,8 +147,7 @@ def test_typing_the_word_records_progress(one_word_book, env):
 
 
 def test_correct_typing_auto_advances(one_word_book, env):
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "dictation",
-                    "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "dictation"])
     try:
         screen = tui.read_until(lambda text: "_ _ _ _ _" in text)
         assert "_ _ _ _ _" in screen, f"masked prompt missing:\n{screen}"
@@ -173,8 +172,7 @@ def test_correct_typing_auto_advances(one_word_book, env):
 
 
 def test_hint_key_reveals_a_prefix(one_word_book, env):
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "spelling",
-                    "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "spelling"])
     try:
         tui.read_until(lambda text: "_ _ _ _ _" in text)
         tui.send("\t")
@@ -187,7 +185,7 @@ def test_hint_key_reveals_a_prefix(one_word_book, env):
 
 
 def test_quit_leaves_state_writable(one_word_book, env):
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
     try:
         tui.read_until(lambda text: "cache" in text)
         tui.send("\x1b")
@@ -222,7 +220,7 @@ def test_enter_on_summary_starts_another_session(tmp_path, env):
                    cwd=str(ROOT), env=env, check=True, capture_output=True)
     progress_path = tmp_path / "state" / "progress.json"
 
-    tui = Tui(env, ["drill", "-b", "five", "-n", "2", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "five", "-n", "2", "-m", "follow"])
     try:
         card = tui.read_until(lambda text: any(w in text for w in words))
         first_word = next(w for w in words if w in card)
@@ -294,7 +292,7 @@ def test_background_probe_switches_the_palette(tmp_path, env):
 
 def test_escape_quits_promptly(one_word_book, env):
     """Esc must not dawdle: the whole point is dropping in and out."""
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
     try:
         tui.read_until(lambda text: "cache" in text)
         started = time.time()
@@ -314,7 +312,7 @@ def test_partial_typing_is_visible_immediately(one_word_book, env):
     Regression: the redraw was skipped whenever the terminal size had not
     changed, so keystrokes were invisible until auto-submit.
     """
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
     try:
         tui.read_until(lambda text: "cache" in text)
         for char in "cac":
@@ -337,7 +335,7 @@ def test_ctrl_b_switches_wordbook(tmp_path, env):
         subprocess.run([sys.executable, str(MAIN), "import", str(source), "--use"],
                        cwd=str(ROOT), env=env, check=True, capture_output=True)
 
-    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
     try:
         tui.read_until(lambda text: "cache" in text)
         tui.send("\x02")                       # Ctrl+B
@@ -357,3 +355,20 @@ def test_ctrl_b_switches_wordbook(tmp_path, env):
 
     settings = json.loads((tmp_path / "config" / "settings.json").read_text())
     assert settings["book"] == "two", "the choice must persist"
+
+
+def test_ctrl_k_marks_the_word_mastered(one_word_book, env):
+    """Ctrl+M is indistinguishable from Enter in a terminal, so it is Ctrl+K."""
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        tui.send("\x0b")                     # Ctrl+K
+        time.sleep(0.3)
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()
+
+    progress = json.loads(one_word_book.read_text())
+    state = progress["words"]["one:cache"]
+    assert state["status"] == "mastered", state

@@ -70,10 +70,7 @@ HELP_LINES = [
     ("Tab", "提示下一个字母"),
     ("Enter", "提交 / 下一张"),
     ("Esc", "退出（自动保存）"),
-    ("Ctrl+R", "重播发音"),
-    ("Ctrl+F", "收藏 / 取消收藏"),
-    ("Ctrl+M", "标记为已掌握"),
-    ("Ctrl+S", "静音开关"),
+    ("Ctrl+K", "标记为已掌握"),
     ("Ctrl+B", "切换词书"),
     ("?", "打开这个帮助"),
     ("1-4", "自测模式：不认识 / 模糊 / 认识 / 太简单"),
@@ -161,7 +158,7 @@ def _fit(painter: Painter, limit: int) -> None:
 
 def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
                  *, streak: int = 0, today_count: int = 0, daily_goal: int = 0,
-                 sound_on: bool = True, help_open: bool = False,
+                 help_open: bool = False,
                  message: str = "", books=None, book_id: str = "",
                  book_menu: bool = False, book_cursor: int = 0) -> list[str]:
     painter = Painter(width, height, theme)
@@ -207,7 +204,7 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
 
     _fit(painter, height - 3)
     bottom_rule(painter)
-    _render_status(painter, session, today_count, daily_goal, sound_on)
+    _render_status(painter, session, today_count, daily_goal)
     _render_keys(painter, session, variant)
     return painter.render()
 
@@ -399,7 +396,7 @@ def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
 
 
 def _render_status(painter: Painter, session: DrillSession, today_count: int,
-                   daily_goal: int, sound_on: bool) -> None:
+                   daily_goal: int) -> None:
     theme = painter.theme
     done = len(session.answers)
     correct = sum(1 for a in session.answers if a.correct)
@@ -417,8 +414,7 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
            else theme.paint("-", "surface2"))
     goal = theme.paint(f"今日 {today_count}/{daily_goal}", "blue") if daily_goal else ""
     elapsed = theme.paint(_format_clock(session.elapsed), "overlay1")
-    mute = theme.paint("🔊", "teal") if sound_on else theme.paint("🔇", "surface2")
-    parts = [part for part in (progress_bar, percent, stats, acc, goal, elapsed, mute)
+    parts = [part for part in (progress_bar, percent, stats, acc, goal, elapsed)
              if part]
     # Drop whole segments from the right instead of slicing a CJK glyph in half.
     budget = painter.width - 2
@@ -436,13 +432,12 @@ def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
     if session.phase == "done":
         keys = [("⏎", "再来一组"), ("⇥", "进度"), ("esc/⌃c", "退出")]
     elif session.phase == "result":
-        keys = [("⏎", "下一张"), ("⌃r", "发音"), ("⌃f", "收藏"), ("esc/⌃c", "退出")]
+        keys = [("⏎", "下一张"), ("⌃k", "掌握"), ("esc/⌃c", "退出")]
     elif variant == "selfcheck":
-        keys = [("1-4", "自评"), ("⌃r", "发音"), ("⌃f", "收藏"), ("?", "帮助"),
-                ("esc/⌃c", "退出")]
+        keys = [("1-4", "自评"), ("⌃b", "词书"), ("?", "帮助"), ("esc/⌃c", "退出")]
     else:
-        keys = [("⏎", "提交"), ("⇥", "提示"), ("⌃r", "发音"), ("⌃f", "收藏"),
-                ("⌃m", "掌握"), ("?", "帮助"), ("esc/⌃c", "退出")]
+        keys = [("⏎", "提交"), ("⇥", "提示"), ("⌃k", "掌握"), ("⌃b", "词书"),
+                ("?", "帮助"), ("esc/⌃c", "退出")]
     budget = painter.width - 6          # "╰─ " + " ─╯"
     sep = theme.paint("  |  ", "surface2")
 
@@ -548,8 +543,6 @@ def _render_books(painter: Painter, books, current: str, cursor: int) -> list[st
 
 def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     hint = {
-        "favorites": ("收藏夹还是空的",
-                      "练到喜欢的词时按 Ctrl+F 收藏，之后就能在这里专练它。"),
         "review": ("错词本是空的",
                    "拼错的单词会自动进错词本，先随便练一组吧。"),
     }.get(session.mode, ("这个词书暂时没有可练的单词",
@@ -565,7 +558,7 @@ def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     centered(painter, "换词书：  words books", "overlay1")
     _fit(painter, painter.height - 3)
     bottom_rule(painter)
-    _render_status(painter, session, 0, 0, True)
+    _render_status(painter, session, 0, 0)
     frame_footer(painter, [("esc/⌃c", "退出")])
     return painter.render()
 
@@ -581,11 +574,7 @@ class Keys:
     BACKSPACE = "backspace"
     DELETE = "delete"
     CTRL_C = "ctrl-c"
-    CTRL_R = "ctrl-r"
-    CTRL_F = "ctrl-f"
-    CTRL_M = "ctrl-m"
-    CTRL_S = "ctrl-s"
-    CTRL_L = "ctrl-l"
+    CTRL_K = "ctrl-k"
     CTRL_B = "ctrl-b"
     UP = "up"
     DOWN = "down"
@@ -596,8 +585,7 @@ class Keys:
 KEY_BYTES = {
     b"\x1b": Keys.ESC, b"\r": Keys.ENTER, b"\n": Keys.ENTER, b"\t": Keys.TAB,
     b"\x7f": Keys.BACKSPACE, b"\x08": Keys.BACKSPACE, b"\x03": Keys.CTRL_C,
-    b"\x12": Keys.CTRL_R, b"\x06": Keys.CTRL_F,
-    b"\x13": Keys.CTRL_S, b"\x0c": Keys.CTRL_L, b"\x02": Keys.CTRL_B,
+    b"\x02": Keys.CTRL_B, b"\x0b": Keys.CTRL_K,
 }
 
 ESCAPE_SEQUENCES = {
@@ -740,8 +728,7 @@ class DrillApp:
 
     def __init__(self, session: DrillSession, *, theme: Theme | None = None,
                  streak: int = 0, today_count: int = 0, daily_goal: int = 0,
-                 sound_on: bool = True, on_pronounce=None, on_favorite=None,
-                 on_master=None, on_toggle_sound=None, on_result=None,
+                 on_master=None, on_result=None,
                  autoplay: bool | str = False, input_fd: int | None = None,
                  output=None, palette: str = "auto", books=None,
                  book_id: str = "", on_switch_book=None):
@@ -753,11 +740,7 @@ class DrillApp:
         self.streak = streak
         self.today_count = today_count
         self.daily_goal = daily_goal
-        self.sound_on = sound_on
-        self.on_pronounce = on_pronounce
-        self.on_favorite = on_favorite
         self.on_master = on_master
-        self.on_toggle_sound = on_toggle_sound
         self.on_result = on_result
         self.autoplay = autoplay
         self.help_open = False
@@ -872,26 +855,11 @@ class DrillApp:
         if key == Keys.ESC:
             self.quit = True
             return
-        if key == Keys.CTRL_R:
-            self._pronounce()
-            return
-        if key == Keys.CTRL_F:
-            if self.on_favorite is not None and session.current:
-                fav = self.on_favorite(session.current)
-                self._flash(f"{'已收藏' if fav else '已取消收藏'}  {session.current.word}")
-            return
-        if key == Keys.CTRL_M:
+        if key == Keys.CTRL_K:
             if self.on_master is not None and session.current:
                 self.on_master(session.current)
                 self._flash(f"已标记掌握  {session.current.word}")
             return
-        if key == Keys.CTRL_S:
-            self.sound_on = not self.sound_on
-            if self.on_toggle_sound is not None:
-                self.on_toggle_sound(self.sound_on)
-            self._flash("声音已开" if self.sound_on else "声音已关")
-            return
-
         if session.phase == "done":
             if key == Keys.ENTER and self.on_result is not None:
                 self.on_result(session.result(), "again")
@@ -942,8 +910,6 @@ class DrillApp:
         answer = self.session.last_answer
         if answer is None:
             return
-        if answer.correct:
-            self._pronounce()
         self.flash_until = time.time() + (RESULT_HOLD_OK if answer.correct else RESULT_HOLD_BAD)
         self.today_count += 1
         self._draw(force=True)
@@ -957,10 +923,6 @@ class DrillApp:
                 self._session_end_handled = True
                 self.on_result(self.result, "finish")
         self._draw(force=True)
-
-    def _pronounce(self) -> None:
-        if self.on_pronounce is not None and self.session.current and self.sound_on:
-            self.on_pronounce(self.session.current)
 
     def _flash(self, text: str, color: str = "teal") -> None:
         self.message = text
@@ -1068,7 +1030,7 @@ class DrillApp:
         lines = render_drill(
             self.session, self.theme, width, height,
             streak=self.streak, today_count=self.today_count,
-            daily_goal=self.daily_goal, sound_on=self.sound_on,
+            daily_goal=self.daily_goal,
             help_open=self.help_open, message=self.message,
             books=self.books, book_id=self.book_id,
             book_menu=self.book_menu, book_cursor=self.book_cursor,
