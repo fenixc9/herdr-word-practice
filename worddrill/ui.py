@@ -383,11 +383,14 @@ def _render_status(painter: Painter, session: DrillSession, today_count: int,
     percent = theme.paint(f"{int(session.progress * 100):3d}%", "subtext")
     stats = (theme.paint(f"✓{correct}", "green") + theme.paint("/", "surface2")
              + theme.paint(f"✗{done - correct}", "red"))
-    acc = theme.paint(f"{int(accuracy * 100)}%", "subtext") if done else theme.paint("—", "surface2")
+    acc = (theme.paint(f"{int(accuracy * 100)}%", "subtext") if done
+           else theme.paint("—", "surface2"))
     goal = theme.paint(f"今日 {today_count}/{daily_goal}", "blue") if daily_goal else ""
     elapsed = theme.paint(_format_clock(session.elapsed), "overlay1")
     mute = theme.paint("🔊", "teal") if sound_on else theme.paint("🔇", "surface2")
-    line = "   ".join(part for part in (progress_bar, percent, stats, acc, goal, elapsed, mute) if part)
+    line = "   ".join(
+        part for part in (progress_bar, percent, stats, acc, goal, elapsed, mute)
+        if part)
     painter.add(" " + term.truncate(line, painter.width - 2))
 
 
@@ -459,8 +462,8 @@ def _render_help(painter: Painter, session: DrillSession) -> list[str]:
     frame_footer(painter, [("?", "关闭"), ("esc", "退出")])
     return painter.render()
 
+
 def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
-    theme = painter.theme
     hint = {
         "favorites": ("收藏夹还是空的",
                       "练到喜欢的词时按 Ctrl+F 收藏，之后就能在这里专练它。"),

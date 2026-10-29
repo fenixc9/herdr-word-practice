@@ -54,7 +54,7 @@ def test_wrong_word_waits_for_enter_and_scores_zero():
 
 def test_hint_fills_a_prefix_and_caps_quality():
     session = DrillSession(words=[make_word("deploy")], mode="spelling",
-                          now=Clock())
+                           now=Clock())
     assert session.hint() == "d"
     assert session.typed == "d"
     assert session.hint() == "e"
@@ -104,14 +104,14 @@ def test_advance_walks_through_words_and_finishes():
 
 def test_skip_records_a_miss_and_feeds_review():
     session = DrillSession(words=[make_word("cache")], mode="dictation",
-                          now=Clock())
+                           now=Clock())
     answer = session.skip()
     assert answer is not None and answer.skipped and not answer.correct
 
 
 def test_selfcheck_uses_quality_grades():
     session = DrillSession(words=[make_word("cache")], mode="selfcheck",
-                          now=Clock())
+                           now=Clock())
     assert session.type_char("c") is False, "selfcheck does not accept typing"
     answer = session.self_grade(1)
     assert answer is not None

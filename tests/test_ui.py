@@ -1,15 +1,12 @@
 import sys
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from worddrill import term  # noqa: E402
 from worddrill.data import Word  # noqa: E402
 from worddrill.session import DrillSession  # noqa: E402
-from worddrill.srs import WordState, grade  # noqa: E402
 from worddrill.ui import (DrillApp, Theme, decode_keys, flush_keys,  # noqa: E402
                           render_drill)
 
@@ -158,6 +155,7 @@ def test_app_tolerates_a_pseudofile_stdin(monkeypatch):
 def test_theme_colors_can_be_disabled(monkeypatch):
     monkeypatch.setenv("NO_COLOR", "1")
     assert term.color_supported() is False
+
 
 def test_pronunciation_providers_switch_accent(monkeypatch):
     from worddrill import audio

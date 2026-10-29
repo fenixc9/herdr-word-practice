@@ -103,6 +103,7 @@ def test_import_book_missing_file(tmp_path):
     with pytest.raises(data.WordbookError):
         data.import_book(tmp_path / "nope.csv", tmp_path / "state")
 
+
 def test_phrases_and_roots_are_parsed():
     coding = data.find_book("coding")
     with_phr = [w for w in coding.words if w.phr]

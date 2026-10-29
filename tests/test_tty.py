@@ -177,6 +177,7 @@ def test_quit_leaves_state_writable(one_word_book, env):
     assert not one_word_book.exists() or isinstance(
         json.loads(one_word_book.read_text()), dict)
 
+
 def test_stats_pane_waits_for_enter(tmp_path, env):
     tui = Tui(env, ["stats", "--wait"])
     try:

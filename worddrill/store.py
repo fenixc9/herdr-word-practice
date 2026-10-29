@@ -51,6 +51,7 @@ DEFAULT_SETTINGS: dict = {
         "enabled": True,
         "min_gap_minutes": 45,
         "quiet_hours": [23, 8],
+        "auto_open": False,
     },
 }
 

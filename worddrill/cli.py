@@ -36,8 +36,6 @@ from .data import (
 )
 from .session import DrillSession, SessionResult
 from .srs import (
-    MODE_HINTS,
-    MODE_LABELS,
     MODES,
     PlanRequest,
     WordState,
@@ -54,7 +52,6 @@ from .store import (
     Settings,
     default_config_dir,
     default_state_dir,
-    file_lock,
     prune_words,
 )
 from .ui import DrillApp, Theme
@@ -682,7 +679,8 @@ def cmd_doctor(args: argparse.Namespace, settings: Settings, progress: Progress,
                          indent=1))
     else:
         for name, ok, detail in checks:
-            mark = term.style("ok  ", term.HEX["green"]) if ok else term.style("fail", term.HEX["red"])
+            mark = (term.style("ok  ", term.HEX["green"]) if ok
+                    else term.style("fail", term.HEX["red"]))
             print(f"  {mark} {name:<16}{detail}")
     return 0 if all(ok for _, ok, _ in checks) else 1
 
