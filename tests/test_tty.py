@@ -137,10 +137,8 @@ def test_correct_typing_auto_advances(one_word_book, env):
             time.sleep(0.03)
         summary = tui.read_until(lambda text: "训练完成" in text)
         assert "100%" in summary
-        tui.send("\r")             # "再来一组" from the summary screen
-        tui.read_until(lambda text: "herdr words" in text)
-        tui.send("\x1b")
-        tui.proc.wait(timeout=10)
+        tui.send("\x1b")           # quit straight from the summary screen
+        assert tui.proc.wait(timeout=10) == 0
     finally:
         tui.close()
 
@@ -149,6 +147,9 @@ def test_correct_typing_auto_advances(one_word_book, env):
     assert state["correct"] == 1
     assert state["wrong"] == 0
     assert state["due"] > 0
+    day = list(progress["days"].values())[0]
+    assert day["correct"] == 1
+    assert day["sessions"] == 1, "finishing a session is counted"
 
 
 def test_hint_key_reveals_a_prefix(one_word_book, env):
@@ -187,3 +188,22 @@ def test_stats_pane_waits_for_enter(tmp_path, env):
         assert tui.proc.wait(timeout=10) == 0
     finally:
         tui.close()
+
+
+def test_enter_on_summary_starts_another_session(one_word_book, env):
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow", "--no-sound"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        tui.send("cache")
+        tui.read_until(lambda text: "训练完成" in text)
+        tui.send("\r")                      # 再来一组
+        again = tui.read_until(lambda text: "1/1" in text, timeout=8)
+        assert "1/1" in again, f"a new session should start:\n{again}"
+        tui.send("\x1b")
+        tui.proc.wait(timeout=10)
+    finally:
+        tui.close()
+    progress = json.loads(one_word_book.read_text())
+    day = list(progress["days"].values())[0]
+    assert day["sessions"] >= 2, "finishing and restarting are both counted"
+    assert progress["words"]["one:cache"]["correct"] == 1
