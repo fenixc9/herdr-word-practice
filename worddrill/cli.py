@@ -727,6 +727,107 @@ def cmd_startup(args: argparse.Namespace, settings: Settings, progress: Progress
     return 0
 
 
+SETUP_MARKER = "# word-practice: 在 vibe coding 的间隙背单词"
+KEYBLOCK = f"""{SETUP_MARKER}（prefix+w 打开一组，约 90 秒）。
+[[keys.command]]
+key = "prefix+w"
+type = "plugin_action"
+command = "herdr-word-practice.drill"
+description = "背单词"
+
+[[keys.command]]
+key = "prefix+shift+w"
+type = "plugin_action"
+command = "herdr-word-practice.dictation"
+description = "背单词：默写"
+
+[[keys.command]]
+key = "prefix+alt+w"
+type = "plugin_action"
+command = "herdr-word-practice.stats"
+description = "背单词：学习进度"
+"""
+
+
+def _plugin_root() -> Path:
+    """The checkout herdr is running us from (works for link and GitHub install)."""
+    return Path(__file__).resolve().parent.parent
+
+
+def _herdr_config() -> Path:
+    explicit = os.environ.get("HERDR_CONFIG")
+    if explicit:
+        return Path(explicit).expanduser()
+    home = os.environ.get("XDG_CONFIG_HOME")
+    base = Path(home) if home else Path.home() / ".config"
+    return base / "herdr" / "config.toml"
+
+
+def cmd_setup(args: argparse.Namespace, settings: Settings, progress: Progress,
+              state_dir: Path) -> int:
+    """Wire the plugin into herdr: keybindings, the `words` command, reload.
+
+    Everything here is idempotent, so `herdr plugin action invoke
+    herdr-word-practice.setup` is safe to run again after an update.
+    """
+    root = _plugin_root()
+    config = _herdr_config()
+    bin_dir = Path(os.environ.get("WORDS_BIN_DIR", "~/.local/bin")).expanduser()
+    steps: list[str] = []
+    dry = bool(getattr(args, "dry_run", False))
+
+    # 1. keybindings
+    try:
+        text = config.read_text(encoding="utf-8")
+    except OSError:
+        text = ""
+    if SETUP_MARKER in text:
+        steps.append(f"键位: 已配置，跳过 ({config})")
+    else:
+        if not dry:
+            config.parent.mkdir(parents=True, exist_ok=True)
+            with config.open("a", encoding="utf-8") as handle:
+                handle.write(("\n" if text and not text.endswith("\n") else "") + KEYBLOCK)
+        steps.append(f"键位: 追加 prefix+w / prefix+shift+w / prefix+alt+w -> {config}")
+
+    # 2. the `words` command
+    target = root / "scripts" / "words"
+    link = bin_dir / "words"
+    on_path = str(bin_dir) in os.environ.get("PATH", "").split(os.pathsep)
+    if link.is_symlink() and Path(os.path.realpath(link)) == Path(os.path.realpath(target)):
+        steps.append(f"words 命令: 已指向 {target}")
+    else:
+        if not dry:
+            bin_dir.mkdir(parents=True, exist_ok=True)
+            if link.is_symlink() or link.exists():
+                link.unlink()
+            link.symlink_to(target)
+        steps.append(f"words 命令: 链接 {link} -> {target}")
+    if not on_path:
+        # Never edit the user's shell startup files — just say what to add.
+        steps.append(f"注意: {bin_dir} 不在 PATH 里，加一行即可: "
+                     f'export PATH="{bin_dir}:$PATH"')
+
+    # 3. reload so the keybindings take effect
+    if not dry:
+        reloaded = herdr.run_herdr_raw(["server", "reload-config"])
+        ok = bool(reloaded) and not isinstance(reloaded.get("error"), dict)
+        steps.append("重载配置: " + ("ok" if ok else "失败，手动跑 herdr server reload-config"))
+
+    if args.json:
+        print(json.dumps({"root": str(root), "config": str(config),
+                          "steps": steps, "dry_run": dry}, ensure_ascii=False,
+                         indent=1))
+        return 0
+    print()
+    for step in steps:
+        print(f"  {step}")
+    print()
+    print("装好了: 在 herdr 里按 prefix+w 开始（第一次会开一个卡片窗格）。")
+    print("其他命令: words books / words stats / words settings / words doctor")
+    return 0
+
+
 def cmd_doctor(args: argparse.Namespace, settings: Settings, progress: Progress,
                state_dir: Path) -> int:
     checks: list[tuple[str, bool, str]] = []
@@ -825,9 +926,15 @@ def build_parser() -> argparse.ArgumentParser:
     open_pane.add_argument("--json", action="store_true")
     open_pane.set_defaults(func=cmd_open_pane)
 
+    setup = sub.add_parser("setup", help="把插件接进 herdr（键位 + words 命令 + 重载）")
+    setup.add_argument("--dry-run", action="store_true", help="只打印将要做什么")
+    setup.add_argument("--json", action="store_true")
+
     doctor = sub.add_parser("doctor", help="自检环境")
     doctor.add_argument("--json", action="store_true")
     doctor.set_defaults(func=cmd_doctor)
+
+    setup.set_defaults(func=cmd_setup)
     return parser
 
 

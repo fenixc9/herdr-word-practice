@@ -68,46 +68,53 @@
 
 | 依赖 | 版本 | 检查 |
 | --- | --- | --- |
-| herdr | `>= 0.9.0` | `herdr --version` |
+| herdr | `>= 0.9.1` | `herdr --version` |
 | Python | `>= 3.9` | `python3 --version` |
 
-不需要 `pip install` 任何东西——只用标准库。
+不需要 `pip install` 任何东西——只用标准库，没有构建步骤。
 
-### 一条命令安装
+### 从 GitHub 安装（推荐）
 
-```bash
-git clone https://github.com/fenixc9/herdr-word-practice.git
-cd herdr-word-practice
-./scripts/install.sh
-```
-
-脚本做四件事（**幂等**，可以反复跑）：
-
-1. `herdr plugin link` —— 把插件注册给 herdr
-2. 把 `scripts/words` 软链到 `~/.local/bin/words`（命令行入口）
-3. 往 `~/.config/herdr/config.toml` 追加三个键位（已存在则跳过）
-4. `herdr server reload-config` + 跑一次 `words doctor` 自检
-
-先看看会改动什么：
+用 herdr 原生的插件安装：
 
 ```bash
-./scripts/install.sh --dry-run
+herdr plugin install fenixc9/herdr-word-practice --ref main
 ```
 
-装完按 **`prefix+w`** 就能开始。
-
-### 手工安装（不想跑脚本）
+然后一条命令完成剩下的接线（写入键位、把 `words` 命令挂到 PATH、重载配置）：
 
 ```bash
-git clone https://github.com/fenixc9/herdr-word-practice.git
-cd herdr-word-practice
-
-herdr plugin link .                        # 注册插件
-ln -s "$PWD/scripts/words" ~/.local/bin/words   # 命令行入口（可选）
-herdr server reload-config
+herdr plugin action invoke herdr-word-practice.setup
 ```
 
-键位写进 `~/.config/herdr/config.toml`：
+就这两条。按 **`prefix+w`** 开始背。
+
+`setup` 是幂等的，**升级后再跑一次**即可：
+
+```bash
+herdr plugin update herdr-word-practice
+herdr plugin action invoke herdr-word-practice.setup
+```
+
+想固定到某个 commit：
+
+```bash
+herdr plugin install fenixc9/herdr-word-practice --ref <COMMIT_SHA>
+```
+
+### 不用 keybinding 也能开
+
+```bash
+# 直接开一个训练窗格
+herdr plugin pane open --plugin herdr-word-practice --entrypoint break
+
+# 或者跑某个动作（drill / follow / dictation / spelling / selfcheck / quiz / review / stats）
+herdr plugin action invoke herdr-word-practice.drill
+```
+
+### 手工写键位
+
+`setup` 干的就是这件事；想自己控制就手动加进 `~/.config/herdr/config.toml`：
 
 ```toml
 [[keys.command]]
@@ -129,20 +136,48 @@ command = "herdr-word-practice.stats"
 description = "背单词：学习进度"
 ```
 
-接着 `herdr server reload-config`。
+然后 `herdr server reload-config`。
+
+### 用 `words` 命令
+
+`setup` 会把 `words` 软链到 `~/.local/bin/words`（指向插件安装目录里的 `scripts/words`）。
+如果那个目录不在 PATH 里，加一行就好：
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+不想用命令行入口也行，所有功能都能通过上面的 herdr 动作到达；`words` 只是让
+`books` / `stats` / `settings` / `import` 这些一次性操作更顺手。
 
 ### 不用 herdr 也能用
 
-界面是纯 ANSI 的，任何终端都行：
+界面是纯 ANSI 的，任何终端都行——适合先看看长什么样：
 
 ```bash
-python3 main.py drill              # 或者装好后直接 words drill
+git clone https://github.com/fenixc9/herdr-word-practice.git
+cd herdr-word-practice
+python3 main.py drill
 ```
+
+### 开发模式（改代码立刻看效果）
+
+想让 herdr 直接跑你本地的 checkout，用 `link` 而不是 GitHub 安装：
+
+```bash
+git clone https://github.com/fenixc9/herdr-word-practice.git
+cd herdr-word-practice
+./scripts/install.sh            # = herdr plugin link . + words setup
+./scripts/install.sh --dry-run  # 先看会改什么
+```
+
+两者不要同时用：同一 id 只能有一个来源，切换前先
+`herdr plugin unlink herdr-word-practice` 或 `herdr plugin uninstall herdr-word-practice`。
 
 ### 卸载
 
 ```bash
-herdr plugin unlink herdr-word-practice
+herdr plugin uninstall herdr-word-practice     # GitHub 安装的版本
 rm -f ~/.local/bin/words
 rm -rf ~/.local/state/herdr/plugins/herdr-word-practice    # 进度也会删掉
 # 键位留在 config.toml 里，不需要就删掉那三块 [[keys.command]]
@@ -151,12 +186,11 @@ rm -rf ~/.local/state/herdr/plugins/herdr-word-practice    # 进度也会删掉
 ### 更新
 
 ```bash
-cd herdr-word-practice && git pull && ./scripts/install.sh
+herdr plugin update herdr-word-practice
+herdr plugin action invoke herdr-word-practice.setup   # 有新键位时才需要
 ```
 
 进度存在 state 目录里，更新不会丢。
-
----
 
 ## 使用
 

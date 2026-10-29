@@ -17,8 +17,8 @@
 
 id = "herdr-word-practice"
 name = "Word Practice"
-version = "1.0.0"
-min_herdr_version = "0.9.0"
+version = "1.1.0"
+min_herdr_version = "0.9.1"
 description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a split pane, with typing recall, phonetics, and 7000+ bundled words."
 platforms = ["linux", "macos"]
 
@@ -63,6 +63,15 @@ command = ["python3", "main.py", "stats", "--wait"]
 #
 # Each mode gets its own action id so a single key can jump straight into
 # dictation or self-test without a menu.
+# One-shot wiring after install: append the keybindings, put `words` on PATH
+# (a symlink into this checkout), and reload the server. Idempotent, so it is
+# safe to run again after `herdr plugin update`.
+[[actions]]
+id = "setup"
+title = "Words: 完成安装（键位 + words 命令）"
+description = "写入 prefix+w 键位、链接 words 命令、重载配置。可重复执行"
+command = ["python3", "main.py", "setup"]
+
 [[actions]]
 id = "drill"
 title = "Words: 开始背单词"
