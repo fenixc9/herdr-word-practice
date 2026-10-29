@@ -175,3 +175,15 @@ def test_quit_leaves_state_writable(one_word_book, env):
         tui.close()
     assert not one_word_book.exists() or isinstance(
         json.loads(one_word_book.read_text()), dict)
+
+def test_stats_pane_waits_for_enter(tmp_path, env):
+    tui = Tui(env, ["stats", "--wait"])
+    try:
+        screen = tui.read_until(lambda text: "最近 7 天" in text)
+        assert "记忆状态" in screen
+        assert "最近 7 天" in screen
+        assert "待复习" in screen
+        tui.send("\r")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()
