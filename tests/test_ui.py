@@ -22,6 +22,8 @@ def session_for(words, mode="follow") -> DrillSession:
 
 
 def frame(session, width=80, height=24, **kwargs):
+    kwargs.setdefault("book_name", "测试词书")
+    kwargs.setdefault("total_words", 340)
     return render_drill(session, Theme(), width, height, **kwargs)
 
 
@@ -199,3 +201,40 @@ def test_footer_corner_sits_on_the_frame_edge():
         assert term.text_width(footer) == width
         # the corner must be the last cell, i.e. directly under the header's ╮
         assert term.text_width(lines[0]) == width
+
+
+def test_status_bar_shows_today_total_and_book():
+    session = session_for([make_word("cache"), make_word("deploy")], mode="follow")
+    session.typed = "cache"
+    session.submit()
+    session.advance()
+    text = term.strip_ansi("\n".join(
+        frame(session, width=76, height=18, streak=3, today_count=8,
+              daily_goal=20))).splitlines()[-2]
+    assert "今日 8/20" in text
+    assert "累计 340 词" in text
+    assert "CET-4 核心" in text or "测试词书" in text
+    assert term.text_width(text) == 76
+
+
+def test_status_bar_drops_the_tail_not_the_numbers():
+    session = session_for([make_word()])
+    for width in (44, 50, 60):
+        text = term.strip_ansi("\n".join(
+            frame(session, width=width, height=18, today_count=8,
+                  daily_goal=20))).splitlines()[-2]
+        assert "今日 8/20" in text, f"today count lost at width {width}: {text!r}"
+        assert "累计" in text, f"total lost at width {width}: {text!r}"
+
+
+def test_status_bar_never_slices_a_segment():
+    """Every segment is dropped whole; nothing is cut mid-glyph."""
+    session = session_for([make_word("illustrate")])
+    for width in range(40, 121, 2):
+        lines = frame(session, width=width, height=18,
+                      today_count=12, daily_goal=20)
+        row = term.strip_ansi(lines[-2])
+        assert term.text_width(row) == width, f"ragged row at width {width}: {row!r}"
+        assert row.endswith("│")
+        for clock in ("00:0", "00:"):
+            assert not row.rstrip("│ ").endswith(clock), f"cut clock at {width}: {row!r}"

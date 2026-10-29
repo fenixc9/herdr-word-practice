@@ -326,6 +326,10 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         app.set_books(book_entries, active.id, active.name)
         app.restart(fresh, streak=new_streak, today_count=new_today)
 
+    def stats_snapshot() -> tuple[int, int]:
+        """(今天练过的不同单词数, 累计练过的不同单词数), live from progress."""
+        return progress.words_today(), progress.distinct_words()
+
     def on_quiz() -> None:
         """Start a short quiz right now, without leaving the drill."""
         fresh = build_session(settings, progress, book, "quiz",
@@ -341,7 +345,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         autoplay=args.autoplay, palette=palette_mode,
         books=book_entries, book_id=book.id, on_switch_book=on_switch_book,
         book_name=book.name, quiz_prefix=getattr(session, "quiz_prefix", 0),
-        on_quiz=on_quiz,
+        on_quiz=on_quiz, stats=stats_snapshot,
     )
     holder["app"] = app
     try:

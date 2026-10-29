@@ -191,6 +191,11 @@ class Progress:
         now = time.time() if now is None else now
         return time.strftime("%Y-%m-%d", time.localtime(now))
 
+    @staticmethod
+    def _day_start(day: str) -> float:
+        """Local midnight of a ``YYYY-MM-DD`` key, as an epoch timestamp."""
+        return time.mktime(time.strptime(day, "%Y-%m-%d"))
+
     def day(self, now: float | None = None) -> dict:
         entry = self.data["days"].setdefault(self.day_key(now), {})
         entry.setdefault("correct", 0)
@@ -202,6 +207,18 @@ class Progress:
 
     def new_today(self, now: float | None = None) -> int:
         return int(self.day(now).get("new", 0))
+
+    def distinct_words(self, since_day: str | None = None) -> int:
+        """How many different words were practised (optionally since ``since_day``)."""
+        words = self.data.get("words", {})
+        if since_day is None:
+            return len(words)
+        start = self._day_start(since_day)
+        return sum(1 for state in words.values()
+                   if float(state.get("last", 0) or 0) >= start)
+
+    def words_today(self, now: float | None = None) -> int:
+        return self.distinct_words(self.day_key(now))
 
     def record_answer(self, key: str, correct: bool, elapsed: float,
                       was_new: bool, now: float | None = None) -> None:

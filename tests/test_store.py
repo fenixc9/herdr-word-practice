@@ -7,7 +7,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from worddrill import store  # noqa: E402
-from worddrill.srs import WordState  # noqa: E402
+from worddrill.srs import WordState, grade  # noqa: E402
+
+Progress = store.Progress
 
 
 def test_progress_roundtrip(tmp_path):
@@ -129,3 +131,22 @@ def test_state_dir_uses_xdg_when_no_shared_dir(tmp_path, monkeypatch):
     monkeypatch.delenv("HERDR_PLUGIN_STATE_DIR", raising=False)
     monkeypatch.setenv("XDG_STATE_HOME", str(tmp_path / "state"))
     assert store.default_state_dir() == tmp_path / "state" / "herdr-words"
+
+
+def test_distinct_word_counts(tmp_path):
+    progress = Progress.load(tmp_path / "progress.json")
+    now = time.time()
+    for key in ("b:one", "b:two"):
+        state = progress.word_state(key)
+        grade(state, 4, now=now)
+        progress.set_word_state(key, state)
+
+    assert progress.words_today(now) == 2
+    assert progress.distinct_words() == 2
+
+    old = progress.word_state("b:two")
+    old.last = now - 3 * 86400
+    progress.set_word_state("b:two", old)
+
+    assert progress.words_today(now) == 1, "only words touched today count"
+    assert progress.distinct_words() == 2, "the lifetime total keeps them"

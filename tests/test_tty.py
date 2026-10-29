@@ -372,3 +372,21 @@ def test_ctrl_k_marks_the_word_mastered(one_word_book, env):
     progress = json.loads(one_word_book.read_text())
     state = progress["words"]["one:cache"]
     assert state["status"] == "mastered", state
+
+
+def test_status_bar_counts_grow_after_an_answer(one_word_book, env):
+    """今日 and 累计 must move as soon as an answer is recorded."""
+    tui = Tui(env, ["drill", "-b", "one", "-n", "1", "-m", "follow"])
+    try:
+        start = tui.read_until(lambda text: "累计 0 词" in text, timeout=8)
+        assert "累计 0 词" in start, f"fresh counters missing:\n{start}"
+
+        tui.send("cache")                    # auto-submits
+        after = tui.read_until(lambda text: "累计 1 词" in text, timeout=8)
+        assert "累计 1 词" in after, f"cumulative count did not grow:\n{after}"
+        assert "今日 1" in after, f"today count did not grow:\n{after}"
+
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()

@@ -162,7 +162,8 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
                  help_open: bool = False,
                  message: str = "", books=None, book_id: str = "",
                  book_menu: bool = False, book_cursor: int = 0,
-                 book_name: str = "", quiz_prefix: int = 0) -> list[str]:
+                 book_name: str = "", quiz_prefix: int = 0,
+                 total_words: int = 0) -> list[str]:
     painter = Painter(width, height, theme)
     mode_label = MODE_LABELS.get(session.mode, session.mode)
     if quiz_prefix and session.index < quiz_prefix:
@@ -184,13 +185,13 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
     if book_menu and books:
         return _render_books(painter, books, book_id, book_cursor)
     if not session.words:
-        return _render_empty(painter, session)
+        return _render_empty(painter, session, total_words, book_name)
     if session.phase == "done":
         return _render_summary(painter, session, theme)
 
     word = session.current
     if word is None:
-        return _render_empty(painter, session)
+        return _render_empty(painter, session, total_words, book_name)
 
     variant = session.prompt_variant(word)
     inner = max(8, width - 8)
@@ -213,7 +214,8 @@ def render_drill(session: DrillSession, theme: Theme, width: int, height: int,
 
     _fit(painter, height - 3)
     bottom_rule(painter)
-    _render_status(painter, session, today_count, daily_goal)
+    _render_status(painter, session, today_count, daily_goal,
+                   total_words, book_name)
     _render_keys(painter, session, variant)
     return painter.render()
 
@@ -408,35 +410,49 @@ def _render_verdict(painter: Painter, answer: Answer, inner: int) -> None:
 
 
 def _render_status(painter: Painter, session: DrillSession, today_count: int,
-                   daily_goal: int) -> None:
+                   daily_goal: int, total_words: int = 0,
+                   book_name: str = "") -> None:
+    """One line: progress, today, cumulative, current book, then the rest.
+
+    Segments are dropped from the right when the pane is narrow, so the three
+    numbers the user actually asked for (今日 / 累计 / 词书) come first.
+    """
     theme = painter.theme
     done = len(session.answers)
     correct = sum(1 for a in session.answers if a.correct)
-    accuracy = correct / done if done else 0.0
-    bar_width = max(6, min(20, painter.width // 4))
+    bar_width = max(6, min(18, painter.width // 5))
     if session.total:
         progress_bar = theme.paint(term.bar(session.progress, bar_width), "mauve")
         percent = theme.paint(f"{int(session.progress * 100):3d}%", "subtext")
     else:
         progress_bar = theme.paint("▱" * bar_width, "surface2")
         percent = theme.paint("  -", "subtext")
+
+    goal = (theme.paint(f"今日 {today_count}/{daily_goal} 词", "blue") if daily_goal
+            else theme.paint(f"今日 {today_count} 词", "blue"))
+    total = (theme.paint(f"累计 {total_words} 词", "lavender") if total_words
+             else theme.paint("累计 0 词", "surface2"))
+    # truncate() pads to the requested width; rstrip so the segment stays tight.
+    book = (theme.paint(term.truncate(book_name, max(8, painter.width // 3)).rstrip(),
+                        "teal") if book_name else "")
     stats = (theme.paint(f"✓{correct}", "green") + theme.paint("/", "surface2")
              + theme.paint(f"✗{done - correct}", "red"))
-    acc = (theme.paint(f"{int(accuracy * 100)}%", "subtext") if done
-           else theme.paint("-", "surface2"))
-    goal = theme.paint(f"今日 {today_count}/{daily_goal}", "blue") if daily_goal else ""
     elapsed = theme.paint(_format_clock(session.elapsed), "overlay1")
-    parts = [part for part in (progress_bar, percent, stats, acc, goal, elapsed)
-             if part]
-    # Drop whole segments from the right instead of slicing a CJK glyph in half.
-    budget = painter.width - 2
+    accuracy = (theme.paint(f"{int(correct / done * 100)}%", "subtext") if done
+                else "")
+
+    parts = [part for part in (progress_bar, percent, goal, total, book, stats,
+                               accuracy, elapsed) if part]
+    budget = painter.width - 2          # the two side borders
     kept: list[str] = []
     for part in parts:
-        trial = "   ".join([*kept, part])
+        trial = " " + "  ".join([*kept, part])   # leading space is budgeted too
         if term.text_width(term.strip_ansi(trial)) > budget:
             break
         kept.append(part)
-    painter.add(" " + term.pad("   ".join(kept), budget))
+    body = term.pad(" " + "  ".join(kept), budget)
+    edge = theme.paint("│", "surface2")
+    painter.add(edge + body + edge)
 
 
 def _render_keys(painter: Painter, session: DrillSession, variant: str) -> None:
@@ -553,7 +569,8 @@ def _render_books(painter: Painter, books, current: str, cursor: int) -> list[st
     return painter.render()
 
 
-def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
+def _render_empty(painter: Painter, session: DrillSession, total_words: int = 0,
+                  book_name: str = "") -> list[str]:
     hint = {
         "review": ("错词本是空的",
                    "拼错的单词会自动进错词本，先随便练一组吧。"),
@@ -570,7 +587,7 @@ def _render_empty(painter: Painter, session: DrillSession) -> list[str]:
     centered(painter, "换词书：  words books", "overlay1")
     _fit(painter, painter.height - 3)
     bottom_rule(painter)
-    _render_status(painter, session, 0, 0)
+    _render_status(painter, session, 0, 0, total_words, book_name)
     frame_footer(painter, [("esc/⌃c", "退出")])
     return painter.render()
 
@@ -745,7 +762,7 @@ class DrillApp:
                  autoplay: bool | str = False, input_fd: int | None = None,
                  output=None, palette: str = "auto", books=None,
                  book_id: str = "", on_switch_book=None, book_name: str = "",
-                 quiz_prefix: int = 0, on_quiz=None):
+                 quiz_prefix: int = 0, on_quiz=None, stats=None):
         self.session = session
         self.palette_mode = (palette or "auto").lower()
         if self.palette_mode not in {"dark", "light"}:
@@ -784,6 +801,7 @@ class DrillApp:
         self.book_name = book_name
         self.quiz_prefix = quiz_prefix
         self.on_quiz = on_quiz
+        self._stats = stats          # () -> (today, total_words)
         self.sync_output = _env_flag("WORDS_TUI_SYNC")
 
     def run(self) -> SessionResult | None:
@@ -1049,14 +1067,16 @@ class DrillApp:
         if not force and (width, height) == self._last_size and not self.flash_until:
             return
         self._last_size = (width, height)
+        today, total = self._stats() if self._stats else (self.today_count, 0)
         lines = render_drill(
             self.session, self.theme, width, height,
-            streak=self.streak, today_count=self.today_count,
+            streak=self.streak, today_count=today,
             daily_goal=self.daily_goal,
             help_open=self.help_open, message=self.message,
             books=self.books, book_id=self.book_id,
             book_menu=self.book_menu, book_cursor=self.book_cursor,
             book_name=self.book_name, quiz_prefix=self.quiz_prefix,
+            total_words=total,
         )
         # One self-contained frame: home, paint, erase the rest, done. Sync
         # mode, when enabled, wraps this frame and is closed before returning,
