@@ -238,3 +238,30 @@ def test_status_bar_never_slices_a_segment():
         assert row.endswith("│")
         for clock in ("00:0", "00:"):
             assert not row.rstrip("│ ").endswith(clock), f"cut clock at {width}: {row!r}"
+
+
+def test_hint_counter_counts_presses_not_letters():
+    """`已提示 N` is how often you asked, not how much got revealed."""
+    session = session_for([make_word("implement")], mode="dictation")
+    for char in "impl":
+        session.type_char(char)
+    session.hint()
+
+    text = term.strip_ansi("\n".join(frame(session, width=64, height=19)))
+    assert "已提示 1" in text, text
+    assert "/9" not in text, "the full length does not belong in the counter"
+
+    session.hint()
+    text = term.strip_ansi("\n".join(frame(session, width=64, height=19)))
+    assert "已提示 2" in text, text
+
+
+def test_hint_counter_resets_per_card():
+    session = session_for([make_word("cache"), make_word("deploy")], mode="dictation")
+    session.hint()
+    session.typed = "cache"
+    session.submit()
+    session.advance()
+    assert session.hint_presses == 0
+    text = term.strip_ansi("\n".join(frame(session, width=64, height=19)))
+    assert "已提示" not in text

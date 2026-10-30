@@ -63,7 +63,7 @@ def test_hint_fills_a_prefix_and_caps_quality():
     answer = session.submit()
     assert answer is not None
     assert answer.correct is True
-    assert answer.hints == len("deploy")
+    assert answer.hints == 3, "two Tab presses plus one full reveal"
     assert answer.quality == 3
 
 

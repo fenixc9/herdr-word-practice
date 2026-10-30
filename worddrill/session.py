@@ -69,6 +69,7 @@ class DrillSession:
     index: int = 0
     typed: str = ""
     hints: int = 0
+    hint_presses: int = 0
     phase: str = "typing"  # typing | result | done
     last_answer: Answer | None = None
     answers: list[Answer] = field(default_factory=list)
@@ -162,6 +163,7 @@ class DrillSession:
                 self.typed = word.word[: self.hints]
             return None
         self.hints = reveal
+        self.hint_presses += 1
         # The hint also repairs anything mistyped before the cursor.
         self.typed = word.word[:reveal]
         return word.word[reveal - 1]
@@ -171,6 +173,7 @@ class DrillSession:
         if word is None:
             return ""
         self.hints = len(word.word)
+        self.hint_presses += 1
         self.typed = word.word
         return word.word
 
@@ -186,12 +189,13 @@ class DrillSession:
         if skipped:
             quality = 0
         elif correct:
-            quality = 3 if self.hints else 4
+            quality = 3 if (self.hint_presses or self.hints) else 4
         else:
             quality = 0
         answer = Answer(
             word=word, quality=quality, correct=correct, typed=typed,
-            hints=self.hints, seconds=max(0.0, self.now() - self.word_started),
+            hints=self.hint_presses,
+            seconds=max(0.0, self.now() - self.word_started),
             skipped=skipped,
         )
         self._finish_answer(answer, typed)
@@ -227,6 +231,7 @@ class DrillSession:
         self.index += 1
         self.typed = ""
         self.hints = 0
+        self.hint_presses = 0
         self.last_answer = None
         self.word_started = self.now()
         if self.index >= self.total:

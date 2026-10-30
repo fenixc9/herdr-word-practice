@@ -333,8 +333,10 @@ def _render_input(painter: Painter, session: DrillSession, word: Word) -> None:
     painter.add(" " * left_pad + theme.paint("╰" + "─" * (box_width - 2) + "╯", box_color))
 
     hint_parts = []
-    if session.hints and session.phase == "typing":
-        hint_parts.append(theme.paint(f"已提示 {session.hints}/{len(word.word)}", "peach"))
+    if session.hint_presses and session.phase == "typing":
+        # Just how many times you asked for help — the revealed length is
+        # already visible in the input box.
+        hint_parts.append(theme.paint(f"已提示 {session.hint_presses}", "peach"))
     hint_parts.append(theme.paint(f"{len(word.word)} 个字母", "surface2"))
     painter.add(" " * left_pad + theme.paint("  ", "surface2").join(hint_parts))
 
