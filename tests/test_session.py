@@ -217,3 +217,47 @@ def test_cloze_masks_most_letters_but_keeps_scaffolding():
     assert masked.count("_") > len(word.word) // 2
     assert masked.replace(" ", "").__len__() == 1 + (len(word.word) - 1) * 2 - \
         (len(word.word) - 1)
+
+
+def test_hint_continues_from_the_current_position():
+    """Typing `cac` then Tab must reveal `h`, not restart at the first letter."""
+    session = DrillSession(words=[make_word("cache")], mode="dictation",
+                           now=Clock())
+    for char in "cac":
+        session.type_char(char)
+
+    assert session.hint() == "h"
+    assert session.typed == "cach"
+    assert session.hints == 4
+
+
+def test_hint_finishes_the_word_from_a_partial_prefix():
+    session = DrillSession(words=[make_word("deployment")], mode="dictation",
+                           now=Clock())
+    for char in "deplo":
+        session.type_char(char)
+
+    assert session.hint() == "y"
+    assert session.typed == "deploy"
+    assert session.hint() == "m"
+    assert session.typed == "deploym"
+
+
+def test_hint_repairs_a_wrong_letter_before_the_cursor():
+    session = DrillSession(words=[make_word("cache")], mode="dictation",
+                           now=Clock())
+    session.type_char("c")
+    session.type_char("x")               # wrong at index 1
+
+    assert session.hint() == "a"
+    assert session.typed == "ca", "the hint rewinds to the first mistake"
+
+
+def test_hint_after_the_word_is_fully_revealed_repairs_the_tail():
+    session = DrillSession(words=[make_word("go")], mode="dictation", now=Clock())
+    session.hint()
+    session.hint()                        # both letters revealed
+    session.type_char("x")                # tail mutated behind the reveal
+
+    assert session.hint() is None
+    assert session.typed == "go"

@@ -217,7 +217,7 @@ words drill -b cet6 -n 5           # 换词书、每组 5 个
 | --- | --- |
 | 字母 | 输入；**拼完自动提交**，不用按回车 |
 | `Enter` | 提交 / 下一张 / 完成页再来一组 |
-| `Tab` | 提示下一个字母（用过提示仍算对，但只给「认识」档） |
+| `Tab` | 提示**下一个**字母——从你已经打对的位置往后给，不是从头重来（用过提示仍算对，但只给「认识」档） |
 | `Backspace` | 删一个字母 |
 | `Ctrl+K` | 标记为已掌握（不再出现在智能复习里） |
 | `Ctrl+B` | 切换词书（数字或 ↑↓+⏎ 选，立即切过去） |
@@ -476,7 +476,7 @@ words doctor [--json]
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q                                        # 142 个测试（含真实 pty 端到端）
+python3 -m pytest tests/ -q                                        # 146 个测试（含真实 pty 端到端）
 python3 -m flake8 --max-line-length=100 worddrill/ main.py tests/  # 风格检查
 python3 main.py drill --once --width 76 --height 20 -b coding      # 看渲染
 ```

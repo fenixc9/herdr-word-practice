@@ -132,17 +132,39 @@ class DrillSession:
     def clear_typed(self) -> None:
         self.typed = ""
 
+    def matched_length(self) -> int:
+        """How many leading letters of ``typed`` are actually right."""
+        word = self.current
+        if word is None:
+            return 0
+        count = 0
+        for index, char in enumerate(self.typed):
+            if index < len(word.word) and char.lower() == word.word[index].lower():
+                count += 1
+            else:
+                break
+        return count
+
     def hint(self) -> str | None:
+        """Reveal the next letter, continuing from what is already typed.
+
+        Prefixes are counted from the cursor, not from the start: typing
+        ``cac`` and pressing Tab gives you ``h``, not a third ``c``.
+        """
         word = self.current
         if word is None or self.phase != "typing":
             return None
-        if self.hints >= len(word.word):
+        reveal = max(self.hints, self.matched_length()) + 1
+        if reveal > len(word.word):
+            # Nothing left to reveal, but still repair a mistyped tail so the
+            # hint that is already on screen means something.
+            if self.hints and self.typed != word.word[: self.hints]:
+                self.typed = word.word[: self.hints]
             return None
-        self.hints += 1
-        prefix = word.word[: self.hints]
-        if not self.typed.startswith(prefix):
-            self.typed = prefix
-        return word.word[self.hints - 1]
+        self.hints = reveal
+        # The hint also repairs anything mistyped before the cursor.
+        self.typed = word.word[:reveal]
+        return word.word[reveal - 1]
 
     def reveal(self) -> str:
         word = self.current
