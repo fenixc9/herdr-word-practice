@@ -2,6 +2,19 @@
 
 **在 vibe coding 的间隙背单词。**
 
+> **English:** a [Herdr](https://herdr.dev) plugin for vocabulary drills between coding
+> sessions. Press `prefix+w`, get one card, type the word, `Esc` back to work (~90 s).
+> Spaced repetition (SM-2 variant), typing recall instead of multiple choice, a periodic
+> fill-in-the-blank quiz, per-wordbook review pools, and 7085 bundled words
+> (CET-4 4537 + CET-6 2271 + dev English 277). Pure Python 3, stdlib only, no build step.
+>
+> ```bash
+> herdr plugin install fenixc9/herdr-word-practice --ref main
+> herdr plugin action invoke herdr-word-practice.setup
+> ```
+>
+> Docs below are in Chinese.
+
 一个 [herdr](https://github.com/) 插件：按 `prefix+w`，在当前 tab 里 split 出一张卡片，打一个词，90 秒后按 `Esc` 回到代码。
 
 它借鉴了 [TypeWords](https://github.com/zyronon/TypeWords) 的核心思路——**靠打字回忆，而不是翻看**——

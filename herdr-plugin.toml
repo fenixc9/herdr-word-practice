@@ -19,7 +19,7 @@ id = "herdr-word-practice"
 name = "Word Practice"
 version = "1.1.0"
 min_herdr_version = "0.9.1"
-description = "背单词 during the gaps between coding sessions: a spaced-repetition drill in a split pane, with typing recall, phonetics, and 7000+ bundled words."
+description = "Vocabulary drills between coding sessions: spaced repetition, typing recall and a periodic quiz, with 7085 bundled words (CET-4/6 + dev English)."
 platforms = ["linux", "macos"]
 
 # Prepare state/config directories once per server start, and print a one-line
