@@ -81,13 +81,17 @@ def test_settings_survive_broken_json(tmp_path):
     assert settings.get("book") == "cet4"
 
 
-def test_prune_words_drops_keys_outside_the_book(tmp_path):
+def test_prune_words_only_touches_the_named_book(tmp_path):
+    """Every wordbook owns its review pool: pruning one must not erase another."""
     progress = store.Progress.load(tmp_path)
     progress.set_word_state("cet4:cache", WordState(reps=1))
-    progress.set_word_state("gone:word", WordState(reps=1))
-    removed = store.prune_words(progress, {"cet4:cache"})
-    assert removed == 1
-    assert set(progress.data["words"]) == {"cet4:cache"}
+    progress.set_word_state("cet4:stale", WordState(reps=1))
+    progress.set_word_state("coding:deploy", WordState(reps=1))
+
+    removed = store.prune_words(progress, "cet4", {"cet4:cache"})
+
+    assert removed == 1, "only the vanished cet4 word is dropped"
+    assert set(progress.data["words"]) == {"cet4:cache", "coding:deploy"}
 
 
 def test_reset_clears_everything(tmp_path):
@@ -150,3 +154,29 @@ def test_distinct_word_counts(tmp_path):
 
     assert progress.words_today(now) == 1, "only words touched today count"
     assert progress.distinct_words() == 2, "the lifetime total keeps them"
+
+
+def test_new_word_allowance_is_per_book(tmp_path):
+    progress = Progress.load(tmp_path)
+    now = time.time()
+    progress.record_answer("cet4:cache", True, 1.0, True, now=now)
+    progress.record_answer("cet4:queue", True, 1.0, True, now=now)
+
+    assert progress.new_today(now, book_id="cet4") == 2
+    assert progress.new_today(now, book_id="coding") == 0, "each book has its own budget"
+    assert progress.new_today(now) == 2, "the global total still works"
+
+
+def test_word_counts_are_per_book(tmp_path):
+    progress = Progress.load(tmp_path)
+    now = time.time()
+    for key in ("cet4:cache", "cet4:queue", "coding:deploy"):
+        state = progress.word_state(key)
+        grade(state, 4, now=now)
+        progress.set_word_state(key, state)
+
+    assert progress.words_in_book("cet4") == 2
+    assert progress.words_in_book("coding") == 1
+    assert progress.distinct_words() == 3
+    assert progress.words_today(now, book_id="cet4") == 2
+    assert progress.words_today(now, book_id="coding") == 1

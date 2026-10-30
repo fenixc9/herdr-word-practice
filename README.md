@@ -266,6 +266,17 @@ words settings quiz_size=5             # 每次 5 题
 
 ### 内置词书
 
+**每本词书有独立的复习池。** 进度按 `词书:单词` 记，切词书不会带走、也不会污染另一本：
+
+- 到期队列、错词本、已掌握标记、每日新词额度（`daily_new_limit`）都按词书各算各的
+- 状态栏的「今日 / 累计」跟着当前词书走
+- 「连续天数」是全局的——它是习惯指标，不是某一本书的指标
+
+```bash
+words books                     # 每本书各自的新/学习中/复习/已掌握
+words stats                     # 待复习 = 当前词书
+```
+
 | id | 名称 | 词数 | 内容 |
 | --- | --- | --- | --- |
 | `cet4` | CET-4 核心 | 4537 | 四级大纲全词表 |
@@ -465,7 +476,7 @@ words doctor [--json]
 ## 开发
 
 ```bash
-python3 -m pytest tests/ -q                                        # 139 个测试（含真实 pty 端到端）
+python3 -m pytest tests/ -q                                        # 142 个测试（含真实 pty 端到端）
 python3 -m flake8 --max-line-length=100 worddrill/ main.py tests/  # 风格检查
 python3 main.py drill --once --width 76 --height 20 -b coding      # 看渲染
 ```

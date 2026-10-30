@@ -146,7 +146,7 @@ def _plan(settings: Settings, progress: Progress, book: Wordbook, mode: str,
         size=size or int(settings.get("session_size", 10) or 10),
         now=now,
         daily_new_limit=int(settings.get("daily_new_limit", 8) or 0),
-        new_today=progress.new_today(now),
+        new_today=progress.new_today(now, book.id),
         quiz_count=quiz_count,
     )
     return plan_session(request)
@@ -237,7 +237,7 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
     now = time.time()
     # Drop states for words that no longer exist in this book (renamed book,
     # edited custom wordlist) before planning, not on the exit path.
-    if prune_words(progress, {w.key for w in book.words}):
+    if prune_words(progress, book.id, {w.key for w in book.words}):
         progress.save()
     quiz_count = _quiz_due(settings, progress) if mode == "smart" else 0
     session = build_session(settings, progress, book, mode, size, now=now,
@@ -325,11 +325,17 @@ def cmd_drill(args: argparse.Namespace, settings: Settings, progress: Progress,
         app = holder["app"]
         app.quiz_prefix = getattr(fresh, "quiz_prefix", 0)
         app.set_books(book_entries, active.id, active.name)
+        app.set_stats(lambda: stats_snapshot(active.id))
         app.restart(fresh, streak=new_streak, today_count=new_today)
 
-    def stats_snapshot() -> tuple[int, int]:
-        """(今天练过的不同单词数, 累计练过的不同单词数), live from progress."""
-        return progress.words_today(), progress.distinct_words()
+    def stats_snapshot(book_id: str = book.id) -> tuple[int, int]:
+        """(这本书今天练过的词数, 这本书累计练过的词数), live from progress.
+
+        Each wordbook keeps its own review pool and its own numbers; the streak
+        above stays global because it is a daily habit, not a per-book one.
+        """
+        return (progress.words_today(book_id=book_id),
+                progress.words_in_book(book_id))
 
     def on_quiz() -> None:
         """Start a short quiz right now, without leaving the drill."""
@@ -376,7 +382,9 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
 
     all_words = [w for book in books for w in book.words]
     overall = status_counts(all_words, states)
-    due = due_count(all_words, states, now)
+    # Each wordbook owns its review pool, so "due" is reported per book too.
+    due_by_book = {book.id: due_count(book.words, states, now) for book in books}
+    active_due = due_by_book.get(active, 0)
 
     if args.json:
         payload = {
@@ -384,7 +392,8 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
             "today": today,
             "goal": goal,
             "streak": streak,
-            "due": due,
+            "due": active_due,
+            "due_by_book": due_by_book,
             "status": overall,
             "totals": totals,
             "next_due": next_due_label(states, now),
@@ -413,7 +422,8 @@ def cmd_stats(args: argparse.Namespace, settings: Settings, progress: Progress,
           + term.style(f" v{__version__}", term.HEX["surface2"]))
     print(term.style(_hr(), term.HEX["surface2"]))
     print(f" 今日      {_meter(today, goal)}")
-    print(f" 待复习    {term.style(str(due), term.HEX['peach'])} 个"
+    print(f" 待复习    {term.style(str(active_due), term.HEX['peach'])} 个"
+          f"  {term.style('(当前词书)', term.HEX['surface2'])}"
           f"   {term.style('下一次: ' + next_due_label(states, now), term.HEX['surface2'])}")
     print(f" 连续      {streak} 天    正确率 "
           f"{totals['accuracy'] * 100:.0f}%    累计 {totals['answers']} 次")
@@ -648,14 +658,18 @@ def cmd_event(args: argparse.Namespace, settings: Settings, progress: Progress,
     streak, today = _streak_and_today(progress, now)
     goal = int(settings.get("daily_goal", 20) or 0)
     books = available_books(state_dir)
-    all_words = [w for book in books for w in book.words]
-    due = due_count(all_words, progress.state_map(), now)
+    states = progress.state_map()
+    # The reminder looks at the book you are currently studying.
+    active_book = settings.get("book") or (books[0].id if books else "")
+    current = next((b for b in books if b.id == active_book), None)
+    due = due_count(current.words, states, now) if current else 0
     remaining = max(0, goal - today)
 
     if args.json:
         print(json.dumps({
             "event": event, "status": status, "nudge": ok, "reason": reason,
-            "due": due, "today": today, "goal": goal, "streak": streak,
+            "book": active_book, "due": due, "today": today, "goal": goal,
+            "streak": streak,
         }, ensure_ascii=False))
         if not ok:
             return 0

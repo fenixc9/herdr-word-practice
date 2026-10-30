@@ -205,8 +205,13 @@ class Progress:
         entry.setdefault("sessions", 0)
         return entry
 
-    def new_today(self, now: float | None = None) -> int:
-        return int(self.day(now).get("new", 0))
+    def new_today(self, now: float | None = None, book_id: str | None = None) -> int:
+        """New words introduced today — per book, since each book has its own pool."""
+        entry = self.day(now)
+        if book_id is None:
+            return int(entry.get("new", 0))
+        per_book = entry.get("new_by_book") or {}
+        return int(per_book.get(book_id, 0))
 
     def distinct_words(self, since_day: str | None = None) -> int:
         """How many different words were practised (optionally since ``since_day``)."""
@@ -217,8 +222,19 @@ class Progress:
         return sum(1 for state in words.values()
                    if float(state.get("last", 0) or 0) >= start)
 
-    def words_today(self, now: float | None = None) -> int:
-        return self.distinct_words(self.day_key(now))
+    def words_today(self, now: float | None = None, book_id: str | None = None) -> int:
+        if book_id is None:
+            return self.distinct_words(self.day_key(now))
+        start = self._day_start(self.day_key(now))
+        prefix = f"{book_id}:"
+        return sum(1 for key, state in self.data.get("words", {}).items()
+                   if key.startswith(prefix)
+                   and float(state.get("last", 0) or 0) >= start)
+
+    def words_in_book(self, book_id: str) -> int:
+        """How many words of one book have any progress at all."""
+        prefix = f"{book_id}:"
+        return sum(1 for key in self.data.get("words", {}) if key.startswith(prefix))
 
     def record_answer(self, key: str, correct: bool, elapsed: float,
                       was_new: bool, now: float | None = None) -> None:
@@ -231,6 +247,9 @@ class Progress:
         day["seconds"] = round(float(day.get("seconds", 0.0)) + max(0.0, elapsed), 2)
         if was_new:
             day["new"] += 1
+            book_id = key.split(":", 1)[0]
+            per_book = day.setdefault("new_by_book", {})
+            per_book[book_id] = int(per_book.get(book_id, 0)) + 1
         self.data["meta"]["last_answer"] = now
         self.data["meta"]["last_word"] = key
 
@@ -292,8 +311,16 @@ class Settings:
         atomic_write_json(self.path, self.data)
 
 
-def prune_words(progress: Progress, allowed_keys: set[str]) -> int:
-    stale = [key for key in progress.data["words"] if key not in allowed_keys]
+def prune_words(progress: Progress, book_id: str, allowed_keys: set[str]) -> int:
+    """Drop states for words that vanished from *this* book only.
+
+    Word keys are ``<book_id>:<word>``, and every wordbook owns its own review
+    pool — pruning the whole store here would wipe the other books' progress
+    the moment you switched to them.
+    """
+    prefix = f"{book_id}:"
+    stale = [key for key in progress.data["words"]
+             if key.startswith(prefix) and key not in allowed_keys]
     for key in stale:
         del progress.data["words"][key]
     return len(stale)

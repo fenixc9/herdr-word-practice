@@ -390,3 +390,39 @@ def test_status_bar_counts_grow_after_an_answer(one_word_book, env):
         assert tui.proc.wait(timeout=10) == 0
     finally:
         tui.close()
+
+
+def test_switching_books_keeps_the_other_pool(tmp_path, env):
+    """Book A keeps its progress when you open book B (per-book review pools)."""
+    for book_id, name, word in (("alpha", "A", "cache"), ("beta", "B", "deploy")):
+        source = tmp_path / f"{book_id}.tsv"
+        source.write_text(f"# id={book_id}\n# name={name}\n{word}\t\tn.\t释义\n",
+                          encoding="utf-8")
+        subprocess.run([sys.executable, str(MAIN), "import", str(source)],
+                       cwd=str(ROOT), env=env, check=True, capture_output=True)
+
+    state = tmp_path / "state" / "progress.json"
+
+    tui = Tui(env, ["drill", "-b", "alpha", "-n", "1", "-m", "follow"])
+    try:
+        tui.read_until(lambda text: "cache" in text)
+        tui.send("cache")
+        tui.read_until(lambda text: "正确" in text)
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()
+
+    before = set(json.loads(state.read_text())["words"])
+    assert "alpha:cache" in before
+
+    tui = Tui(env, ["drill", "-b", "beta", "-n", "1", "-m", "follow"])
+    try:
+        tui.read_until(lambda text: "deploy" in text)
+        tui.send("\x1b")
+        assert tui.proc.wait(timeout=10) == 0
+    finally:
+        tui.close()
+
+    after = set(json.loads(state.read_text())["words"])
+    assert "alpha:cache" in after, f"opening book beta erased book alpha: {after}"

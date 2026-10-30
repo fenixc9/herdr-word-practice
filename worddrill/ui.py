@@ -1047,6 +1047,10 @@ class DrillApp:
         if self.on_switch_book is not None:
             self.on_switch_book(book["id"])
 
+    def set_stats(self, stats) -> None:
+        """Point the status bar at another book's counters after a switch."""
+        self._stats = stats
+
     def set_books(self, books, current: str, name: str = "") -> None:
         self.books = list(books)
         self.book_id = current
