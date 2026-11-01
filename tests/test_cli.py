@@ -238,7 +238,7 @@ def test_setup_wires_keybindings_and_the_words_command(env, tmp_path):
     payload = json.loads(first.stdout)
     text = (tmp_path / "config.toml").read_text()
     assert text.count("herdr-word-practice.drill") == 1
-    assert "prefix+shift+w" in text and "prefix+alt+w" in text
+    assert "prefix+shift+i" in text and "prefix+shift+o" in text
 
     link = tmp_path / "bin" / "words"
     assert link.is_symlink()
@@ -246,5 +246,34 @@ def test_setup_wires_keybindings_and_the_words_command(env, tmp_path):
 
     second = json.loads(run(["setup", "--json"], env).stdout)
     assert (tmp_path / "config.toml").read_text() == text, "second run must not duplicate"
-    assert any("已配置" in step for step in second["steps"])
+    assert any("已是最新" in step for step in second["steps"]), second["steps"]
     assert payload["dry_run"] is False
+
+
+def test_setup_migrates_the_old_prefix_w_bindings(env, tmp_path):
+    """`prefix+w` clashes with herdr's workspace picker, so setup rewrites it."""
+    config = tmp_path / "config.toml"
+    config.write_text(
+        '[[keys.command]]\nkey = "prefix+f"\ntype = "plugin_action"\n'
+        'command = "someone-else.action"\ndescription = "keep me"\n\n'
+        '# word-practice: 在 vibe coding 的间隙背单词（prefix+w 打开一组，约 90 秒）。\n'
+        '[[keys.command]]\nkey = "prefix+w"\ntype = "plugin_action"\n'
+        'command = "herdr-word-practice.drill"\ndescription = "背单词"\n\n'
+        '[[keys.command]]\nkey = "prefix+shift+w"\ntype = "plugin_action"\n'
+        'command = "herdr-word-practice.dictation"\ndescription = "背单词：默写"\n\n'
+        '[[keys.command]]\nkey = "prefix+alt+w"\ntype = "plugin_action"\n'
+        'command = "herdr-word-practice.stats"\ndescription = "背单词：学习进度"\n',
+        encoding="utf-8")
+    env["HERDR_CONFIG"] = str(config)
+    env["WORDS_BIN_DIR"] = str(tmp_path / "bin")
+
+    result = run(["setup", "--json"], env)
+    assert result.returncode == 0, result.stderr
+    text = config.read_text()
+
+    assert 'key = "prefix+shift+u"' in text
+    assert 'key = "prefix+w"' not in text, "the clashing binding must be gone"
+    assert 'key = "prefix+alt+w"' not in text
+    assert 'key = "prefix+f"' in text, "user bindings are left alone"
+    assert text.count("# word-practice:") == 1, "no duplicate block"
+    assert text.count("[[keys.command]]") == 4

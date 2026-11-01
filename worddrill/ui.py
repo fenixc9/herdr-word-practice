@@ -538,7 +538,8 @@ def _render_help(painter: Painter, session: DrillSession) -> list[str]:
     painter.blank(1)
     centered(painter, MODE_HINTS.get(session.mode, ""), "overlay1")
     painter.blank(1)
-    centered(painter, "在 Herdr 里按 prefix+w 随时开始；Ctrl+C 也可以退出。", "surface2")
+    centered(painter, "在 Herdr 里按 prefix+shift+u 随时开始；Ctrl+C 也可以退出。",
+             "surface2")
     while len(painter.rows) < painter.height - 1:
         painter.blank(1)
     bottom_rule(painter)

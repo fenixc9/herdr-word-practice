@@ -3,7 +3,7 @@
 **在 vibe coding 的间隙背单词。**
 
 > **English:** a [Herdr](https://herdr.dev) plugin for vocabulary drills between coding
-> sessions. Press `prefix+w`, get one card, type the word, `Esc` back to work (~90 s).
+> sessions. Press `prefix+shift+u`, get one card, type the word, `Esc` back to work (~90 s).
 > Spaced repetition (SM-2 variant), typing recall instead of multiple choice, a periodic
 > fill-in-the-blank quiz, per-wordbook review pools, and 7085 bundled words
 > (CET-4 4537 + CET-6 2271 + dev English 277). Pure Python 3, stdlib only, no build step.
@@ -15,7 +15,7 @@
 >
 > Docs below are in Chinese.
 
-一个 [herdr](https://github.com/) 插件：按 `prefix+w`，在当前 tab 里 split 出一张卡片，打一个词，90 秒后按 `Esc` 回到代码。
+一个 [herdr](https://github.com/) 插件：按 `prefix+shift+u`，在当前 tab 里 split 出一张卡片，打一个词，90 秒后按 `Esc` 回到代码。
 
 它借鉴了 [TypeWords](https://github.com/zyronon/TypeWords) 的核心思路——**靠打字回忆，而不是翻看**——
 再把「间隔重复 + 打字判分 + 音标/例句/词根」压进一个能塞进侧栏的终端界面。
@@ -100,7 +100,7 @@ herdr plugin install fenixc9/herdr-word-practice --ref main
 herdr plugin action invoke herdr-word-practice.setup
 ```
 
-就这两条。按 **`prefix+w`** 开始背。
+就这两条。按 **`prefix+shift+u`** 开始背。
 
 `setup` 是幂等的，**升级后再跑一次**即可：
 
@@ -131,23 +131,27 @@ herdr plugin action invoke herdr-word-practice.drill
 
 ```toml
 [[keys.command]]
-key = "prefix+w"
+key = "prefix+shift+u"
 type = "plugin_action"
 command = "herdr-word-practice.drill"
 description = "背单词"
 
 [[keys.command]]
-key = "prefix+shift+w"
+key = "prefix+shift+i"
 type = "plugin_action"
 command = "herdr-word-practice.dictation"
 description = "背单词：默写"
 
 [[keys.command]]
-key = "prefix+alt+w"
+key = "prefix+shift+o"
 type = "plugin_action"
 command = "herdr-word-practice.stats"
 description = "背单词：学习进度"
 ```
+
+> 为什么是 `shift+u/i/o`：herdr 自己占了 `prefix+w`（workspace picker）和
+> `prefix+shift+w`（rename workspace），字母里只剩 `a d f i m t u y` 没被内置占用。
+> 这组是连续三个键，一个手势就能记住。想换别的，改 `config.toml` 里的 `key =` 即可。
 
 然后 `herdr server reload-config`。
 

@@ -56,7 +56,7 @@ command = ["python3", "main.py", "stats", "--wait"]
 # Bind these in ~/.config/herdr/config.toml:
 #
 #   [[keys.command]]
-#   key = "prefix+w"
+#   key = "prefix+shift+u"
 #   type = "plugin_action"
 #   command = "herdr-word-practice.drill"
 #   description = "背单词"
@@ -69,7 +69,7 @@ command = ["python3", "main.py", "stats", "--wait"]
 [[actions]]
 id = "setup"
 title = "Words: 完成安装（键位 + words 命令）"
-description = "写入 prefix+w 键位、链接 words 命令、重载配置。可重复执行"
+description = "写入 prefix+shift+u/i/o 键位、链接 words 命令、重载配置。可重复执行"
 command = ["python3", "main.py", "setup"]
 
 [[actions]]

@@ -743,25 +743,59 @@ def cmd_startup(args: argparse.Namespace, settings: Settings, progress: Progress
 
 
 SETUP_MARKER = "# word-practice: 在 vibe coding 的间隙背单词"
-KEYBLOCK = f"""{SETUP_MARKER}（prefix+w 打开一组，约 90 秒）。
+# prefix+w and prefix+shift+w are taken by herdr itself (workspace picker and
+# rename-workspace), so the plugin lives on prefix+shift+u/i/o.
+KEYBLOCK = f"""{SETUP_MARKER}（prefix+shift+u 打开一组，约 90 秒）。
 [[keys.command]]
-key = "prefix+w"
+key = "prefix+shift+u"
 type = "plugin_action"
 command = "herdr-word-practice.drill"
 description = "背单词"
 
 [[keys.command]]
-key = "prefix+shift+w"
+key = "prefix+shift+i"
 type = "plugin_action"
 command = "herdr-word-practice.dictation"
 description = "背单词：默写"
 
 [[keys.command]]
-key = "prefix+alt+w"
+key = "prefix+shift+o"
 type = "plugin_action"
 command = "herdr-word-practice.stats"
 description = "背单词：学习进度"
 """
+
+
+# Older setups wrote these bindings; `setup` replaces them in place so people do
+# not end up with two sets of shortcuts (or a clash with herdr's own prefix+w).
+def _legacy_keyblock() -> str:
+    block = KEYBLOCK
+    for new, old in (("prefix+shift+u", "prefix+w"),
+                     ("prefix+shift+i", "prefix+shift+w"),
+                     ("prefix+shift+o", "prefix+alt+w")):
+        block = block.replace(new, old)
+    return block.replace("（prefix+shift+u 打开一组", "（prefix+w 打开一组")
+
+
+LEGACY_KEYBLOCKS = [_legacy_keyblock()]
+
+
+def _replace_marked_block(text: str) -> str:
+    """Rewrite whatever follows the marker line with the current KEYBLOCK."""
+    lines = text.splitlines(keepends=True)
+    start = next((i for i, line in enumerate(lines) if line.startswith(SETUP_MARKER)), None)
+    if start is None:
+        return text.rstrip("\n") + "\n\n" + KEYBLOCK
+    end = start
+    while end < len(lines):
+        line = lines[end]
+        if not (line.startswith("#") or line.startswith("[[keys.command]]")
+                or line.strip() == "" or "=" in line):
+            break
+        end += 1
+    block = KEYBLOCK.splitlines(keepends=True)
+    block[-1] = block[-1] + "\n"
+    return "".join(lines[:start] + block + lines[end:])
 
 
 def _plugin_root() -> Path:
@@ -813,14 +847,27 @@ def cmd_setup(args: argparse.Namespace, settings: Settings, progress: Progress,
         text = config.read_text(encoding="utf-8")
     except OSError:
         text = ""
-    if SETUP_MARKER in text:
-        steps.append(f"键位: 已配置，跳过 ({config})")
+    if KEYBLOCK in text:
+        steps.append(f"键位: 已是最新，跳过 ({config})")
+    elif SETUP_MARKER in text:
+        # An older version bound prefix+w*, which herdr also uses. Swap the
+        # whole block in place instead of appending a second set.
+        replaced = False
+        for legacy in LEGACY_KEYBLOCKS:
+            if legacy in text:
+                if not dry:
+                    config.write_text(text.replace(legacy, KEYBLOCK), encoding="utf-8")
+                replaced = True
+                break
+        if not replaced and not dry:
+            config.write_text(_replace_marked_block(text), encoding="utf-8")
+        steps.append("键位: 已从旧版 prefix+w 更新为 prefix+shift+u / +i / +o")
     else:
         if not dry:
             config.parent.mkdir(parents=True, exist_ok=True)
             with config.open("a", encoding="utf-8") as handle:
                 handle.write(("\n" if text and not text.endswith("\n") else "") + KEYBLOCK)
-        steps.append(f"键位: 追加 prefix+w / prefix+shift+w / prefix+alt+w -> {config}")
+        steps.append(f"键位: 追加 prefix+shift+u / +i / +o -> {config}")
 
     # 2. the `words` command
     target = root / "scripts" / "words"
@@ -855,7 +902,7 @@ def cmd_setup(args: argparse.Namespace, settings: Settings, progress: Progress,
     for step in steps:
         print(f"  {step}")
     print()
-    print("装好了: 在 herdr 里按 prefix+w 开始（第一次会开一个卡片窗格）。")
+    print("装好了: 在 herdr 里按 prefix+shift+u 开始（第一次会开一个卡片窗格）。")
     print("其他命令: words books / words stats / words settings / words doctor")
     return 0
 
